@@ -42,68 +42,35 @@ const dailyArticles = [
     { date: "2025-05-02", start: "ドミニオン (カードゲーム)", goal: "杉崎花" },
 ];
 
-$(document).ready(function() {
-    const formattedDate = getJapanDate();
-    const article = dailyArticles.find(item => item.date === formattedDate);
+$(document).ready(function () {
+    const today = new Date().toISOString().split('T')[0]; // 今日の日付を取得
+    const dailyArticle = dailyArticles.find(article => article.date === today);
 
-    if (article) {
-        $('.rectangleLabel.first').text("最初の記事");
-        $('.rectangleLabel.second').text("目標の記事");
-        $('.rectangle').eq(0).text(article.start);
-        $('.rectangle').eq(1).text(article.goal);
+    if (dailyArticle) {
+        $('.rectangle').eq(0).text(dailyArticle.start); // 最初の記事を設定
+        $('.rectangle').eq(1).text(dailyArticle.goal);  // 目標の記事を設定
     } else {
-        console.error("本日の日付に対応する記事が見つかりません。");
+        $('.rectangle').eq(0).text('本日の日替わり記事はありません');
+        $('.rectangle').eq(1).text('本日の日替わり記事はありません');
+        $('.startBlock').hide(); // スタートボタンを非表示
     }
 
-    $('.startBlock').click(function() {
-        const startArticle = $('.rectangle').eq(0).text(); // startに書かれているテキストを取得
-        fetchWikipediaArticle(startArticle); // Wikipediaの記事を表示
-        $('.rectangleContainer').remove();
-        $('.startBlock').hide();
-        $('.aboutLink').hide();
-        $('.menuIcon').show(); // ハンバーガーメニューを表示
+    $('.startBlock').click(function () {
+        if (dailyArticle) {
+            const title1 = dailyArticle.start;
+            const title2 = dailyArticle.goal;
+            targetArticleTitleB = title2; // 目標記事タイトルをグローバル変数に保存
+            fetchWikipediaArticle(title1); // 最初の記事を取得
+            displayGoal(title2); // 目標記事を表示
+            $('img.logo').hide(); // ロゴを非表示
+            $('.rectangleContainer').remove(); // 記事選択部分を削除
+            $('.startBlock').remove(); // スタートボタンを削除
+            $('.wikiBlock').addClass('loaded'); // 背景色と外枠色を変更
+            $('.menuIcon').show(); // ハンバーガーメニューを表示
+            $('.title').text('0 / 6HOPS'); // タイトルを初期化
+            $('.titleUnderline').hide(); // タイトル下線を非表示
+        }
     });
 });
 
-function fetchWikipediaArticle(title) {
-    $('.wikiBlock').html('<div class="loadingBar"></div>'); // ローディングバーを表示
-    $.ajax({
-        url: 'https://ja.wikipedia.org/w/api.php',
-        data: {
-            action: 'parse',
-            page: title,
-            format: 'json',
-            prop: 'text',
-            origin: '*'
-        },
-        dataType: 'json',
-        success: function(data) {
-            const content = data.parse.text['*'];
-            const $content = $('<div>').html(content);
 
-            // 不要な部分を削除
-            $content.find('.reflist, .navbox, .infobox, .metadata, .external, .mw-references-wrap').remove();
-
-            $('.wikiBlock').html('<h2>' + title + '</h2>' + $content.html());
-        },
-        error: function(error) {
-            console.error('Error fetching Wikipedia article:', error);
-            alert('記事の取得に失敗しました。');
-        }
-    });
-}
-
-function getJapanDate() {
-    const now = new Date();
-    const formatter = new Intl.DateTimeFormat("ja-JP", {
-        timeZone: "Asia/Tokyo",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-    });
-    const parts = formatter.formatToParts(now);
-    const year = parts.find(part => part.type === "year").value;
-    const month = parts.find(part => part.type === "month").value;
-    const day = parts.find(part => part.type === "day").value;
-    return `${year}-${month}-${day}`;
-}

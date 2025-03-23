@@ -37,6 +37,26 @@
             position: absolute;
             top: 60px; /* タイトルの下に配置 */
         }
+
+        .progressBar {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50%;
+            height: 10px;
+            background-color: #ede9d0;
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .progressBar .progress {
+            height: 100%;
+            width: 0;
+            background-color: #4caf50;
+            transition: width 0.3s ease;
+        }
     </style>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-612086937">
@@ -50,6 +70,32 @@
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="./js/wiki.js?v=3.3"></script> <!-- wiki.jsを読み込み -->
+    <script>
+        function showProgressBar() {
+            const progressBar = $('<div class="progressBar"><div class="progress"></div></div>');
+            $('body').append(progressBar);
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                $('.progress').css('width', `${progress}%`);
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        progressBar.remove();
+                    }, 500);
+                }
+            }, 300);
+        }
+
+        $(document).ready(function () {
+            $('.startBlock').click(function () {
+                showProgressBar(); // プログレスバーを表示
+                // ...existing logic for starting the game...
+            });
+        });
+    </script>
 </head>
 
 <body>

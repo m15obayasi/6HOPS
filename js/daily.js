@@ -73,4 +73,88 @@ $(document).ready(function () {
     });
 });
 
+function showProgressBar() {
+    const progressBar = $('<div class="progressBar"><div class="progress"></div></div>');
+    $('body').append(progressBar);
+
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += 10;
+        $('.progress').css('width', `${progress}%`);
+
+        if (progress >= 100) {
+            clearInterval(interval);
+        }
+    }, 300);
+
+    // プログレスバーを非表示にする関数を返す
+    return function hideProgressBar() {
+        clearInterval(interval);
+        progressBar.remove();
+    };
+}
+
+function fetchWikipediaArticle(title) {
+    const hideProgressBar = showProgressBar(); // プログレスバーを表示
+    const encodedTitle = encodeURIComponent(title); // タイトルをURLエンコード
+    const apiUrl = `https://ja.wikipedia.org/w/api.php?action=parse&page=${encodedTitle}&format=json&prop=text&origin=*`;
+
+    $.ajax({
+        url: apiUrl,
+        dataType: 'json',
+        success: function (data) {
+            const content = data.parse.text['*'];
+            const $content = $('<div>').html(content);
+
+            $content.find('.reflist, .navbox, .infobox, .metadata, .external, .mw-references-wrap').remove();
+
+            $('.wikiBlock').html('<h2>' + title + '</h2>' + $content.html());
+            setupLinkClickHandlers(); // 再度リンククリックイベントを設定
+            hideProgressBar(); // 記事が表示されたらプログレスバーを消す
+        },
+        error: function (error) {
+            console.error('Error fetching Wikipedia article:', error);
+            alert('記事の取得に失敗しました。詳細: ' + error.statusText);
+            hideProgressBar(); // エラー時もプログレスバーを消す
+        }
+    });
+}
+
+function setupLinkClickHandlers() {
+    $('.wikiBlock').off('click', 'a'); // 既存のクリックイベントを解除
+    $('.wikiBlock').on('click', 'a', function (event) {
+        event.preventDefault(); // デフォルトのリンク遷移を防止
+        const linkTitle = $(this).attr('title'); // クリックされたリンクのタイトルを取得
+        if (linkTitle) {
+            loadArticle(linkTitle); // 記事を読み込む
+        }
+    });
+}
+
+function loadArticle(linkTitle) {
+    const hideProgressBar = showProgressBar(); // プログレスバーを表示
+    const encodedTitle = encodeURIComponent(linkTitle); // タイトルをURLエンコード
+    const apiUrl = `https://ja.wikipedia.org/w/api.php?action=parse&page=${encodedTitle}&format=json&prop=text&origin=*`;
+
+    $.ajax({
+        url: apiUrl,
+        dataType: 'json',
+        success: function (data) {
+            const content = data.parse.text['*'];
+            const $content = $('<div>').html(content);
+
+            $content.find('.reflist, .navbox, .infobox, .metadata, .external, .mw-references-wrap').remove();
+
+            $('.wikiBlock').html('<h2>' + linkTitle + '</h2>' + $content.html());
+            setupLinkClickHandlers(); // 再度リンククリックイベントを設定
+            hideProgressBar(); // 記事が表示されたらプログレスバーを消す
+        },
+        error: function (error) {
+            console.error('Error fetching Wikipedia article:', error);
+            alert('記事の取得に失敗しました。詳細: ' + error.statusText);
+            hideProgressBar(); // エラー時もプログレスバーを消す
+        }
+    });
+}
+
 

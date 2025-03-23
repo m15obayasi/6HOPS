@@ -1,0 +1,687 @@
+/* body 全体の基本スタイルを Wikipedia に近づける */
+body {
+    background-color: #f8f9fa;
+    /* Wikipediaの記事背景色 (body 全体) */
+    font-family: sans-serif;
+    /* Wikipediaの基本フォント (sans-serif) */
+    line-height: 1.6;
+    color: #333;
+    /* Wikipediaのテキスト色 (body 全体) */
+    margin: 0;
+    /* body のデフォルト margin をリセット */
+    padding: 0;
+    /* body のデフォルト padding をリセット */
+    padding-top: 60px; /* .fixedScreenの高さ分の隙間を作成 */
+}
+
+.fixedScreen {
+    position: fixed; /* 画面に固定 */
+    width: 100%;
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #F8F9FA;
+    z-index: 1000; /* 他の要素より前面に表示 */
+    margin-bottom: 20px; /* 隙間を追加 */
+}
+
+.titleDropdown {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+}
+
+.dropdownMenu {
+    display: none;
+    position: absolute;
+    top: 100%; /* fixedScreenの下に展開 */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    border: 1px solid black;
+    z-index: 1000;
+    min-width: 60vw; /* rectangleと同じ横幅に設定 */
+}
+
+.dropdownItem {
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    color: black;
+}
+
+.dropdownItem:hover {
+    background-color: black;
+    color: white;
+}
+
+.titleDropdown:hover .dropdownMenu {
+    display: block;
+}
+
+.title {
+    font-size: 2em; /* フォントサイズを2emに変更 */
+    margin: 0;
+    color: black;
+    position: absolute; /* 絶対位置に変更 */
+    top: 50%; /* 親要素の中央に配置 */
+    left: 50%; /* 親要素の中央に配置 */
+    transform: translate(-50%, -50%); /* 中央揃え */
+}
+
+.titleUnderline {
+    border-bottom: 2px solid black;
+    width: 100%;
+    position: absolute;
+    top: 60px; /* タイトルの下に配置 */
+}
+
+.startBlock {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 10vh;
+    font-size: 5vh;
+    width: 40vw;
+    margin: 0 auto;
+    font-weight: bold;
+    border: 2px solid black; /* 外枠の色を追加 */
+}
+
+.startBlock:hover {
+    background-color: black;
+    color: #f2f8f2;
+    cursor: pointer;
+}
+
+.rectangleContainer {
+    position: relative; /* 親要素を相対位置に設定 */
+    display: flex;
+    justify-content: center;
+    margin-bottom: 50px;
+    margin-top: 30px; /* 隙間を少し詰める */
+    font-weight: bold;
+    flex-direction: column; /* 縦並びにする */
+}
+
+.rectangle {
+    width: 60vw;
+    height: 6.5vh; /* 縦幅を現状の3分の2にする */
+    font-size: 1.5em;
+    margin: 10px auto; /* 縦並びの間隔を調整し、中央揃え */
+    border: 2px solid black;
+    background-color: white;
+    display: flex;
+    justify-content: center;    
+    align-items: center;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    white-space: normal;
+    word-wrap: break-word;  /* 長い文字列を折り返す */
+    text-align: center;
+    padding: 10px;
+    position: relative; /* 子要素を絶対位置に設定するため */
+}
+
+.rectangleLabel {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 1em;
+    text-align: center;
+    margin-bottom: 2px; /* 距離を詰める */
+}
+
+.rectangleLabel.first {
+    margin-top: 20px;/* 隙間を開ける */
+    margin-bottom: 2px; /* 距離を詰める */
+}
+
+.rectangleLabel.second {
+    margin-top: 40px; /* 隙間を開ける */
+    margin-bottom: 2px; /* 距離を詰める */
+}
+
+@media (max-width: 600px) {
+    .rectangleContainer {
+        flex-direction: column; /* 縦並びにする */
+    }
+
+    .rectangle {
+        width: 85vw; /* 横幅を画面の90%にする */
+        height: 6.5vh; /* 縦幅を現状の3分の2にする */
+        font-size: 1.5em; /* フォントサイズを調整 */
+    }
+
+    .startBlock {
+        width: 90vw; /* 横幅を画面いっぱいにする */
+        margin-top: 3px; /* .rectangleとの距離を5pxにする */
+    }
+
+    .logo {
+        display: none; /* ロゴを非表示にする */
+    }
+}
+
+.buttonContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.button {
+    color: #f2f8f2;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 10px;
+    cursor: pointer;
+    font-size: 2vh;
+}
+
+.button.retry, .button.confirm {
+    width: 40vw;
+    height: 10vh;
+    color: black;
+    font-size: 1.5em;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    border: 1.5px solid black; /* 外枠の色を追加 */
+}
+
+.button:hover {
+    background-color: black;
+    color: white;
+}
+
+@media (max-width: 600px) {
+    .buttonContainer {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .button.retry, .button.confirm {
+        width: 50%; /* 画面を2分割し、隙間を作らない */
+        margin: 1; /* 隙間をなくす */
+    }
+
+    .button:hover {
+        background-color: #f2f8f2;;
+        color: black;
+    }
+}
+
+@media (max-width: 600px) {
+    .title {
+        font-size: 2.5em; /* フォントサイズを調整 */
+        white-space: nowrap; /* 改行を防ぐ */
+        overflow: hidden;
+        overflow-x: auto; /* 横スクロールを有効にする */
+        -webkit-overflow-scrolling: touch; /* スムーズスクロールを有効にする */
+    }
+}
+
+@media (max-width: 600px) {
+    body {
+        overscroll-behavior: none; /* スワイプしてリロードする動作を無効化 */
+    }
+    html {
+        overscroll-behavior: none; /* スワイプしてリロードする動作を無効化 */
+    }
+}
+
+@media (max-width: 600px) {
+    .button:hover {
+        background-color: initial; /* ホバー時の背景色を元に戻す */
+        color: initial; /* ホバー時の文字色を元に戻す */
+    }
+}
+
+.wikiBlock {
+    font-family: sans-serif;
+    /* wikiBlock 内も sans-serif に統一 */
+    line-height: 1.6;
+    color: #333;
+    /* wikiBlock 内も #333 に統一 */
+    background-color: #f8f9fa;
+    /* Wikipediaの記事背景色 (wikiBlock) */
+    border: 1px solid #f8f9fa;
+    /* bodyの背景色と同様の外枠色 */
+    padding: 1em;
+    /* padding を 1em に */
+    margin: 20px auto;
+    width: 80%;
+    overflow-wrap: break-word;
+}
+
+.wikiBlock.loaded {
+    background-color: #fff;
+    /* 記事読み込み後の背景色 (変更なし) */
+    border-color: #c8ccd1;
+    /* 記事読み込み後の外枠色 */
+}
+
+/* 見出しスタイル (h2, h3, h4...) を Wikipedia に近づける */
+.wikiBlock h2 {
+    font-size: 1.5em;
+    border-bottom: 1px solid #a2a9b1;
+    /* Wikipedia の h2 下線 */
+    padding-bottom: 0.3em;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    line-height: 1.2;
+    /* 行間を少し狭く */
+}
+
+.wikiBlock h3 {
+    font-size: 1.3em;
+    border-bottom: 1px solid #a2a9b1;
+    /* Wikipedia の h3 下線 (必要に応じて) */
+    padding-bottom: 0.2em;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    line-height: 1.2;
+}
+
+.wikiBlock h4 {
+    font-size: 1.1em;
+    font-weight: bold;
+    /* Wikipedia の h4 は bold */
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+/* 必要に応じて h5, h6 スタイルも追加 */
+
+.wikiBlock p {
+    margin-bottom: 0.8em;
+}
+
+.wikiBlock a {
+    color: #0645ad;
+    /* Wikipedia のリンク色 */
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    /* ホバー時のボーダー用 */
+}
+
+.wikiBlock a:hover {
+    color: #0b0080;
+    /* Wikipedia のホバー時リンク色 */
+    border-bottom: 1px solid #0645ad;
+    /* Wikipedia のホバー時ボーダー */
+}
+
+/* リスト (ul, ol) スタイルを Wikipedia に近づける */
+.wikiBlock ul,
+.wikiBlock ol {
+    margin-left: 1.5em;
+    /* 左インデント */
+    margin-bottom: 0.5em;
+    list-style-type: disc;
+    /* ul のリストマーカーを disc (●) に */
+}
+
+.wikiBlock ol {
+    list-style-type: decimal;
+    /* ol のリストマーカーを decimal (1, 2, 3...) に */
+}
+
+.wikiBlock li {
+    margin-bottom: 0.3em;
+}
+
+/* テーブル (table.wikitable) スタイルを Wikipedia に近づける (調整) */
+.wikiBlock table.wikitable {
+    border: 1px solid #c8ccd1;
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 0.9em;
+    background-color: #f8f9fa;
+    /* テーブル背景色を記事背景色に合わせる */
+}
+
+.wikiBlock table.wikitable th,
+.wikiBlock table.wikitable td {
+    border: 1px solid #c8ccd1;
+    padding: 0.3em 0.5em;
+}
+
+.wikiBlock table.wikitable th {
+    background-color: #f2f2f2;
+    /* th の背景色を Wikipedia に合わせる */
+    font-weight: bold;
+    text-align: center;
+}
+
+/* 画像 (img) スタイル (調整) */
+.wikiBlock img {
+    max-width: 100%;
+    height: auto;
+    border: none;
+    /* 画像のボーダーを削除 (変更なし) */
+    vertical-align: middle;
+    /* 画像とテキストの vertical alignment を調整 */
+}
+
+/* 水平線 (hr) スタイル (追加) */
+.wikiBlock hr {
+    border: 0;
+    border-top: 1px solid #a2a9b1;
+    /* Wikipedia の hr 色 */
+    margin: 1em 0;
+}
+
+/* 引用 (blockquote) スタイル (追加) */
+.wikiBlock blockquote {
+    border: 1px solid #a2a9b1;
+    /* 引用符のボーダー */
+    background-color: #f8f9fa;
+    /* 引用符の背景色 */
+    padding: 0.5em 1em;
+    margin: 1em 0;
+    font-style: italic;
+    /* 斜体 */
+}
+
+/* 定義リスト (dl, dt, dd) スタイル (追加 - 必要に応じて) */
+.wikiBlock dl {
+    margin-bottom: 0.5em;
+}
+
+.wikiBlock dt {
+    font-weight: bold;
+    margin-top: 0.5em;
+}
+
+.wikiBlock dd {
+    margin-left: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+.menuIcon {
+    font-size: 3vh;
+    cursor: pointer;
+    width: 50px;
+    margin-left: 10px;
+}
+
+.sideMenu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: white; /* 背景色を白に変更 */
+    color: black; /* 文字色を黒に変更 */
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+    z-index: 1001;
+    overflow-y: auto;
+    border: 1px solid black; /* 外枠を1pxの黒に設定 */
+}
+
+@media (min-width: 1024px) {
+    .sideMenu {
+        width: 500px; /* 横幅を2倍に広くする */
+    }
+    
+}
+
+.sideMenu h2 {
+    font-size: 2vh; /* フォントサイズを入れ替え */
+    margin-top: 0;
+    margin-bottom: 10px; /* 隙間を追加 */
+}
+
+.history {
+    margin-top: 10px; /* 隙間を詰める */
+    font-size: 2vh;
+    margin-bottom: 10px; /* 目標記事との間に隙間を追加 */
+}
+
+.history div {
+    cursor: pointer;
+    color: black; /* 文字色を黒に変更 */
+    text-decoration: none; /* 下線を削除 */
+    background-color: white; /* 背景色を白に変更 */
+    padding: 5px; /* パディングを追加 */
+    margin-bottom: 10px; /* 隙間を追加 */
+    font-size: 2vh; /* フォントサイズを調整 */
+    border: 1px solid black; /* 外枠を1pxの黒に設定 */
+}
+
+.history div.active {
+    background-color: #ede9d0; /* 現在表示されている記事の背景色 */
+}
+
+.history div::before {
+    content: attr(data-index) ". "; /* 項番を追加 */
+}
+
+.history div:hover {
+    background-color: black; /* ホバー時の背景色を黒に変更 */
+    color: white; /* ホバー時の文字色を白に変更 */
+}
+
+.history div.disabled {
+    pointer-events: none; /* クリックを無効にする */
+    opacity: 0.5; /* 見た目を薄くする */
+}
+
+.closeMenu {
+    font-size: 2.5vh; /* フォントサイズを調整 */
+    color: black; /* 文字色を黒に変更 */
+    cursor: pointer;
+    text-align: center; /* テキストを中央揃え */
+    margin-bottom: 10px;
+    background-color: white; /* 背景色を白に変更 */
+    padding: 10px 0; /* 上下のパディングを追加 */
+    width: 100%; /* 横幅をハンバーガーメニューと同じにする */
+    border: 1px solid black; /* 外枠を1pxの黒に設定 */
+}
+
+.closeMenu:hover {
+    background-color: black; /* ホバー時の背景色を黒に変更 */
+    color: white; /* ホバー時の文字色を白に変更 */
+}
+
+.menuHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px; /* 隙間を追加 */
+}
+
+.menuHeader h2, .closeMenu {
+    font-size: 2.5vh; /* フォントサイズを入れ替え */
+    margin: 0;
+}
+
+.goalTitle {
+    color: black; /* 文字色を黒に変更 */
+    text-decoration: none; /* 下線を削除 */
+    background-color: white; /* 背景色を白に変更 */
+    padding: 5px; /* パディングを追加 */
+    margin-bottom: 10px; /* 隙間を追加 */
+    font-size: 2vh; /* フォントサイズを調整 */
+    border: 1px solid black; /* 外枠を1pxの黒に設定 */
+}
+
+.goalSummary {
+    font-size: 2vh;
+    color: black; /* 文字色を黒に変更 */
+    margin-top: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal; /* 折り返しを有効にする */
+    max-width: 100%;
+    margin-bottom: 100px; /* ホームに戻るとの間に隙間を追加 */
+    display: none; /* 初期状態では非表示 */
+    background-color: white; /* 背景色を白に変更 */
+}
+
+.homeLink {
+    background-color: white; /* 背景色を白に変更 */
+    color: black; /* 文字色を黒に変更 */
+    cursor: pointer;
+    text-decoration: none; /* 下線を削除 */
+    height: 10vh;
+    margin-top: 20px;
+    padding: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 2vh; /* フォントサイズを調整 */
+    font-weight: bold; /* フォントウェイトを調整 */
+    border: 1px solid black; /* 外枠を1pxの黒に設定 */
+}
+
+.homeLink:hover {
+    background-color: black; /* ホバー時の背景色を黒に変更 */
+    color: white; /* ホバー時の文字色を白に変更 */
+}
+
+.shareButton {
+    width: 100%;
+    height: 10vh;
+    background-color: white; /* 背景色を白に変更 */
+    border: 1px solid black; /* 外枠を1pxの黒に設定 */
+    text-align: center;
+    line-height: 10vh;
+    margin-top: 10px;
+    color: black; /* 文字色を黒に変更 */
+}
+
+.shareLink {
+    color: black;
+    text-decoration: none;
+    font-size: 2vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shareLink:hover {
+    color: white; /* ホバー時の文字色を白に変更 */
+}
+
+.shareLogo {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.shareLink:hover .shareLogo {
+    filter: invert(1); /* ホバー時に色を反転 */
+}
+
+.shareButton:hover {
+    background-color: black; /* ホバー時の背景色を黒に変更 */
+    color: white; /* ホバー時の文字色を白に変更 */
+}
+
+.aboutLink {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.aboutLink a {
+    color: black;
+    text-decoration: none;
+    font-size: 2vh;
+}
+
+.aboutLink a:hover {
+    text-decoration: underline;
+}
+
+.progressContainer {
+    position: fixed; /* 固定 */
+    top: 60px; /* .fixedScreen の下に配置 */
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start; /* 左詰めにする */
+    padding: 10px 0;
+    background-color: #f8f9fa; /* 背景色を追加 */
+    z-index: 999; /* .fixedScreen の下に配置 */
+}
+
+.progressBlock {
+    width: 15%;
+    height: 10px;
+    display: none; /* 初期状態では非表示 */
+}
+
+.progressBar {
+    width: 100%;
+    height: 5px;
+    background-color: #ede9d0;
+    margin-top: 20px; /* 位置を下げるためのマージンを追加 */
+    animation: progressAnimation 0.5s linear;
+}
+
+@keyframes progressAnimation {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+.logo {
+    display: none; /* ロゴを非表示にする */
+}
+
+.hintBlock {
+    background-color: white; /* 背景色を白に変更 */
+    color: black; /* 文字色を黒に変更 */
+    padding: 3px;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 2vh; /* フォントサイズを調整 */
+    font-weight: bold; /* フォントウェイトを調整 */
+    border: 1px solid black; /* 外枠を1pxの黒に設定 */
+}
+
+.hintBlock:hover {
+    background-color: black; /* ホバー時の背景色を黒に変更 */
+    color: white; /* ホバー時の文字色を白に変更 */
+}
+
+.continueButton {
+    border: 1px solid black;
+    color: black;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 2vh;
+    font-weight: bold;
+}
+
+.continueButton:hover {
+    background-color: black;
+    color: white;
+}
+
+.continuedArticle {
+    padding: 5px;
+    margin-bottom: 10px;
+    font-size: 2vh;
+    cursor: pointer;
+    border: 1px solid black;
+}
+
+.continuedArticle:hover {
+    background-color: black;
+    color: white;
+}
+
+.title, .startBlock, .menuIcon, .sideMenu, .homeLink, .hintBlock, .goalTitle, .goalSummary, .shareButton, .shareLink, .continueButton, .continuedArticle {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: normal; /* フォントウェイトを標準に戻す */
+}

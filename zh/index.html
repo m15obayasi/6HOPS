@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-W3NNXDSG');</script>
+    <!-- End Google Tag Manager -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KGM7VF4G2T"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-KGM7VF4G2T');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6HOPS</title>
+    <link rel="stylesheet" href="../css/style.css?v=3.5"> <!-- パラメータクエリを更新 -->
+    <link href="https://fonts.googleapis.com/css?family=Cherry+Swash:700" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+SC">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400&display=swap"> <!-- Zen Maru Gothicを追加 -->
+    <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+    <meta property="og:image" content="../img/wikiLogo.png">
+    <meta name="google-adsense-account" content="ca-pub-8967129057333443">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8967129057333443"
+        crossorigin="anonymous"></script>
+    <style>
+        .titleUnderline {
+            border-bottom: 2px solid black;
+            width: 100%;
+            position: absolute;
+            top: 60px; /* タイトルの下に配置 */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W3NNXDSG"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div class="fixedScreen">
+        <div class="menuIcon" style="display: none;">&#9776;</div> <!-- 汉堡菜单 -->
+        <div class="title">6HOPS</div>
+        <div class="titleUnderline"></div> <!-- 在标题下添加下划线 -->
+        <hr>
+    </div>
+
+    <div class="sideMenu" style="display: none;">
+        <div class="menuHeader">
+            <div class="closeMenu">关闭</div> <!-- 关闭按钮 -->
+            <h2></h2>
+        </div>
+        <h2>　</h2>
+        <div class="history"></div>
+        <div class="goalTitle"></div>
+        <div class="hintBlock">提示</div> <!-- 提示按钮 -->
+        <div class="goalSummary"></div>
+        <h2>　</h2>
+        <h2 class="homeLink">返回首页</h2>        <!-- 分享按钮 -->
+        <div class="shareButton">
+            <a href="#" class="shareLink" target="_blank">
+                <img src="../img/logo-black.png" alt="Share Logo" class="shareLogo">
+                分享
+            </a>
+        </div>
+    </div>
+
+    <div class="rectangleContainer">
+        <div class="rectangleLabel first">第一个文章</div>
+        <div class="rectangle"></div>
+        <div class="rectangleLabel second">第六个文章</div>
+        <div class="rectangle"></div>
+    </div>
+    <div class="progressBar" style="display: none;"></div>
+
+    <div class="startBlock">
+        <div class="start">开始</div>
+    </div>
+    <div class="aboutLink">
+        <a href="./outset.html">关于本站</a>
+    </div>
+    <div class="wikiBlock"></div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="../js/wiki_zh.js?v=3.4"></script> <!-- パラメータクエリを更新 -->
+    <script>
+        $(document).ready(function() {
+            const title1 = localStorage.getItem('title1');
+            const title2 = localStorage.getItem('title2');
+            if (title1 && title2) {
+                localStorage.removeItem('title1');
+                localStorage.removeItem('title2');
+                targetArticleTitleB = title2; // 保存目标文章标题到全局变量
+                fetchWikipediaArticle(title1);
+                displayGoal(title2); // 显示目标文章标题和摘要
+                $('img.logo').hide(); // 隐藏插图
+                $('.rectangleContainer').remove();
+                $('.startBlock').hide();
+                $('.aboutLink').hide();
+                $('.wikiBlock').addClass('loaded'); // 更改背景色和边框颜色
+                $('.menuIcon').show(); // 显示汉堡菜单
+                $('.title').text('0 / 6HOPS'); // 重置标题
+                $('.titleUnderline').hide(); // 隐藏标题下的下划线
+
+                // 添加分享按钮的点击事件
+                $('.shareLink').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent('挑战6HOPS，从"' + title1 + '"到"' + title2 + '"！ \n#TRY_6HOPS\nhttps://myeik.net/6HOPS/zh')}`);
+            }
+        });
+    </script>
+
+</body>
+
+</html>

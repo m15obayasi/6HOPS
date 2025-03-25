@@ -62,6 +62,16 @@ $(document).ready(function() {
             alert("本日の日付に対応する記事が見つかりません。");
         });
     }
+
+    // Wikipedia記事内リンクのクリックイベントを設定
+    $('.wikiBlock').on('click', 'a', function(event) {
+        event.preventDefault();
+        const linkTitle = $(this).attr('title');
+        if (linkTitle) {
+            console.log("Navigating to linked article:", linkTitle);
+            fetchWikipediaArticle(linkTitle); // リンク先の記事を取得
+        }
+    });
 });
 
 function fetchWikipediaArticle(title) {

@@ -147,6 +147,7 @@ function showActionButtons() {
 }
 
 function fetchWikipediaArticle(title) {
+    $('.progressBar').show(); // プログレスバーを表示
     $('.wikiBlock').html('<div class="loadingBar"></div>');
     $('.title').append('<div class="loadingBar"></div>');
     $.ajax({
@@ -176,11 +177,13 @@ function fetchWikipediaArticle(title) {
                 return;
             }
             $('.loadingBar').remove();
+            $('.progressBar').hide(); // プログレスバーを非表示
         },
         error: function(error) {
             console.error('Error fetching Wikipedia article:', error);
             alert('記事の取得に失敗しました。');
             $('.loadingBar').remove();
+            $('.progressBar').hide(); // プログレスバーを非表示
         }
     });
 }
@@ -240,6 +243,12 @@ function loadArticle(linkTitle) {
         return;
     }
     fetchWikipediaArticle(linkTitle);
+
+    // daily.htmlでもタイトルと履歴を更新
+    if ($('body').hasClass('daily')) {
+        updateTitle(clickCount);
+        updateHistory();
+    }
 }
 
 function updateProgress(clickCount) {

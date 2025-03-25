@@ -6,7 +6,10 @@ $(document).ready(function() {
         $('.aboutLink').hide();
         setTimeout(function() {
             $('.progressBar').hide();
-            showActionButtons(); // retryボタンとconfirmボタンを表示
+            // 条件を追加して daily.html ではボタンを表示しない
+            if (!$('body').hasClass('daily')) {
+                showActionButtons(); // retryボタンとconfirmボタンを表示
+            }
         }, 500);
     });
 
@@ -143,34 +146,18 @@ function showActionButtons() {
     buttonContainer.show();
 }
 
-function showProgressBar() {
-    const progressBar = $('<div class="progressBar"><div class="progress"></div></div>');
-    $('body').append(progressBar);
-
-    let progress = 0;
-    const interval = setInterval(() => {
-        progress += 10;
-        $('.progress').css('width', `${progress}%`);
-
-        if (progress >= 100) {
-            clearInterval(interval);
-        }
-    }, 300);
-
-    // プログレスバーを非表示にする関数を返す
-    return function hideProgressBar() {
-        clearInterval(interval);
-        progressBar.remove();
-    };
-}
-
 function fetchWikipediaArticle(title) {
-    const hideProgressBar = showProgressBar(); // プログレスバーを表示
-    const encodedTitle = encodeURIComponent(title); // タイトルをURLエンコード
-    const apiUrl = `https://ja.wikipedia.org/w/api.php?action=parse&page=${encodedTitle}&format=json&prop=text&origin=*`;
-
+    $('.wikiBlock').html('<div class="loadingBar"></div>');
+    $('.title').append('<div class="loadingBar"></div>');
     $.ajax({
-        url: apiUrl, // 正しいWikipedia APIエンドポイントを使用
+        url: 'https://ja.wikipedia.org/w/api.php',
+        data: {
+            action: 'parse',
+            page: title,
+            format: 'json',
+            prop: 'text',
+            origin: '*'
+        },
         dataType: 'json',
         success: function(data) {
             const content = data.parse.text['*'];
@@ -188,12 +175,12 @@ function fetchWikipediaArticle(title) {
                 displayResult('成功');
                 return;
             }
-            hideProgressBar(); // 記事が表示されたらプログレスバーを消す
+            $('.loadingBar').remove();
         },
         error: function(error) {
             console.error('Error fetching Wikipedia article:', error);
-            alert('記事の取得に失敗しました。詳細: ' + error.statusText);
-            hideProgressBar(); // エラー時もプログレスバーを消す
+            alert('記事の取得に失敗しました。');
+            $('.loadingBar').remove();
         }
     });
 }
@@ -234,6 +221,8 @@ function setupLinkClickHandlers() {
         event.preventDefault();
         const linkTitle = $(this).attr('title');
         if (linkTitle) {
+            $('.wikiBlock').html('<div class="loadingBar"></div>');
+            $('.title').append('<div class="loadingBar"></div>');
             setTimeout(function() {
                 loadArticle(linkTitle);
             }, 500);
@@ -241,27 +230,6 @@ function setupLinkClickHandlers() {
     });
 }
 
-function showProgressBar() {
-    const progressBar = $('<div class="progressBar"><div class="progress"></div></div>');
-    $('body').append(progressBar);
-
-    let progress = 0;
-    const interval = setInterval(() => {
-        progress += 10;
-        $('.progress').css('width', `${progress}%`);
-
-        if (progress >= 100) {
-            clearInterval(interval);
-        }
-    }, 300);
-
-    return function hideProgressBar() {
-        clearInterval(interval);
-        progressBar.remove();
-    };
-}
-
-// 記事遷移時にプログレスバーを表示
 function loadArticle(linkTitle) {
     clickCount++;
     updateProgress(clickCount);
@@ -271,7 +239,6 @@ function loadArticle(linkTitle) {
         displayResult('失敗');
         return;
     }
-    showProgressBar(); // プログレスバーを表示
     fetchWikipediaArticle(linkTitle);
 }
 
@@ -311,4 +278,21 @@ function displayResult(result) {
     const resultText = result === '成功' ? '成功' : '失敗';
     const resultMessage = result === '成功' ? 'おめでとう！目標の記事へ辿り着いた！' : '残念！6回以内に目標の記事へ辿り着けなかった……';
     $('.wikiBlock').html('<h2>' + resultText + '</h2><p>' + resultMessage + '</p>');
+}
+
+function setTitles(start, goal) {
+    const title1 = start;
+    const title2 = goal;
+    targetArticleTitleB = title2; // 目標記事タイトルをグローバル変数に保存
+    fetchWikipediaArticle(title1); // Wikipediaの記事を表示
+    displayGoal(title2); // 目標記事のタイトルと概要を表示
+    $('.rectangleContainer').remove();
+    $('.startBlock').hide();
+    $('.aboutLink').hide();
+    $('.menuIcon').show(); // ハンバーガーメニューを表示
+    $('.title').text('0 / 6HOPS'); // タイトルを初期化
+    $('.titleUnderline').hide(); // タイトルの下の線を非表示にする
+
+    // シェアボタンのクリックイベントを追加
+    $('.shareLink').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent('「' + title1 + '」から「' + title2 + '」への6HOPSに挑戦中！ \n#TRY_6HOPS\nhttps://myeik.net/6HOPS/')}`);
 }

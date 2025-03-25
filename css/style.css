@@ -30,42 +30,6 @@ body {
     margin-bottom: 20px; /* 隙間を追加 */
 }
 
-.titleDropdown {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-    text-align: center;
-    width: 100%;
-}
-
-.dropdownMenu {
-    display: none;
-    position: absolute;
-    top: 100%; /* fixedScreenの下に展開 */
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: white;
-    border: 1px solid black;
-    z-index: 1000;
-    min-width: 60vw; /* rectangleと同じ横幅に設定 */
-}
-
-.dropdownItem {
-    padding: 10px;
-    text-align: center;
-    cursor: pointer;
-    color: black;
-}
-
-.dropdownItem:hover {
-    background-color: black;
-    color: white;
-}
-
-.titleDropdown:hover .dropdownMenu {
-    display: block;
-}
-
 .title {
     font-size: 2em; /* フォントサイズを2emに変更 */
     margin: 0;
@@ -511,6 +475,7 @@ body {
 }
 
 .goalSummary {
+    display: none; /* 初期状態では非表示 */
     font-size: 2vh;
     color: black; /* 文字色を黒に変更 */
     margin-top: 5px;
@@ -519,7 +484,6 @@ body {
     white-space: normal; /* 折り返しを有効にする */
     max-width: 100%;
     margin-bottom: 100px; /* ホームに戻るとの間に隙間を追加 */
-    display: none; /* 初期状態では非表示 */
     background-color: white; /* 背景色を白に変更 */
 }
 
@@ -657,7 +621,7 @@ body {
 
 .progressBar {
     position: fixed;
-    top: 0;
+    top: 0; /* 画面最上部に配置 */
     left: 0;
     width: 100%;
     height: 10px; /* 太さを現行の2倍に設定 */

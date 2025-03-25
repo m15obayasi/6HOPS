@@ -5,25 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>6HOPS</title>
-    <link rel="stylesheet" href="./css/style.css?v=3.4"> <!-- スタイルをstyle.cssに集約 -->
+    <link rel="stylesheet" href="./css/style.css?v=3.4"> <!-- パラメータクエリを更新 -->
     <link href="https://fonts.googleapis.com/css?family=Cherry+Swash:700" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+JP">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400&display=swap">
     <!-- Zen Maru Gothicを追加 -->
-    <link rel="icon" href="./img/favicon.ico" type="image/x-icon">
-    <meta property="og:image" content="./img/wikiLogo.png">
+    <link rel="icon" href="./img/favicon.ico" type="image/x-icon"> <!-- パスを確認 -->
+    <meta property="og:image" content="./img/wikiLogo.png"> <!-- パスを確認 -->
     <meta name="google-adsense-account" content="ca-pub-8967129057333443">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8967129057333443"
         crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> <!-- jQueryを追加 -->
-    <script src="./js/daily.js"></script> <!-- daily.jsを先に読み込む -->
-    <script src="./js/wiki.js"></script> <!-- wiki.jsを後に読み込む -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="./js/wiki.js?v=3.5"></script> <!-- パラメータクエリを更新 -->
 </head>
 
-<body class="daily">
+<body>
     <div class="fixedScreen">
         <div class="menuIcon" style="display: none;">&#9776;</div>
-        <div class="title">6HOPS</div>
+        <div class="titleContainer">
+            <div class="title">6HOPS</div>
+            <div class="dropdownMenu">
+                <a href="./index.html">デイリーモード</a>
+            </div>
+        </div>
         <div class="titleUnderline"></div>
         <hr>
     </div>
@@ -39,7 +43,7 @@
         <div class="hintBlock">ヒント</div> <!-- ヒントボタン -->
         <div class="goalSummary"></div>
         <h2>　</h2>
-        <h2 class="homeLink">ホームに戻る</h2> <!-- ホームリンク -->
+        <h2 class="homeLink">ホームに戻る</h2> <!-- シェアボタンの追加 -->
         <div class="shareButton">
             <a href="#" class="shareLink" target="_blank">
                 <img src="./img/logo-black.png" alt="Share Logo" class="shareLogo">
@@ -49,9 +53,9 @@
     </div>
 
     <div class="rectangleContainer">
-        <div class="rectangleLabel first"></div> <!-- テキストはスクリプトで設定 -->
+        <div class="rectangleLabel first">最初の記事</div>
         <div class="rectangle"></div>
-        <div class="rectangleLabel second"></div>
+        <div class="rectangleLabel second">6つ目の記事</div>
         <div class="rectangle"></div>
     </div>
     <div class="progressBar" style="display: none;"></div>
@@ -59,11 +63,10 @@
     <div class="startBlock">
         <div class="start">START</div>
     </div>
-
     <div class="aboutLink">
         <a href="./outset.html">このサイトについて</a>
     </div>
-    <div class="wikiBlock"></div> <!-- 初期状態で非表示を削除 -->
+    <div class="wikiBlock"></div>
 
 </body>
 

@@ -38,6 +38,7 @@ body {
     top: 50%; /* 親要素の中央に配置 */
     left: 50%; /* 親要素の中央に配置 */
     transform: translate(-50%, -50%); /* 中央揃え */
+    white-space: nowrap; /* 改行を防ぐ */
 }
 
 .titleUnderline {
@@ -634,4 +635,44 @@ body {
     width: 0;
     background-color: #4caf50;
     transition: width 0.3s ease;
+}
+
+.titleContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: inline-block;
+}
+
+.dropdownMenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white; /* 背景色を白に設定 */
+    border: 1px solid black;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1100; /* アンダーラインよりも高い値に設定 */
+    min-width: 375px; /* 横幅を現行の2.5倍程度に設定 */
+    text-align: center;
+    padding: 10px 0; /* 上下の余白を追加 */
+}
+
+.dropdownMenu a {
+    display: block;
+    padding: 10px;
+    color: black;
+    text-decoration: none;
+    font-size: 1em;
+}
+
+.dropdownMenu a:hover {
+    background-color: black;
+    color: white;
+}
+
+.titleContainer:hover .dropdownMenu {
+    display: block;
 }

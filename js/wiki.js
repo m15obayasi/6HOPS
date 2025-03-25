@@ -8,6 +8,7 @@ $(document).ready(function() {
             $('.progressBar').hide();
             // 条件を追加して daily.html ではボタンを表示しない
             if (!$('body').hasClass('daily')) {
+                // challenge.html 用の処理
                 showActionButtons(); // retryボタンとconfirmボタンを表示
             }
         }, 500);

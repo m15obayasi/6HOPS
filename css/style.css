@@ -19,8 +19,8 @@ body {
     width: 100%;
     top: 0;
     left: 0;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 30px;
+    padding-bottom: 30px;
     box-sizing: border-box;
     display: flex;
     justify-content: space-between;
@@ -30,8 +30,41 @@ body {
     margin-bottom: 20px; /* 隙間を追加 */
 }
 
+.modeBar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 10px 0;
+    margin-top: 30px;
+}
+
+.modeBar a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: black;
+    font-size: 0.9em;
+    font-weight: bold;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.modeBar a:hover {
+    background-color: black;
+    color: white;
+    border: 1px solid black;
+}
+
+.modeBar a.active {
+    background-color: black;
+    color: white;
+    border: 1px solid black;
+}
+
 .title {
-    font-size: 2em; /* フォントサイズを2emに変更 */
+    font-size: 3em; /* フォントサイズを2emに変更 */
     margin: 0;
     color: black;
     position: absolute; /* 絶対位置に変更 */
@@ -45,7 +78,7 @@ body {
     border-bottom: 2px solid black;
     width: 100%;
     position: absolute;
-    top: 60px; /* タイトルの下に配置 */
+    top: 80px; /* タイトルの下に配置 */
 }
 
 .startBlock {
@@ -80,7 +113,7 @@ body {
     width: 60vw;
     height: 6.5vh; /* 縦幅を現状の3分の2にする */
     font-size: 1.5em;
-    margin: 10px auto; /* 縦並びの間隔を調整し、中央揃え */
+    margin: 8px auto; /* 縦並びの間隔を調整し、中央揃え */
     border: 2px solid black;
     background-color: white;
     display: flex;
@@ -102,12 +135,11 @@ body {
 }
 
 .rectangleLabel.first {
-    margin-top: 20px;/* 隙間を開ける */
     margin-bottom: 2px; /* 距離を詰める */
 }
 
 .rectangleLabel.second {
-    margin-top: 40px; /* 隙間を開ける */
+    margin-top: 10px; /* 隙間を開ける */
     margin-bottom: 2px; /* 距離を詰める */
 }
 
@@ -124,7 +156,6 @@ body {
 
     .startBlock {
         width: 90vw; /* 横幅を画面いっぱいにする */
-        margin-top: 3px; /* .rectangleとの距離を5pxにする */
     }
 
     .logo {
@@ -625,7 +656,7 @@ body {
     top: 0; /* fixedScreenの最上部に配置 */
     left: 0;
     width: 100%;
-    height: 5px; /* 太さを調整 */
+    height: 20px; /* 太さを調整 */
     background-color: #ede9d0;
     z-index: 1002; /* fixedScreenより前面に表示 */
 }

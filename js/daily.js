@@ -54,6 +54,7 @@ $(document).ready(function() {
 
         $('.startBlock').click(function() {
             console.log("Start button clicked. Fetching article:", article.start);
+            $('.modeBar').hide(); // modeBarを非表示にする
             setTitles(article.start, article.goal); // wiki.js の setTitles を呼び出し
         });
     } else {

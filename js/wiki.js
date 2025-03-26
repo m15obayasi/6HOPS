@@ -130,6 +130,7 @@ function showActionButtons() {
     confirmButton.click(function() {
         const title1 = $('.rectangle').eq(0).text();
         const title2 = $('.rectangle').eq(1).text();
+        $('.modeBar').hide(); // modeBarを非表示にする
         targetArticleTitleB = title2;
         fetchWikipediaArticle(title1);
         displayGoal(title2);
@@ -287,7 +288,28 @@ function updateTitle(clickCount) {
 function displayResult(result) {
     const resultText = result === '成功' ? '成功' : '失敗';
     const resultMessage = result === '成功' ? 'おめでとう！目標の記事へ辿り着いた！' : '残念！6回以内に目標の記事へ辿り着けなかった……';
-    $('.wikiBlock').html('<h2>' + resultText + '</h2><p>' + resultMessage + '</p>');
+    const shareMessage = result === '成功' 
+        ? `<br><br><a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(startArticleTitle + 'から' + targetArticleTitleB + 'へ' + clickCount + '手で辿り着いた！ \n#CLEAR_6HOPS\n')}" target="_blank" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>` 
+        : `<br><br><a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(startArticleTitle + 'から' + targetArticleTitleB + 'へ6手で辿り着けなかった…… \n#CLEAR_6HOPS\n')}" target="_blank" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`;
+    
+    let continueButton = '';
+    if (result === '失敗') {
+        continueButton = `<div class="continueButton">それでも続ける</div>`;
+    }
+
+    $('.wikiBlock').html('<h2>' + resultText + '</h2><p>' + resultMessage + '</p>' + shareMessage + continueButton);
+
+    if (result === '失敗') {
+        $('.continueButton').click(function() {
+            $('.goalTitle').text('X. ' + targetArticleTitleB);
+            const lastTitle = history[clickCount - 1];
+            clickCount = 5; // カウントを5にリセット
+            continueMode = true; // 続けるモードを有効にする
+            updateTitle(clickCount); // タイトルを更新
+            updateProgress(clickCount); // プログレスバーを更新
+            loadArticleFromHistory(lastTitle, clickCount); // 直前の記事を読み込む
+        });
+    }
 }
 
 function setTitles(start, goal) {

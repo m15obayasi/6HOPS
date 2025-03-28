@@ -1,30 +1,27 @@
 const dailyArticles = [
-    { date: "2025-03-23", start: "不思議の国のアリス", goal: "Suica" },
-    { date: "2025-03-24", start: "Suica", goal: "チャットモンチー" },
-    { date: "2025-03-25", start: "チャットモンチー", goal: "Aマッソ" },
     { date: "2025-03-26", start: "Aマッソ", goal: "赤い公園" },
     { date: "2025-03-27", start: "赤い公園", goal: "斉藤由貴" },
     { date: "2025-03-28", start: "斉藤由貴", goal: "プラスチック" },
-    { date: "2025-03-29", start: "プラスチック", goal: "三四郎 (お笑いコンビ)" },
+    { date: "2025-03-29", start: "合成樹脂", goal: "三四郎 (お笑いコンビ)" },
     { date: "2025-03-30", start: "三四郎 (お笑いコンビ)", goal: "ユーゴスラビア" },
     { date: "2025-03-31", start: "ユーゴスラビア", goal: "ゴーレム" },
     { date: "2025-04-01", start: "ゴーレム", goal: "オイルショック" },
-    { date: "2025-04-02", start: "オイルショック", goal: "サンデーサイレンス" },
-    { date: "2025-04-03", start: "サンデーサイレンス", goal: "ふかわりょう" },
+    { date: "2025-04-02", start: "オイルショック", goal: "めちゃ×2イケてるッ!" },
+    { date: "2025-04-03", start: "めちゃ×2イケてるッ!", goal: "ふかわりょう" },
     { date: "2025-04-04", start: "ふかわりょう", goal: "ベネズエラ" },
     { date: "2025-04-05", start: "ベネズエラ", goal: "高橋名人" },
     { date: "2025-04-06", start: "高橋名人", goal: "リニアモーターカー" },
     { date: "2025-04-07", start: "リニアモーターカー", goal: "ヒクソン・グレイシー" },
-    { date: "2025-04-08", start: "ヒクソン・グレイシー", goal: "コレサワ" },
-    { date: "2025-04-09", start: "コレサワ", goal: "踊る大捜査線" },
+    { date: "2025-04-08", start: "ヒクソン・グレイシー", goal: "長篠の戦い" },
+    { date: "2025-04-09", start: "長篠の戦い", goal: "踊る大捜査線" },
     { date: "2025-04-10", start: "踊る大捜査線", goal: "田中角栄" },
     { date: "2025-04-11", start: "田中角栄", goal: "コレサワ" },
     { date: "2025-04-12", start: "コレサワ", goal: "火縄銃" },
     { date: "2025-04-13", start: "火縄銃", goal: "テイルズ オブ レジェンディア" },
     { date: "2025-04-14", start: "テイルズ オブ レジェンディア", goal: "木村多江" },
     { date: "2025-04-15", start: "木村多江", goal: "フリーランス" },
-    { date: "2025-04-16", start: "フリーランス", goal: "トリビアの泉 〜素晴らしきムダ知識〜" },
-    { date: "2025-04-17", start: "トリビアの泉 〜素晴らしきムダ知識〜", goal: "明智光秀" },
+    { date: "2025-04-16", start: "フリーランス", goal: "結婚できない男" },
+    { date: "2025-04-17", start: "結婚できない男", goal: "明智光秀" },
     { date: "2025-04-18", start: "明智光秀", goal: "橋本環奈" },
     { date: "2025-04-19", start: "橋本環奈", goal: "キウイフルーツ" },
     { date: "2025-04-20", start: "キウイフルーツ", goal: "美少女戦士セーラームーン" },
@@ -48,13 +45,14 @@ $(document).ready(function() {
 
     if (article) {
         $('.rectangleLabel.first').text("最初の記事");
-        $('.rectangleLabel.second').text("目標の記事");
+        $('.rectangleLabel.second').text("6つ目の記事");
         $('.rectangle').eq(0).text(article.start);
         $('.rectangle').eq(1).text(article.goal);
 
         $('.startBlock').click(function() {
             console.log("Start button clicked. Fetching article:", article.start);
             $('.modeBar').hide(); // modeBarを非表示にする
+            startArticleTitle = article.start; // startArticleTitleを更新
             setTitles(article.start, article.goal); // wiki.js の setTitles を呼び出し
         });
     } else {

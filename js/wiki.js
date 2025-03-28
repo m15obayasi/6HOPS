@@ -66,7 +66,7 @@ $(document).ready(function() {
         $('.titleUnderline').hide(); // タイトルの下の線を非表示にする
 
         // シェアボタンのクリックイベントを追加
-        $('.shareLink').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent('「' + title1 + '」から「' + title2 + '」への6HOPSに挑戦中！ \n#TRY_6HOPS\nhttps://myeik.net/6HOPS/')}`);
+        $('.shareLink').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent('「' + startArticleTitle + '」から「' + targetArticleTitleB + '」への6HOPSに挑戦中！ \n#TRY_6HOPS\nhttps://myeik.net/6HOPS/')}`);
     }
 });
 
@@ -143,7 +143,7 @@ function showActionButtons() {
         $('.title').text('0 / 6HOPS');
         $('.titleUnderline').hide();
 
-        $('.shareLink').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent('「' + title1 + '」から「' + title2 + '」への6HOPSに挑戦中！ \n#TRY_6HOPS\nhttps://myeik.net/6HOPS/')}`);
+        $('.shareLink').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent('「' + startArticleTitle + '」から「' + targetArticleTitleB + '」への6HOPSに挑戦中！ \n#TRY_6HOPS\nhttps://myeik.net/6HOPS/')}`);
     });
 
     buttonContainer.show();
@@ -330,5 +330,5 @@ function setTitles(start, goal) {
     $('.titleUnderline').hide(); // タイトルの下の線を非表示にする
 
     // シェアボタンのクリックイベントを追加
-    $('.shareLink').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent('「' + title1 + '」から「' + title2 + '」への6HOPSに挑戦中！ \n#TRY_6HOPS\nhttps://myeik.net/6HOPS/')}`);
+    $('.shareLink').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent('「' + startArticleTitle + '」から「' + targetArticleTitleB + '」への6HOPSに挑戦中！ \n#TRY_6HOPS\nhttps://myeik.net/6HOPS/')}`);
 }

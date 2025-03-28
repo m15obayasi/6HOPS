@@ -74,6 +74,7 @@ let clickCount = 0;
 let targetArticleTitleB = "";
 let history = [];
 let startArticleTitle = "";
+let continueMode = false; // 続けるモードのフラグを追加
 
 function fetchRandomWikipediaTitles() {
     $.ajax({
@@ -178,6 +179,9 @@ function fetchWikipediaArticle(title) {
                 displayResult('成功');
                 return;
             }
+            if (continueMode && clickCount >= 5) {
+                addContinuedArticle(title, clickCount === 5 ? 6 : clickCount + 1); // 続けるモードの場合、記事タイトルを追加
+            }
             $('.loadingBar').remove();
             $('.progressBar').hide(); // プログレスバーを非表示
         },
@@ -240,7 +244,7 @@ function loadArticle(linkTitle) {
     updateProgress(clickCount);
     updateTitle(clickCount);
     window.scrollTo(0, 0);
-    if (clickCount > 5 && linkTitle !== targetArticleTitleB) {
+    if (clickCount > 5 && linkTitle !== targetArticleTitleB && !continueMode) {
         displayResult('失敗');
         return;
     }
@@ -264,7 +268,7 @@ function updateHistory() {
     for (let i = 0; i < 6; i++) {
         const title = history[i] || '';
         const historyItem = $('<div data-index="' + i + '">' + title + '</div>');
-        if (i === clickCount) {
+        if (i === clickCount && !continueMode) {
             historyItem.addClass('active');
         }
         if (i > clickCount) {

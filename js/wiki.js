@@ -1,50 +1,39 @@
 $(document).ready(function() {
+    setupMenuHandlers(); // メニュー関連のイベントハンドラーを設定
+
     $('.startBlock').click(function() {
-        $('.progressBar').show();
-        fetchRandomWikipediaTitles();
-        $('.startBlock').hide();
-        $('.aboutLink').hide();
+        $('.progressBar').show(); // プログレスバーを表示
+        fetchRandomWikipediaTitles(); // ランダムなWikipedia記事タイトルを取得
+        $('.startBlock').hide(); // スタートブロックを非表示
+        $('.aboutLink').hide(); // Aboutリンクを非表示
         setTimeout(function() {
-            $('.progressBar').hide();
-            // 条件を追加して daily.html ではボタンを表示しない
-            if (!$('body').hasClass('daily')) {
-                // challenge.html 用の処理
-                showActionButtons(); // retryボタンとconfirmボタンを表示
+            $('.progressBar').hide(); // プログレスバーを非表示
+            if (!$('body').hasClass('daily')) { // DAILYモードでない場合
+                showActionButtons(); // アクションボタンを表示
             }
         }, 500);
     });
 
-    $('.menuIcon').click(function() {
-        $('.sideMenu').toggle();
-    });
-
-    $('.closeMenu').click(function() {
-        $('.sideMenu').hide();
-    });
-
-    $(document).click(function(event) {
-        if (!$(event.target).closest('.sideMenu, .menuIcon').length) {
-            $('.sideMenu').hide();
-        }
-    });
-
-    $('.history').on('click', 'div', function() {
-        const index = $(this).index();
-        const title = history[index];
-        loadArticleFromHistory(title, index);
-        history = history.slice(0, index + 1);
-        updateHistory();
-        updateProgress(index);
-        updateTitle(index);
+    $('.history').on('click', 'div', function () {
+        // 履歴の項目をクリックしたときの処理
+        const index = $(this).index(); // クリックされた履歴のインデックスを取得
+        const title = history[index]; // クリックされた履歴のタイトルを取得
+        loadArticleFromHistory(title, index); // 履歴から記事を読み込む
+        history = history.slice(0, index + 1); // クリックされた履歴以降の履歴を削除
+        updateHistory(); // 履歴を更新
+        updateProgress(index); // プログレスバーを更新
+        updateTitle(index); // タイトルを更新
     });
 
     $('.homeLink').click(function() {
         if (confirm('ホームに戻りますか？')) {
+        // ホームに戻る確認ダイアログを表示
             location.reload();
         }
     });
 
-    $('.hintBlock').click(function() {
+    $('.hintBlock').click(function () {
+        // ヒントブロックをトグル表示
         $('.goalSummary').toggle();
     });
 
@@ -53,22 +42,43 @@ $(document).ready(function() {
     if (title1 && title2) {
         localStorage.removeItem('title1');
         localStorage.removeItem('title2');
-        targetArticleTitleB = title2; // 目標記事タイトルをグローバル変数に保存
+        targetArticleTitleB = title2;
         fetchWikipediaArticle(title1);
-        displayGoal(title2); // 目標記事のタイトルと概要を表示
-        $('img.logo').hide(); // イラストを非表示にする
+        displayGoal(title2);
+        $('img.logo').hide();
         $('.rectangleContainer').remove();
         $('.startBlock').hide();
         $('.aboutLink').hide();
-        $('.wikiBlock').addClass('loaded'); // 背景色と外枠色を変更
-        $('.menuIcon').show(); // ハンバーガーメニューを表示
-        $('.title').text('0 / 6HOPS'); // タイトルを当初のものに戻す
-        $('.titleUnderline').hide(); // タイトルの下の線を非表示にする
+        $('.wikiBlock').addClass('loaded');
+        $('.menuIcon').show();
+        $('.title').text('0 / 6HOPS');
+        $('.titleUnderline').hide();
 
-        // シェアボタンのクリックイベントを追加
-        $('.shareLink').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent('「' + startArticleTitle + '」から「' + targetArticleTitleB + '」への6HOPSに挑戦中！ \n#TRY_6HOPS\nhttps://myeik.net/6HOPS/')}`);
+        $('.shareLink').attr('href', generateShareLink('TRY'));
     }
 });
+
+function setupMenuHandlers() {
+    $('.menuIcon').click(function() {
+        $('.sideMenu').toggle(); // メニューの表示/非表示を切り替え
+    });
+
+    $('.closeMenu').click(function() {
+        $('.sideMenu').hide();  // メニューを閉じる
+    });
+
+    $(document).click(function(event) {
+        if (!$(event.target).closest('.sideMenu, .menuIcon').length) {
+        // メニュー外をクリックした場合
+            $('.sideMenu').hide(); // メニューを閉じる
+        }
+    });
+}
+
+function generateShareLink(mode) {
+    const tweetText = `「${startArticleTitle}」から「${targetArticleTitleB}」への6HOPSに挑戦中！\n#${mode}_6HOPS\nhttps://myeik.net/6HOPS/`;
+    return `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+}
 
 let clickCount = 0;
 let targetArticleTitleB = "";
@@ -100,11 +110,13 @@ function fetchRandomWikipediaTitles() {
             } else {
                 $('.rectangle').eq(0).text(titles[0]);
                 $('.rectangle').eq(1).text(titles[1]);
-                startArticleTitle = titles[0];
+
+                if (!startArticleTitle) {
+                    startArticleTitle = titles[0];
+                }
             }
         },
         error: function(error) {
-            console.error('Error fetching Wikipedia titles:', error);
             alert('ランダムな記事タイトルの取得に失敗しました。');
         }
     });
@@ -143,7 +155,7 @@ function showActionButtons() {
         $('.title').text('0 / 6HOPS');
         $('.titleUnderline').hide();
 
-        $('.shareLink').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent('「' + startArticleTitle + '」から「' + targetArticleTitleB + '」への6HOPSに挑戦中！ \n#TRY_6HOPS\nhttps://myeik.net/6HOPS/')}`);
+        $('.shareLink').attr('href', generateShareLink('TRY'));
     });
 
     buttonContainer.show();
@@ -250,7 +262,6 @@ function loadArticle(linkTitle) {
     }
     fetchWikipediaArticle(linkTitle);
 
-    // daily.htmlでもタイトルと履歴を更新
     if ($('body').hasClass('daily')) {
         updateTitle(clickCount);
         updateHistory();
@@ -291,37 +302,65 @@ function updateTitle(clickCount) {
 
 function displayResult(result) {
     const resultText = result === '成功' ? '成功' : '失敗';
-    const resultMessage = result === '成功' ? 'おめでとう！目標の記事へ辿り着いた！' : '残念！6回以内に目標の記事へ辿り着けなかった……';
-    const shareMessage = result === '成功' 
-        ? `<br><br><a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(startArticleTitle + 'から' + targetArticleTitleB + 'へ' + clickCount + '手で辿り着いた！ \n#CLEAR_6HOPS\n')}" target="_blank" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>` 
-        : `<br><br><a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(startArticleTitle + 'から' + targetArticleTitleB + 'へ6手で辿り着けなかった…… \n#CLEAR_6HOPS\n')}" target="_blank" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`;
-    
+    const resultMessage = result === '成功'
+        ? 'おめでとう！目標の記事へ辿り着いた！'
+        : '残念！6回以内に目標の記事へ辿り着けなかった……';
+    const baseMessage = result === '成功'
+        ? `「${startArticleTitle}」から「${targetArticleTitleB}」へ${clickCount}手で辿り着いた！\n#TRY_6HOPS\n`
+        : `「${startArticleTitle}」から「${targetArticleTitleB}」へ6手で辿り着けなかった……\n#TRY_6HOPS\n`;
+
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(baseMessage)}&url=${encodeURIComponent('https://myeik.net/6HOPS/')}`;
+
+    const shareButton = `
+        <div class="shareButton">
+            <a href="${tweetUrl}" target="_blank" rel="noopener noreferrer" class="shareLink">
+                <img src="./img/logo-black.png" alt="Share Logo" class="shareLogo">
+                でシェアする
+            </a>
+        </div>
+    `;
+
     let continueButton = '';
     if (result === '失敗') {
-        continueButton = `<div class="continueButton">それでも続ける</div>`;
+        continueButton = `
+            <div class="continueButton">
+                それでも続ける
+            </div>
+        `;
     }
 
-    $('.wikiBlock').html('<h2>' + resultText + '</h2><p>' + resultMessage + '</p>' + shareMessage + continueButton);
+    $('.wikiBlock').html(`
+        <h2>${resultText}</h2>
+        <p>${resultMessage}</p>
+        ${shareButton}
+        ${continueButton}
+    `);
 
     if (result === '失敗') {
-        $('.continueButton').click(function() {
+        $('.continueButton').off('click').on('click', function() {
             $('.goalTitle').text('X. ' + targetArticleTitleB);
             const lastTitle = history[clickCount - 1];
-            clickCount = 5; // カウントを5にリセット
-            continueMode = true; // 続けるモードを有効にする
-            updateTitle(clickCount); // タイトルを更新
-            updateProgress(clickCount); // プログレスバーを更新
-            loadArticleFromHistory(lastTitle, clickCount); // 直前の記事を読み込む
+            clickCount = 5;
+            continueMode = true;
+            updateTitle(clickCount);
+            updateProgress(clickCount);
+            loadArticleFromHistory(lastTitle, clickCount);
         });
     }
+
+    $('.shareLink').off('click').on('click', function(event) {
+        event.preventDefault();
+        const url = $(this).attr('href');
+        window.open(url, '_blank');
+    });
 }
 
 function setTitles(start, goal) {
-    const title1 = start;
-    const title2 = goal;
-    targetArticleTitleB = title2; // 目標記事タイトルをグローバル変数に保存
-    fetchWikipediaArticle(title1); // Wikipediaの記事を表示
-    displayGoal(title2); // 目標記事のタイトルと概要を表示
+    startArticleTitle = start; // 明示的に設定
+    targetArticleTitleB = goal; // 明示的に設定
+
+    fetchWikipediaArticle(start); // Wikipediaの記事を表示
+    displayGoal(goal); // 目標記事のタイトルと概要を表示
     $('.rectangleContainer').remove();
     $('.startBlock').hide();
     $('.aboutLink').hide();
@@ -329,6 +368,5 @@ function setTitles(start, goal) {
     $('.title').text('0 / 6HOPS'); // タイトルを初期化
     $('.titleUnderline').hide(); // タイトルの下の線を非表示にする
 
-    // シェアボタンのクリックイベントを追加
-    $('.shareLink').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent('「' + startArticleTitle + '」から「' + targetArticleTitleB + '」への6HOPSに挑戦中！ \n#TRY_6HOPS\nhttps://myeik.net/6HOPS/')}`);
+    $('.shareLink').attr('href', generateShareLink('TRY'));
 }

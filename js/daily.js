@@ -40,6 +40,17 @@ const dailyArticles = [
 ];
 
 $(document).ready(function() {
+    setupDailyMode();
+    $('.wikiBlock').on('click', 'a', function(event) {
+        event.preventDefault();
+        const linkTitle = $(this).attr('title');
+        if (linkTitle) {
+            fetchWikipediaArticle(linkTitle);
+        }
+    });
+});
+
+function setupDailyMode() {
     const formattedDate = getJapanDate();
     const article = dailyArticles.find(item => item.date === formattedDate);
 
@@ -50,58 +61,15 @@ $(document).ready(function() {
         $('.rectangle').eq(1).text(article.goal);
 
         $('.startBlock').click(function() {
-            console.log("Start button clicked. Fetching article:", article.start);
-            $('.modeBar').hide(); // modeBarを非表示にする
-            startArticleTitle = article.start; // startArticleTitleを更新
-            setTitles(article.start, article.goal); // wiki.js の setTitles を呼び出し
+            startArticleTitle = article.start;
+            $('.modeBar').hide();
+            setTitles(article.start, article.goal);
         });
     } else {
-        console.error("本日の日付に対応する記事が見つかりません。");
         $('.startBlock').off('click').click(function() {
             alert("本日の日付に対応する記事が見つかりません。");
         });
     }
-
-    // Wikipedia記事内リンクのクリックイベントを設定
-    $('.wikiBlock').on('click', 'a', function(event) {
-        event.preventDefault();
-        const linkTitle = $(this).attr('title');
-        if (linkTitle) {
-            console.log("Navigating to linked article:", linkTitle);
-            fetchWikipediaArticle(linkTitle); // リンク先の記事を取得
-        }
-    });
-});
-
-function fetchWikipediaArticle(title) {
-    console.log("Fetching Wikipedia article:", title);
-    $('.wikiBlock').html('<div class="loadingBar"></div>'); // ローディングバーを表示
-    $.ajax({
-        url: 'https://ja.wikipedia.org/w/api.php',
-        data: {
-            action: 'parse',
-            page: title,
-            format: 'json',
-            prop: 'text',
-            origin: '*'
-        },
-        dataType: 'json',
-        success: function(data) {
-            console.log("Article fetched successfully:", data);
-            const content = data.parse.text['*'];
-            const $content = $('<div>').html(content);
-
-            // 不要な部分を削除
-            $content.find('.reflist, .navbox, .infobox, .metadata, .external, .mw-references-wrap').remove();
-
-            $('.wikiBlock').html('<h2>' + title + '</h2>' + $content.html());
-            $('.wikiBlock').show(); // wikiBlockを表示
-        },
-        error: function(error) {
-            console.error('Error fetching Wikipedia article:', error);
-            alert('記事の取得に失敗しました。');
-        }
-    });
 }
 
 function getJapanDate() {

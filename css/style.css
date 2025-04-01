@@ -393,8 +393,7 @@ body {
 }
 
 .wikiBlock dd {
-    margin-left: 1.5em;
-    margin-bottom: 0.5em;
+    margin-bottom: 0.8em;
 }
 
 .menuIcon {
@@ -541,19 +540,8 @@ body {
     color: white; /* ホバー時の文字色を白に変更 */
 }
 
-.shareButton {
-    width: 100%;
-    height: 10vh;
-    background-color: white; /* 背景色を白に変更 */
-    border: 1px solid black; /* 外枠を1pxの黒に設定 */
-    text-align: center;
-    line-height: 10vh;
-    margin-top: 10px;
-    color: black; /* 文字色を黒に変更 */
-}
-
-.shareLink {
-    color: black;
+.shareLink, .wikiBlockShareLink {
+    color: black !important;
     text-decoration: none;
     font-size: 2vh;
     display: flex;
@@ -561,8 +549,8 @@ body {
     justify-content: center;
 }
 
-.shareLink:hover {
-    color: white; /* ホバー時の文字色を白に変更 */
+.shareLink:hover, .wikiBlockShareLink:hover {
+    color: white !important; /* ホバー時の文字色を白に変更 */
 }
 
 .shareLogo {
@@ -571,13 +559,32 @@ body {
     margin-right: 10px;
 }
 
-.shareLink:hover .shareLogo {
+.shareButton:hover .shareLogo, .wikiBlockShareLink:hover .shareLogo {
     filter: invert(1); /* ホバー時に色を反転 */
 }
 
+.shareButton {
+    cursor: pointer; /* クリック可能であることを示す */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 10vh;
+    background-color: white;
+    border: 1px solid black;
+    text-align: center;
+    line-height: 10vh;
+    margin-top: 10px;
+    color: black;
+}
+
 .shareButton:hover {
-    background-color: black; /* ホバー時の背景色を黒に変更 */
-    color: white; /* ホバー時の文字色を白に変更 */
+    background-color: black;
+    color: white;
+}
+
+.shareButton:hover .shareLink {
+    color: white !important; /* マウスホバー時にテキストを白に変更 */
 }
 
 .aboutLink {

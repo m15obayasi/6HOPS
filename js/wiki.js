@@ -179,7 +179,21 @@ function fetchWikipediaArticle(title) {
             const content = data.parse.text['*'];
             const $content = $('<div>').html(content);
 
+            // 不要な要素を削除
             $content.find('.reflist, .navbox, .infobox, .metadata, .external, .mw-references-wrap').remove();
+            $content.find('span.mw-editsection, a[title$="（英語版）"]').remove();
+            $content.find('sup.reference').remove(); // 脚注を非表示
+            $content.find('img').css('pointer-events', 'none'); // 画像のクリックを無効化
+
+            // 存在しない記事へのリンクを通常の黒字テキストに置き換え
+            $content.find('a.new').replaceWith(function() {
+                return $('<span>').text($(this).text()).css('color', '#333');
+            });
+
+            // 日本語以外のWikipedia記事リンク（ja.wikipedia.org以外のURL）を通常の黒字テキストに置き換え
+            $content.find('a[href*=".wikipedia.org"]').not('a[href*="ja.wikipedia.org"]').replaceWith(function() {
+                return $('<span>').text($(this).text()).css('color', '#333');
+            });
 
             $('.wikiBlock').html('<h2>' + title + '</h2>' + $content.html());
             setupLinkClickHandlers();

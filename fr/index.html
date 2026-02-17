@@ -21,33 +21,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>6HOPS</title>
-    <link rel="stylesheet" href="../css/style.css?v=3.4"> <!-- パラメータクエリを更新 -->
+    <link rel="stylesheet" href="../css/style.min.css?v=7.6"> <!-- パラメータクエリを更新 -->
     <link href="https://fonts.googleapis.com/css?family=Cherry+Swash:700" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400&display=swap"> <!-- Zen Maru Gothicを追加 -->
     <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
     <meta property="og:image" content="../img/wikiLogo.png">
     <meta name="google-adsense-account" content="ca-pub-8967129057333443">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8967129057333443"
-        crossorigin="anonymous"></script>
-    <style>
-        .titleUnderline {
-            border-bottom: 2px solid black;
-            width: 100%;
-            position: absolute;
-            top: 60px; /* タイトルの下に配置 */
-        }
-    </style>
+    <!-- ad script commented out for local debugging -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8967129057333443"
+        crossorigin="anonymous"></script> -->
 </head>
 
-<body>
+<body class="challenge">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W3NNXDSG"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <div class="fixedScreen">
+        <div class="fixedScreen">
+                <!-- Mobile tracker (version simplifiée mobile) -->
+                <div class="mobileTracker" aria-label="Historique HOP" style="display:none;">
+                    <span class="mobileTrackerStep">0 / 6 HOPS</span>
+                </div>
         <div class="menuIcon" style="display: none;">&#9776;</div> <!-- Hamburger Menu -->
-        <div class="title">6HOPS</div>
+        <div class="titleContainer">
+            <div class="title">6HOPS</div>
+        </div>
         <div class="titleUnderline"></div> <!-- タイトルの下に線を追加 -->
         <hr>
     </div>
@@ -72,7 +71,10 @@
         </div>
     </div>
 
-    <div class="rectangleContainer">
+    <div class="challengeIntro">
+        Wikipédia est une encyclopédie libre que chacun peut modifier.
+    </div>
+    <div class="rectangleContainer prestart">
         <div class="rectangleLabel first">Premier Article</div>
         <div class="rectangle"></div>
         <div class="rectangleLabel second">6ème Article</div>
@@ -89,31 +91,7 @@
     <div class="wikiBlock"></div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="../js/wiki_fr.js?v=3.3"></script> <!-- パラメータクエリを更新 -->
-    <script>
-        $(document).ready(function() {
-            const title1 = localStorage.getItem('title1');
-            const title2 = localStorage.getItem('title2');
-            if (title1 && title2) {
-                localStorage.removeItem('title1');
-                localStorage.removeItem('title2');
-                targetArticleTitleB = title2; // Save target article title to global variable
-                fetchWikipediaArticle(title1);
-                displayGoal(title2); // Display target article title and summary
-                $('img.logo').hide(); // Hide the illustration
-                $('.rectangleContainer').remove();
-                $('.startBlock').hide();
-                $('.aboutLink').hide();
-                $('.wikiBlock').addClass('loaded'); // Change background and border color
-                $('.menuIcon').show(); // Show hamburger menu
-                $('.title').text('0 / 6HOPS'); // Reset title
-                $('.titleUnderline').hide(); // Hide the underline below the title
-
-                // Add click event for share button
-                $('.shareLink').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent('Challenging 6HOPS from "' + title1 + '" to "' + title2 + '"! \n#TRY_6HOPS\nhttps://myeik.net/6HOPS/fr')}`);
-            }
-        });
-    </script>
+    <script src="../js/wiki.min.js?v=6.1"></script> <!-- パラメータクエリを更新 -->
 
 </body>
 

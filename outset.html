@@ -20,7 +20,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>6HOPS</title>
-    <link rel="stylesheet" href="./css/style.css?v=3.3"> <!-- パラメータクエリを更新 -->
+    <link rel="stylesheet" href="./css/style.min.css?v=4.3"> <!-- パラメータクエリを更新 -->
     <link href="https://fonts.googleapis.com/css?family=Cherry+Swash:700" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+JP">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400&display=swap">
@@ -28,8 +28,9 @@
     <link rel="icon" href="./img/favicon.ico" type="image/x-icon">
     <meta property="og:image" content="./img/wikiLogo.png">
     <meta name="google-adsense-account" content="ca-pub-8967129057333443">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8967129057333443"
-        crossorigin="anonymous"></script>
+    <!-- ad script commented out for local debugging -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8967129057333443"
+        crossorigin="anonymous"></script> -->
 </head>
 
 <body>
@@ -184,17 +185,16 @@
 <a href="./index.html">ホームに戻る</a>
 <p></p>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="./js/wiki.js?v=3.2"></script> <!-- パラメータクエリを更新 -->
     <script>
-        $(document).ready(function() {
-            $('.boxed-2').click(function() {
-                const title1 = 'イヌ';
-                const title2 = '火星';
-                localStorage.setItem('title1', title1);
-                localStorage.setItem('title2', title2);
-                $('.startBlock').hide();
-                $('.aboutLink').hide();
+        document.addEventListener('DOMContentLoaded', function() {
+            const boxed = document.querySelector('.boxed-2');
+            if (!boxed) {
+                return;
+            }
+
+            boxed.addEventListener('click', function() {
+                localStorage.setItem('title1', 'イヌ');
+                localStorage.setItem('title2', '火星');
                 window.location.href = './index.html';
             });
         });

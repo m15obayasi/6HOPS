@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>6HOPS</title>
-    <link rel="stylesheet" href="./css/style.css?v=3.8"> <!-- パラメータクエリを更新 -->
+    <link rel="stylesheet" href="./css/style.min.css?v=7.6"> <!-- パラメータクエリを更新 -->
     <link href="https://fonts.googleapis.com/css?family=Cherry+Swash:700" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+JP">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400&display=swap">
@@ -13,13 +13,14 @@
     <link rel="icon" href="./img/favicon.ico" type="image/x-icon"> <!-- パスを確認 -->
     <meta property="og:image" content="./img/wikiLogo.png"> <!-- パスを確認 -->
     <meta name="google-adsense-account" content="ca-pub-8967129057333443">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8967129057333443"
-        crossorigin="anonymous"></script>
+    <!-- ad script commented out for local debugging -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8967129057333443"
+        crossorigin="anonymous"></script> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="./js/wiki.js?v=4.0"></script> <!-- パラメータクエリを更新 -->
+    <script src="./js/wiki.min.js?v=6.1"></script> <!-- パラメータクエリを更新 -->
 </head>
 
-<body>
+<body class="challenge">
     <div class="fixedScreen">
         <div class="menuIcon" style="display: none;">&#9776;</div>
         <div class="titleContainer">
@@ -49,11 +50,11 @@
         </div>
     </div>
 
-    <div class="modeBar">
-        <a href="./index.html">デイリーモード</a>
-        <a href="./challenge.html" class="active">チャレンジモード</a>
+    <div class="challengeIntro">
+        <span class="challengeIntroText"><span class="challengeIntroWord">ウィキペディア</span>は、<br>
+        誰でも編集できるフリー百科事典です。</span>
     </div>
-    <div class="rectangleContainer">
+    <div class="rectangleContainer prestart">
         <div class="rectangleLabel first">最初の記事</div>
         <div class="rectangle"></div>
         <div class="rectangleLabel second">6つ目の記事</div>

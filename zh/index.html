@@ -20,33 +20,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>6HOPS</title>
-    <link rel="stylesheet" href="../css/style.css?v=3.5"> <!-- パラメータクエリを更新 -->
+    <link rel="stylesheet" href="../css/style.min.css?v=7.6"> <!-- パラメータクエリを更新 -->
     <link href="https://fonts.googleapis.com/css?family=Cherry+Swash:700" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+SC">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400&display=swap"> <!-- Zen Maru Gothicを追加 -->
     <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
     <meta property="og:image" content="../img/wikiLogo.png">
     <meta name="google-adsense-account" content="ca-pub-8967129057333443">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8967129057333443"
-        crossorigin="anonymous"></script>
-    <style>
-        .titleUnderline {
-            border-bottom: 2px solid black;
-            width: 100%;
-            position: absolute;
-            top: 60px; /* タイトルの下に配置 */
-        }
-    </style>
+    <!-- ad script commented out for local debugging -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8967129057333443"
+        crossorigin="anonymous"></script> -->
 </head>
 
-<body>
+<body class="challenge">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W3NNXDSG"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <div class="fixedScreen">
+        <div class="fixedScreen">
+                <!-- Mobile tracker (简化版移动端) -->
+                <div class="mobileTracker" aria-label="HOP 历史" style="display:none;">
+                    <span class="mobileTrackerStep">0 / 6 HOPS</span>
+                </div>
         <div class="menuIcon" style="display: none;">&#9776;</div> <!-- 汉堡菜单 -->
-        <div class="title">6HOPS</div>
+        <div class="titleContainer">
+            <div class="title">6HOPS</div>
+        </div>
         <div class="titleUnderline"></div> <!-- 在标题下添加下划线 -->
         <hr>
     </div>
@@ -71,7 +70,10 @@
         </div>
     </div>
 
-    <div class="rectangleContainer">
+    <div class="challengeIntro">
+        维基百科是任何人都可以编辑的自由百科全书。
+    </div>
+    <div class="rectangleContainer prestart">
         <div class="rectangleLabel first">第一个文章</div>
         <div class="rectangle"></div>
         <div class="rectangleLabel second">第六个文章</div>
@@ -88,31 +90,7 @@
     <div class="wikiBlock"></div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="../js/wiki_zh.js?v=3.4"></script> <!-- パラメータクエリを更新 -->
-    <script>
-        $(document).ready(function() {
-            const title1 = localStorage.getItem('title1');
-            const title2 = localStorage.getItem('title2');
-            if (title1 && title2) {
-                localStorage.removeItem('title1');
-                localStorage.removeItem('title2');
-                targetArticleTitleB = title2; // 保存目标文章标题到全局变量
-                fetchWikipediaArticle(title1);
-                displayGoal(title2); // 显示目标文章标题和摘要
-                $('img.logo').hide(); // 隐藏插图
-                $('.rectangleContainer').remove();
-                $('.startBlock').hide();
-                $('.aboutLink').hide();
-                $('.wikiBlock').addClass('loaded'); // 更改背景色和边框颜色
-                $('.menuIcon').show(); // 显示汉堡菜单
-                $('.title').text('0 / 6HOPS'); // 重置标题
-                $('.titleUnderline').hide(); // 隐藏标题下的下划线
-
-                // 添加分享按钮的点击事件
-                $('.shareLink').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent('挑战6HOPS，从"' + title1 + '"到"' + title2 + '"！ \n#TRY_6HOPS\nhttps://myeik.net/6HOPS/zh')}`);
-            }
-        });
-    </script>
+    <script src="../js/wiki.min.js?v=6.1"></script> <!-- パラメータクエリを更新 -->
 
 </body>
 

@@ -528,29 +528,29 @@ body {
 }
 
 .button.confirm.final-stop {
-    background-color: #3366cc;
+    background-color: #000;
     color: #fff;
-    border-color: #3366cc;
+    border-color: #000;
 }
 
 .button.confirm.primary-action {
-    background-color: #3366cc;
+    background-color: #000;
     color: #fff;
-    border-color: #3366cc;
+    border-color: #000;
 }
 
 .buttonContainer.roulette.decision-phase .button.retry {
-    opacity: 0.82;
-    background-color: #f1f3f5;
-    color: #3a3f45;
-    border-color: #b8bec6;
+    opacity: 1;
+    background-color: #fff;
+    color: #000;
+    border-color: #a2a9b1;
 }
 
 .buttonContainer.roulette.decision-phase .button.retry:hover {
-    opacity: 0.92;
-    background-color: #e2e5e9;
-    color: #202122;
-    border-color: #a2a9b1;
+    opacity: 1;
+    background-color: #000;
+    color: #fff;
+    border-color: #000;
 }
 
 .button:hover {
@@ -1765,6 +1765,7 @@ body {
     font-size: 0.72rem;
     line-height: 1.25;
     white-space: normal;
+    overflow-wrap: anywhere;
     pointer-events: auto;
     z-index: 1;
     transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
@@ -1810,26 +1811,34 @@ body {
         margin-bottom: 22px;
     }
 
-    .dailyInitial .rectangleContainer {
+    .dailyInitial .rectangleContainer,
+    .randomInitial .rectangleContainer {
         margin-top: 0;
         margin-bottom: 28px;
     }
 
-    .dailyInitial .rectangleLabel.first {
+    .dailyInitial .rectangleLabel.first,
+    .randomInitial .rectangleLabel.first {
         margin-bottom: 6px;
     }
 
-    .dailyInitial .rectangleLabel.second {
+    .dailyInitial .rectangleLabel.second,
+    .randomInitial .rectangleLabel.second {
         margin-top: 18px;
         margin-bottom: 6px;
     }
 
-    .dailyInitial .rectangle {
+    .dailyInitial .rectangle,
+    .randomInitial .rectangle {
         margin-top: 0;
         margin-bottom: 0;
     }
 
     .dailyInitial .startBlock {
+        transform: none;
+    }
+
+    .challenge.randomInitial .buttonContainer.roulette {
         transform: none;
     }
 }
@@ -1848,21 +1857,25 @@ body {
         padding: 10px 12px;
     }
 
-    .dailyInitial .rectangleContainer {
+    .dailyInitial .rectangleContainer,
+    .randomInitial .rectangleContainer {
         margin-top: 0;
         margin-bottom: 24px;
     }
 
-    .dailyInitial .rectangleLabel.first {
+    .dailyInitial .rectangleLabel.first,
+    .randomInitial .rectangleLabel.first {
         margin-bottom: 6px;
     }
 
-    .dailyInitial .rectangleLabel.second {
+    .dailyInitial .rectangleLabel.second,
+    .randomInitial .rectangleLabel.second {
         margin-top: 16px;
         margin-bottom: 6px;
     }
 
-    .dailyInitial .rectangle {
+    .dailyInitial .rectangle,
+    .randomInitial .rectangle {
         margin-top: 0;
         margin-bottom: 0;
     }
@@ -1887,6 +1900,16 @@ body {
         gap: 9px;
         padding: 12px;
     }
+}
+
+/* ルーレットの進行ボタンはDailyと同じ白黒に統一する */
+.button.confirm.final-stop,
+.button.confirm.primary-action,
+.button.confirm.final-stop:hover,
+.button.confirm.primary-action:hover {
+    background-color: #000;
+    color: #fff;
+    border-color: #000;
 }
 
 /* Ensure mobileTrackerTitle is usable when moved outside .desktopTracker

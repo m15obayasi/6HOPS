@@ -22,7 +22,7 @@ const LOCALE_CONFIG = {
         alertGoalSummaryFailed: '目標記事の概要の取得に失敗しました。',
         alertRouletteFailed: 'ルーレット用の記事タイトルの取得に失敗しました。',
         buttons: { retry: 'もう1回', stop: '止める', confirm: '確定', share: 'でシェアする' },
-        landing: { topicSuffix: 'のお題', today: '本日', archiveLabel: '過去のお題', datePickerAria: '過去のDailyを選ぶ', dailyStart: 'START', randomStart: 'ランダムを始める', randomLink: 'ランダムで遊ぶ' },
+        landing: { topicSuffix: 'のお題', today: '本日', archiveLabel: '過去のお題', datePickerAria: '過去のDailyを選ぶ', dailyStart: 'START', randomStart: 'ランダムを始める', randomLink: 'ランダムで遊ぶ', dailyLink: 'デイリーチャレンジ', dailyShort: 'デイリー' },
         mode: { daily: 'DAILY', random: 'ランダム' },
         result: {
             successLabel: '成功',
@@ -46,7 +46,7 @@ const LOCALE_CONFIG = {
         alertGoalSummaryFailed: 'Failed to fetch target summary.',
         alertRouletteFailed: 'Failed to fetch roulette article titles.',
         buttons: { retry: 'Retry', stop: 'Stop', confirm: 'Confirm', share: 'Share' },
-        landing: { topicSuffix: ' — Daily challenge', today: 'Today', archiveLabel: 'Past challenges', datePickerAria: 'Choose a past Daily', dailyStart: 'START', randomStart: 'START RANDOM', randomLink: 'Play a random game' },
+        landing: { topicSuffix: ' — Daily challenge', today: 'Today', archiveLabel: 'Past challenges', datePickerAria: 'Choose a past Daily', dailyStart: 'START', randomStart: 'START RANDOM', randomLink: 'Play a random game', dailyLink: 'Daily challenge', dailyShort: 'Daily' },
         mode: { daily: 'DAILY', random: 'RANDOM' },
         result: {
             successLabel: 'Success',
@@ -70,7 +70,7 @@ const LOCALE_CONFIG = {
         alertGoalSummaryFailed: 'Fehler beim Abrufen der Zielzusammenfassung.',
         alertRouletteFailed: 'Fehler beim Abrufen der Roulette-Artikel.',
         buttons: { retry: 'Noch einmal', stop: 'Stoppen', confirm: 'Bestätigen', share: 'Teilen' },
-        landing: { topicSuffix: ' – Tagesaufgabe', today: 'Heute', archiveLabel: 'Frühere Aufgaben', datePickerAria: 'Frühere Daily-Aufgabe wählen', dailyStart: 'START', randomStart: 'ZUFALL STARTEN', randomLink: 'Zufällig spielen' },
+        landing: { topicSuffix: ' – Tagesaufgabe', today: 'Heute', archiveLabel: 'Frühere Aufgaben', datePickerAria: 'Frühere Daily-Aufgabe wählen', dailyStart: 'START', randomStart: 'ZUFALL STARTEN', randomLink: 'Zufällig spielen', dailyLink: 'Tagesaufgabe', dailyShort: 'Daily' },
         mode: { daily: 'DAILY', random: 'ZUFALL' },
         result: {
             successLabel: 'Erfolg',
@@ -94,7 +94,7 @@ const LOCALE_CONFIG = {
         alertGoalSummaryFailed: 'Échec de récupération du résumé cible.',
         alertRouletteFailed: 'Échec de récupération des titres de roulette.',
         buttons: { retry: 'Réessayer', stop: 'Arrêter', confirm: 'Confirmer', share: 'Partager' },
-        landing: { topicSuffix: ' – Défi quotidien', today: 'Aujourd’hui', archiveLabel: 'Défis précédents', datePickerAria: 'Choisir un ancien Daily', dailyStart: 'DÉMARRER', randomStart: 'LANCER AU HASARD', randomLink: 'Jouer au hasard' },
+        landing: { topicSuffix: ' – Défi quotidien', today: 'Aujourd’hui', archiveLabel: 'Défis précédents', datePickerAria: 'Choisir un ancien Daily', dailyStart: 'DÉMARRER', randomStart: 'LANCER AU HASARD', randomLink: 'Jouer au hasard', dailyLink: 'Défi quotidien', dailyShort: 'Daily' },
         mode: { daily: 'DAILY', random: 'ALÉATOIRE' },
         result: {
             successLabel: 'Succès',
@@ -118,7 +118,7 @@ const LOCALE_CONFIG = {
         alertGoalSummaryFailed: '获取目标摘要失败。',
         alertRouletteFailed: '获取轮盘文章标题失败。',
         buttons: { retry: '再试一次', stop: '停止', confirm: '确定', share: '分享' },
-        landing: { topicSuffix: ' 每日题目', today: '今天', archiveLabel: '往期题目', datePickerAria: '选择往期每日挑战', dailyStart: '开始', randomStart: '开始随机挑战', randomLink: '玩随机模式' },
+        landing: { topicSuffix: ' 每日题目', today: '今天', archiveLabel: '往期题目', datePickerAria: '选择往期每日挑战', dailyStart: '开始', randomStart: '开始随机挑战', randomLink: '玩随机模式', dailyLink: '每日挑战', dailyShort: '每日' },
         mode: { daily: '每日', random: '随机' },
         result: {
             successLabel: '成功',
@@ -167,17 +167,7 @@ $(document).ready(function() {
             startDailyGame();
             return;
         }
-
-        $('.progressBar').show(); // プログレスバーを表示
-        rouletteIntroOffset = $('.challengeIntro:visible').outerHeight(true) || 0;
-        $('.challengeIntro').hide();
-        $('.rectangleContainer').removeClass('prestart');
-        $('.startBlock').hide(); // スタートブロックを非表示
-        $('.aboutLink').hide(); // Aboutリンクを非表示
-        startRouletteSelection(function() {
-            $('.progressBar').hide(); // プログレスバーを非表示
-            showActionButtons(); // アクションボタンを表示
-        });
+        startRandomRoulette();
     });
 
     $('.history').on('click', 'div', function () {
@@ -318,6 +308,7 @@ let rouletteIntroOffset = 0;
 let rouletteTitlesCache = null;
 let rouletteTitlesRequest = null;
 let rouletteTitleCallbacks = [];
+let rouletteRunId = 0;
 let gameMode = 'daily';
 let dailyChallenge = null;
 let todayDailyDateKey = '';
@@ -335,12 +326,21 @@ function setupLandingMode() {
     selectDailyChallenge(requestedDateKey, false);
     $('.rectangleContainer').removeClass('prestart');
     $('.start').text(localeConfig.landing.dailyStart);
+    configureModeSwitch('random');
+}
+
+function configureModeSwitch(targetMode) {
+    const showRandom = targetMode === 'random';
+    const longLabel = showRandom ? localeConfig.landing.randomLink : localeConfig.landing.dailyLink;
+    const shortLabel = showRandom ? localeConfig.mode.random : localeConfig.landing.dailyShort;
     $('.randomModeButton')
         .empty()
-        .attr('aria-label', localeConfig.landing.randomLink)
-        .append($('<span class="randomLongLabel"></span>').text(localeConfig.landing.randomLink))
-        .append($('<span class="randomShortLabel" aria-hidden="true"></span>').text(localeConfig.mode.random));
-    $('.randomModeButton').on('click', switchToRandomMode);
+        .show()
+        .attr('aria-label', longLabel)
+        .append($('<span class="randomLongLabel"></span>').text(longLabel))
+        .append($('<span class="randomShortLabel" aria-hidden="true"></span>').text(shortLabel))
+        .off('click.modeSwitch')
+        .on('click.modeSwitch', showRandom ? switchToRandomMode : switchToDailyMode);
 }
 
 function getRequestedDailyDateKey(todayKey) {
@@ -461,15 +461,56 @@ function startDailyGame() {
 }
 
 function switchToRandomMode() {
+    if (gameStarted || gameMode === 'random') return;
     gameMode = 'random';
-    dailyChallenge = null;
-    $('body').removeClass('dailyInitial');
-    $('.dailyTopic, .randomModeButton').hide();
-    $('.challengeIntro').show();
+    $('body').removeClass('dailyInitial').addClass('randomInitial');
+    $('.dailyTopic').hide();
     $('.rectangle').empty();
-    $('.rectangleContainer').addClass('prestart');
-    $('.start').text(localeConfig.landing.randomStart);
-    fetchRouletteTitles();
+    configureModeSwitch('daily');
+    startRandomRoulette();
+}
+
+function switchToDailyMode() {
+    if (gameStarted || gameMode === 'daily') return;
+    gameMode = 'daily';
+    rouletteRunId++;
+    if (rouletteTimer) {
+        clearInterval(rouletteTimer);
+        rouletteTimer = null;
+    }
+    rouletteStopStage = 0;
+    rouletteFrozenTitleA = '';
+    rouletteFrozenTitleB = '';
+    $('.buttonContainer').remove();
+    $('.progressBar').hide();
+    $('body').removeClass('randomInitial').addClass('dailyInitial');
+    $('.dailyTopic').show();
+    $('.rectangleContainer').removeClass('prestart');
+    $('.startBlock').show();
+    $('.start').text(localeConfig.landing.dailyStart);
+    selectDailyChallenge(dailyChallenge.date, false);
+    configureModeSwitch('random');
+}
+
+function startRandomRoulette() {
+    const runId = ++rouletteRunId;
+    $('.progressBar').show();
+    rouletteIntroOffset = 0;
+    $('.challengeIntro').hide();
+    $('.rectangleContainer').removeClass('prestart');
+    $('.startBlock').hide();
+    $('.aboutLink').hide();
+    startRouletteSelection(function() {
+        if (gameMode !== 'random' || runId !== rouletteRunId) {
+            if (rouletteTimer) {
+                clearInterval(rouletteTimer);
+                rouletteTimer = null;
+            }
+            return;
+        }
+        $('.progressBar').hide();
+        showActionButtons();
+    });
 }
 
 function isDesktopTrackerMode() {
@@ -1098,6 +1139,7 @@ function flashRouletteStop(rectangleIndex) {
 
 function beginChallengeGame(title1, title2) {
     gameStarted = true;
+    $('body').removeClass('dailyInitial randomInitial');
     startArticleTitle = title1;
     targetArticleTitleB = title2;
     targetArticlePageId = null;

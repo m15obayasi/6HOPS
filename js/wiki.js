@@ -181,14 +181,8 @@ $(document).ready(function() {
     });
 
     $('.history').on('click', 'div', function () {
-        // 履歴の項目をクリックしたときの処理
-        const index = $(this).index(); // クリックされた履歴のインデックスを取得
-        const title = history[index]; // クリックされた履歴のタイトルを取得
-        loadArticleFromHistory(title, index); // 履歴から記事を読み込む
-        history = history.slice(0, index + 1); // クリックされた履歴以降の履歴を削除
-        updateHistory(); // 履歴を更新
-        updateProgress(index); // プログレスバーを更新
-        updateTitle(index); // タイトルを更新
+        const index = Number($(this).attr('data-index'));
+        returnToHistoryIndex(index);
     });
 
     $('.homeLink').click(function() {
@@ -388,160 +382,46 @@ function isDesktopTrackerMode() {
 function setupDesktopTracker() {
     if (!$('.desktopTracker').length) {
         $('.fixedScreen').append(`<div class="desktopTracker" aria-label="${localeConfig.trackerAria}"></div>`);
-        // created .desktopTracker
     }
 
-    // クリックで吹き出し表示（デスクトップ）またはモバイル用タイトル領域更新
+    // 0〜5は一度のクリック／タップでその時点の記事へ戻る。
+    // 6だけは従来どおりゴールのヒント表示として扱う。
     $('.desktopTracker').off('click.trackerSlot').on('click.trackerSlot', '.trackerSlot', function(e) {
         if (!gameStarted) return;
         const $slot = $(this);
         const index = Number($slot.data('index'));
+        if (Number.isNaN(index)) return;
 
-        const isMobile = window.matchMedia('(max-width: 1023px)').matches;
-        // ゴール以外は履歴がなければ何もしない
-        if ((index < 6 && (Number.isNaN(index) || index > clickCount || !history[index]))) return;
-
-        if (isMobile) {
-            // モバイルではポップアップを使わず下部のタイトル領域に表示する
-            const titleText = (index === 6) ? (targetArticleTitleB || '') : (history[index] || '');
-            const $bar = $('.mobileTrackerTitle');
-            if ($bar.length) {
-                $bar.attr('data-index', index);
-                $bar.empty();
-                const $num = $('<span>').addClass('num').addClass((index === 0 || index === 6) ? 'edge' : 'blue').text(index);
-                const $titleSpan = $('<span>').addClass('titleText').text(titleText || '');
-                $bar.append($num).append($titleSpan);
-                if (index === 6) {
-                    const summary = ($('.goalSummary').text() || '').trim();
-                    if (summary) {
-                        const $goal = $('<div>').addClass('mobileGoalSummary').text(summary);
-                        $bar.append($goal);
-                    }
-                }
-                $bar.toggleClass('clickable', !!titleText && index < 6);
-                if (titleText) {
-                    $bar.show();
-                    try {
-                        const headerH = $('.fixedScreen').outerHeight() || 0;
-                        // make it float over the current viewport under the header
-                        $bar.addClass('floating');
-                        $bar.css({ position: 'fixed', top: (headerH + 8) + 'px', left: '50%', transform: 'translateX(-50%)' });
-                    } catch (e) {}
-                } else {
-                    $bar.removeClass('floating').css({ position: 'relative', top: '', left: '', transform: '', marginBottom: '' }).hide();
-                }
-            }
+        if (index < 6) {
+            if (index > clickCount || !history[index]) return;
+            e.preventDefault();
             e.stopPropagation();
+            returnToHistoryIndex(index);
             return;
         }
 
-        // デスクトップ: 吹き出し表示トグル
-        if ($slot.hasClass('show-title-popup')) {
-            $slot.removeClass('show-title-popup');
-        } else {
-            $('.desktopTracker .trackerSlot').removeClass('show-title-popup');
-            $slot.addClass('show-title-popup');
-        }
-
-        // 吹き出し以外のクリックで閉じる
-        e.stopPropagation();
-    });
-    // 追加: タッチデバイス向けに pointerdown も受け取り、モバイルならタイトル領域更新、デスクトップならトグル
-    $('.desktopTracker').off('pointerdown.trackerSlot').on('pointerdown.trackerSlot', '.trackerSlot', function(e) {
-        if (!gameStarted) return;
-        const $slot = $(this);
-        const index = Number($slot.data('index'));
-        const isMobile = window.matchMedia('(max-width: 1023px)').matches;
-        if ((index < 6 && (Number.isNaN(index) || index > clickCount || !history[index]))) return;
-
-        // debug
-        // pointerdown on tracker slot
-        // debugBadge removed
-
-        if (isMobile) {
-            const titleText = (index === 6) ? (targetArticleTitleB || '') : (history[index] || '');
-            const $bar = $('.mobileTrackerTitle');
-            if ($bar.length) {
-                $bar.attr('data-index', index);
-                $bar.empty();
-                const $num2 = $('<span>').addClass('num').addClass((index === 0 || index === 6) ? 'edge' : 'blue').text(index);
-                const $titleSpan2 = $('<span>').addClass('titleText').text(titleText || '');
-                $bar.append($num2).append($titleSpan2);
-                if (index === 6) {
-                    const summary2 = ($('.goalSummary').text() || '').trim();
-                    if (summary2) {
-                        const $goal2 = $('<div>').addClass('mobileGoalSummary').text(summary2);
-                        $bar.append($goal2);
-                    }
-                }
-                $bar.toggleClass('clickable', !!titleText && index < 6);
-                if (titleText) {
-                    $bar.show();
-                    try {
-                        const headerH = $('.fixedScreen').outerHeight() || 0;
-                        $bar.addClass('floating');
-                        $bar.css({ position: 'fixed', top: (headerH + 8) + 'px', left: '50%', transform: 'translateX(-50%)' });
-                    } catch (e) {}
-                    // debugBadge removed
-                } else {
-                    $bar.removeClass('floating').css({ position: 'relative', top: '', left: '', transform: '', marginBottom: '' }).hide();
-                }
-            }
-            e.stopPropagation();
-            return;
-        }
-
-        // デスクトップは既存の挙動
-        if ($slot.hasClass('show-title-popup')) {
-            $slot.removeClass('show-title-popup');
-        } else {
-            $('.desktopTracker .trackerSlot').removeClass('show-title-popup');
-            $slot.addClass('show-title-popup');
-        }
-        e.stopPropagation();
-    });
-
-    // touchend: ensure tap -> title-bar behavior on mobile (protect against some browsers' click suppression)
-    $('.desktopTracker').off('touchend.trackerSlot').on('touchend.trackerSlot', '.trackerSlot', function(e) {
-        if (!gameStarted) return;
-        const $slot = $(this);
-        const index = Number($slot.data('index'));
-        const isMobile = window.matchMedia('(max-width: 1023px)').matches;
-        if (!isMobile) return;
-        if ((index < 6 && (Number.isNaN(index) || index > clickCount || !history[index]))) return;
-
-        const titleText = (index === 6) ? (targetArticleTitleB || '') : (history[index] || '');
-        const $bar = $('.mobileTrackerTitle');
-            if ($bar.length) {
-            $bar.attr('data-index', index);
-            $bar.empty();
-            const $num3 = $('<span>').addClass('num').addClass((index === 0 || index === 6) ? 'edge' : 'blue').text(index);
-            const $titleSpan3 = $('<span>').addClass('titleText').text(titleText || '');
-            $bar.append($num3).append($titleSpan3);
-            if (index === 6) {
-                const summary3 = ($('.goalSummary').text() || '').trim();
-                if (summary3) {
-                    const $goal3 = $('<div>').addClass('mobileGoalSummary').text(summary3);
-                    $bar.append($goal3);
-                }
-            }
-            $bar.toggleClass('clickable', !!titleText && index < 6);
-            if (titleText) {
-                $bar.show();
-                try {
-                    const headerH = $('.fixedScreen').outerHeight() || 0;
-                    $bar.addClass('floating');
-                    $bar.css({ position: 'fixed', top: (headerH + 8) + 'px', left: '50%', transform: 'translateX(-50%)' });
-                } catch (e) {}
-                // debugBadge removed
-            } else {
-                $bar.removeClass('floating').css({ position: 'relative', top: '', left: '', transform: '', marginBottom: '' }).hide();
-            }
-        }
-        // debugBadge removed
+        if (index !== 6 || !targetArticleTitleB) return;
         e.preventDefault();
         e.stopPropagation();
+
+        if (window.matchMedia('(max-width: 1023px)').matches) {
+            const $bar = $('.mobileTrackerTitle');
+            const summary = ($('.goalSummary').text() || '').trim();
+            $bar.removeClass('clickable').attr('data-index', 6).empty()
+                .append($('<span>').addClass('num edge').text('6'))
+                .append($('<span>').addClass('titleText').text(targetArticleTitleB));
+            if (summary) {
+                $bar.append($('<div>').addClass('mobileGoalSummary').text(summary));
+            }
+            const headerH = $('.fixedScreen').outerHeight() || 0;
+            $bar.addClass('floating').css({ position: 'fixed', top: (headerH + 8) + 'px', left: '50%', transform: 'translateX(-50%)' }).show();
+            return;
+        }
+
+        $('.desktopTracker .trackerSlot').not($slot).removeClass('show-title-popup');
+        $slot.toggleClass('show-title-popup');
     });
+
     // tracker以外クリックで吹き出しとモバイルタイトルを閉じる
     $(document).off('click.trackerPopup').on('click.trackerPopup', function(e) {
         if (!$(e.target).closest('.desktopTracker').length) {
@@ -550,49 +430,9 @@ function setupDesktopTracker() {
         }
     });
 
-    // 吹き出しをクリックしたら該当記事へ移動（ただし6は遷移させない）
-    $('.desktopTracker').off('click.trackerPopupInner').on('click.trackerPopupInner', '.trackerTitlePopup', function(e) {
-        e.stopPropagation();
-        if (!gameStarted) return;
-        const $slot = $(this).closest('.trackerSlot');
-        const index = Number($slot.data('index'));
-        if (index === 6) {
-            // 6はヒント表示のみ。クリックで遷移させない。
-            $('.desktopTracker .trackerSlot').removeClass('show-title-popup');
-            return;
-        }
-        const title = history[index];
-        if (!title) return;
-        loadArticleFromHistory(title, index);
-        history = history.slice(0, index + 1);
-        updateHistory();
-        $('.desktopTracker .trackerSlot').removeClass('show-title-popup');
-    });
-
-    // モバイル: トラッカー下部のタイトル領域をクリックしたら履歴に戻る
-    $(document).off('click.mobileTitle').on('click.mobileTitle', '.mobileTrackerTitle.clickable', function(e) {
-        e.stopPropagation();
-        // mobile title clicked
-        // debugBadge removed
-        if (!gameStarted) return;
-        const $bar = $(this);
-        const index = Number($bar.attr('data-index'));
-        if (Number.isNaN(index)) return;
-        if (index === 6) {
-            // goal: do not navigate
-            return;
-        }
-        const title = history[index];
-        if (!title) return;
-        loadArticleFromHistory(title, index);
-        history = history.slice(0, index + 1);
-        updateHistory();
-        $bar.hide();
-    });
-
     // Debounced resize to avoid excessive re-renders
     let __trackerResizeTimeout = null;
-    $(window).on('resize', function() {
+    $(window).off('resize.desktopTracker').on('resize.desktopTracker', function() {
         if (__trackerResizeTimeout) clearTimeout(__trackerResizeTimeout);
         __trackerResizeTimeout = setTimeout(function() {
             renderDesktopTracker();
@@ -601,13 +441,7 @@ function setupDesktopTracker() {
     });
 
     renderDesktopTracker();
-    // renderDesktopTracker called
-
-    // debugBadge removed
 }
-
-// show small on-screen debug badge for quick verification
-// debugBadge removed
 
 function renderDesktopTracker() {
     const tracker = $('.desktopTracker');
@@ -751,6 +585,43 @@ function showActionButtons() {
     buttonContainer.show();
 }
 
+function normalizeWikipediaMediaUrl(url) {
+    const value = (url || '').trim();
+    if (!value) return '';
+    if (value.startsWith('//')) return 'https:' + value;
+    if (value.startsWith('/')) return 'https://' + localeConfig.wikiDomain + value;
+    return value;
+}
+
+function normalizeWikipediaSrcset(srcset) {
+    return (srcset || '').split(',').map(function(candidate) {
+        const parts = candidate.trim().split(/\s+/);
+        if (!parts[0]) return '';
+        parts[0] = normalizeWikipediaMediaUrl(parts[0]);
+        return parts.join(' ');
+    }).filter(Boolean).join(', ');
+}
+
+function prepareWikipediaMedia($content) {
+    $content.find('img').each(function() {
+        const $image = $(this);
+        const currentSrc = $image.attr('src') || '';
+        const lazySrc = $image.attr('data-src') || '';
+        const source = lazySrc && (!currentSrc || currentSrc.startsWith('data:')) ? lazySrc : currentSrc;
+        const currentSrcset = $image.attr('srcset') || $image.attr('data-srcset') || '';
+
+        if (source) $image.attr('src', normalizeWikipediaMediaUrl(source));
+        if (currentSrcset) $image.attr('srcset', normalizeWikipediaSrcset(currentSrcset));
+        $image.attr('decoding', 'async').css('pointer-events', 'none');
+    });
+
+    $content.find('source[srcset], source[data-srcset]').each(function() {
+        const $source = $(this);
+        const srcset = $source.attr('srcset') || $source.attr('data-srcset') || '';
+        if (srcset) $source.attr('srcset', normalizeWikipediaSrcset(srcset));
+    });
+}
+
 function fetchWikipediaArticle(title) {
     if (isLoadingArticle) {
         return;
@@ -776,10 +647,10 @@ function fetchWikipediaArticle(title) {
             const $content = $('<div>').html(content);
 
             // 不要な要素を削除
-            $content.find('.reflist, .navbox, .infobox, .metadata, .external, .mw-references-wrap').remove();
+            $content.find('.reflist, .navbox, .metadata, .external, .mw-references-wrap').remove();
             $content.find('span.mw-editsection').remove();
             $content.find('sup.reference').remove(); // 脚注を非表示
-            $content.find('img').css('pointer-events', 'none'); // 画像のクリックを無効化
+            prepareWikipediaMedia($content);
 
             // 存在しない記事へのリンクを通常の黒字テキストに置き換え
             $content.find('a.new').replaceWith(function() {
@@ -790,11 +661,10 @@ function fetchWikipediaArticle(title) {
                 return $('<span>').text($(this).text()).css('color', '#333');
             });
 
-            $('.wikiBlock').html('<h2>' + title + '</h2>' + $content.html());
+            $('.wikiBlock').empty().append($('<h2>').text(parsedTitle)).append($content.contents());
             setupLinkClickHandlers();
-            if (!history.includes(title)) {
-                history.push(title);
-            }
+            history = history.slice(0, clickCount);
+            history[clickCount] = parsedTitle;
             updateHistory();
             const reachedGoal = (targetArticlePageId && parsedPageId === targetArticlePageId)
                 || (!targetArticlePageId && (title === targetArticleTitleB || parsedTitle === targetCanonicalTitle));
@@ -915,10 +785,19 @@ function updateHistory() {
     renderDesktopTracker();
 }
 
-function loadArticleFromHistory(title, index) {
+function returnToHistoryIndex(index) {
+    if (isLoadingArticle || Number.isNaN(index) || index < 0 || index > clickCount || !history[index]) {
+        return;
+    }
+    const title = history[index];
+    history = history.slice(0, index + 1);
     clickCount = index;
     updateProgress(clickCount);
     updateTitle(clickCount);
+    updateHistory();
+    $('.desktopTracker .trackerSlot').removeClass('show-title-popup');
+    $('.mobileTrackerTitle').hide();
+    window.scrollTo(0, 0);
     fetchWikipediaArticle(title);
 }
 

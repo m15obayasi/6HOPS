@@ -678,6 +678,7 @@ body {
     margin: 20px auto;
     width: min(80%, 980px);
     overflow-wrap: break-word;
+    overflow-x: hidden;
 }
 
 .wikiBlock:empty {
@@ -764,6 +765,9 @@ body {
 
 /* テーブル (table.wikitable) スタイルを Wikipedia に近づける (調整) */
 .wikiBlock table.wikitable {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
     border: 1px solid #c8ccd1;
     border-collapse: collapse;
     margin: 1em 0;
@@ -790,9 +794,62 @@ body {
     max-width: 100%;
     height: auto;
     border: none;
-    /* 画像のボーダーを削除 (変更なし) */
     vertical-align: middle;
-    /* 画像とテキストの vertical alignment を調整 */
+}
+
+/* Wikipediaの代表画像を含む情報ボックスを、本文を圧迫しない形で残す */
+.wikiBlock .infobox {
+    float: right;
+    clear: right;
+    width: min(320px, 40%);
+    max-width: 100%;
+    margin: 0 0 1.25em 1.5em;
+    border: 1px solid #c8ccd1;
+    border-collapse: collapse;
+    background: #f8f9fa;
+    font-size: 0.9em;
+}
+
+.wikiBlock .infobox th,
+.wikiBlock .infobox td {
+    padding: 0.35em 0.5em;
+    vertical-align: top;
+}
+
+.wikiBlock figure,
+.wikiBlock .thumb,
+.wikiBlock .thumbinner {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.wikiBlock figure,
+.wikiBlock .thumb {
+    margin: 1.25em auto;
+}
+
+.wikiBlock figure img,
+.wikiBlock .thumb img,
+.wikiBlock .infobox img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.wikiBlock figcaption,
+.wikiBlock .thumbcaption {
+    margin-top: 0.4em;
+    color: #54595d;
+    font-size: 0.86em;
+    line-height: 1.45;
+}
+
+@media (max-width: 700px) {
+    .wikiBlock .infobox {
+        float: none;
+        width: 100%;
+        margin: 1em 0 1.25em;
+    }
 }
 
 /* 水平線 (hr) スタイル (追加) */

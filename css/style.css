@@ -1612,9 +1612,9 @@ body {
 
 .randomModeButton:hover,
 .randomModeButton:focus-visible {
-    color: #202122;
-    border-color: #72777d;
-    background: #f8f9fa;
+    color: #fff;
+    border-color: #000;
+    background: #000;
     outline: none;
 }
 

@@ -362,8 +362,7 @@ function buildDailyDatePicker() {
     const $picker = $('<div class="dailyDatePicker"></div>');
     const $button = $('<button type="button" class="dailyDate" aria-haspopup="true" aria-expanded="false"></button>')
         .attr('aria-label', localeConfig.landing.datePickerAria)
-        .append('<time></time>')
-        .append('<span class="dailyDateCaret" aria-hidden="true">⌄</span>');
+        .append('<time></time>');
     const $archive = $('<div class="dailyArchive" hidden></div>');
     $archive.append($('<div class="dailyArchiveHeading"></div>').text(localeConfig.landing.archiveLabel));
 

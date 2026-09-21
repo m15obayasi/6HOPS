@@ -1655,7 +1655,7 @@ body {
 .dailyDate {
     position: relative;
     appearance: none;
-    padding: 2px 22px 3px 5px;
+    padding: 2px 5px 3px;
     border: 0;
     border-bottom: 1px solid transparent;
     background: transparent;
@@ -1671,19 +1671,6 @@ body {
     color: #3366cc;
     border-bottom-color: #3366cc;
     outline: none;
-}
-
-.dailyDateCaret {
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-58%);
-    font-size: 0.85em;
-    transition: transform 0.15s ease;
-}
-
-.dailyDate[aria-expanded="true"] .dailyDateCaret {
-    transform: translateY(-42%) rotate(180deg);
 }
 
 .dailyArchive {

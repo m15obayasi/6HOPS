@@ -208,7 +208,12 @@ async function main() {
     const browser = await chromium.launch({
         headless: true,
         executablePath: edgePath,
-        args: ['--disable-gpu-sandbox']
+        args: [
+            '--disable-gpu-sandbox',
+            '--window-size=1280,720',
+            '--force-device-scale-factor=1',
+            '--high-dpi-support=1'
+        ]
     });
     const context = await browser.newContext({
         viewport: { width: 1280, height: 720 },
@@ -232,8 +237,12 @@ async function main() {
         .kicker { color:#3366cc; font-size:18px; font-weight:800; letter-spacing:.16em; margin-bottom:18px; }
         h1 { margin:0; font-size:76px; line-height:1; letter-spacing:.03em; }
         p { margin:22px 0 0; color:#54595d; font-size:30px; font-weight:700; }
+        .challenge { display:inline-flex; align-items:center; gap:20px; margin-top:30px; padding:13px 24px;
+            border:1px solid #a2a9b1; background:#fff; font-weight:800; }
+        .date { color:#54595d; font-size:18px; letter-spacing:.04em; }
+        .pair { color:#202122; font-size:28px; }
         .rule { width:96px; height:3px; margin:32px auto 0; background:#202122; }
-    </style></head><body><main><div class="kicker">DAILY MODE</div><h1>6HOPS</h1><p>— Wikipediaを使ったゲーム —</p><div class="rule"></div></main></body></html>`);
+    </style></head><body><main><div class="kicker">DAILY MODE</div><h1>6HOPS</h1><p>— Wikipediaを使ったゲーム —</p><div class="challenge"><span class="date">2026-09-22</span><span class="pair">石鹸 → 侍</span></div><div class="rule"></div></main></body></html>`);
     await sleep(3800);
 
     await page.goto(`${baseUrl}?date=2026-09-22`, { waitUntil: 'domcontentloaded', timeout: 30000 });

@@ -18,8 +18,19 @@ function printPlan(filePath, metadata) {
     console.log(`  タイトル: ${metadata.title}`);
     console.log(`  公開設定: ${metadata.privacyStatus}`);
     console.log(`  お題: ${metadata.challenge.start} → ${metadata.challenge.goal}`);
+    if (metadata.thumbnailPath) console.log(`  サムネイル: ${metadata.thumbnailPath}`);
     console.log('  概要欄:');
     console.log(metadata.description.split('\n').map((line) => `    ${line}`).join('\n'));
+}
+
+function findThumbnail(filePath) {
+    const parsed = path.parse(filePath);
+    const candidates = [
+        path.join(parsed.dir, `${parsed.name}-thumbnail.jpg`),
+        path.join(parsed.dir, `${parsed.name}-thumbnail.jpeg`),
+        path.join(parsed.dir, `${parsed.name}-thumbnail.png`)
+    ];
+    return candidates.find((candidate) => fs.existsSync(candidate)) || null;
 }
 
 async function initiateUpload(accessToken, filePath, metadata) {
@@ -85,12 +96,33 @@ async function uploadFile(uploadUrl, filePath) {
     return payload;
 }
 
+async function uploadThumbnail(accessToken, videoId, thumbnailPath) {
+    const extension = path.extname(thumbnailPath).toLowerCase();
+    const contentType = extension === '.png' ? 'image/png' : 'image/jpeg';
+    const endpoint = new URL('https://www.googleapis.com/upload/youtube/v3/thumbnails/set');
+    endpoint.search = new URLSearchParams({ videoId, uploadType: 'media' }).toString();
+    const thumbnail = fs.readFileSync(thumbnailPath);
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            authorization: `Bearer ${accessToken}`,
+            'content-type': contentType,
+            'content-length': String(thumbnail.length)
+        },
+        body: thumbnail
+    });
+    if (!response.ok) {
+        throw new Error(`サムネイルの設定に失敗しました (${response.status}): ${await response.text()}`);
+    }
+}
+
 async function main() {
     const args = parseArgs(process.argv.slice(2));
     const filePath = args.file ? path.resolve(args.file) : findLatestVideo();
     if (!fs.existsSync(filePath)) throw new Error(`動画が見つかりません: ${filePath}`);
     const config = loadConfig();
     const metadata = buildMetadata(filePath, config, args.privacy);
+    metadata.thumbnailPath = findThumbnail(filePath);
     printPlan(filePath, metadata);
 
     if (args['dry-run']) {
@@ -110,6 +142,18 @@ async function main() {
     const accessToken = await getAccessToken();
     const uploadUrl = await initiateUpload(accessToken, filePath, metadata);
     const result = await uploadFile(uploadUrl, filePath);
+    let thumbnailStatus = metadata.thumbnailPath ? 'pending' : 'not-provided';
+    let thumbnailError = null;
+    if (metadata.thumbnailPath) {
+        console.log('サムネイルを設定しています…');
+        try {
+            await uploadThumbnail(accessToken, result.id, metadata.thumbnailPath);
+            thumbnailStatus = 'uploaded';
+        } catch (error) {
+            thumbnailStatus = 'failed';
+            thumbnailError = error;
+        }
+    }
     const record = {
         sha256: digest,
         file: path.basename(filePath),
@@ -117,7 +161,8 @@ async function main() {
         channelId: result.snippet?.channelId || null,
         uploadedAt: new Date().toISOString(),
         privacyStatus: metadata.privacyStatus,
-        title: metadata.title
+        title: metadata.title,
+        thumbnailStatus
     };
     history.uploads.push(record);
     writePrivateJson(paths.history, history);
@@ -125,6 +170,9 @@ async function main() {
     console.log(`https://youtu.be/${result.id}`);
     if (record.channelId) console.log(`チャンネルID: ${record.channelId}`);
     console.log(`公開設定: ${metadata.privacyStatus}`);
+    if (thumbnailError) {
+        throw new Error(`動画はアップロードされましたが、${thumbnailError.message}`);
+    }
 }
 
 main().catch((error) => {

@@ -3,7 +3,7 @@
   "categoryId": "20",
   "madeForKids": false,
   "siteUrl": "https://myeik.net/6HOPS/",
-  "titleTemplate": "6HOPS Daily実況プレイ｜{date}｜{start} → {goal}",
+  "titleTemplate": "6HOPS 回答編｜{date}｜{start} → {goal}",
   "descriptionTemplate": "Wikipediaのリンクだけを辿り、6回以内にゴールを目指すゲーム『6HOPS』のDaily実況プレイです。\n\n本日のお題：{start} → {goal}\nプレイはこちら：{url}\n\nお題は毎日変わります。\n\n#6HOPS #Wikipedia #ゲーム",
   "tags": [
     "6HOPS",

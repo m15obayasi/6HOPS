@@ -114,6 +114,7 @@ async function main() {
         sha256: digest,
         file: path.basename(filePath),
         videoId: result.id,
+        channelId: result.snippet?.channelId || null,
         uploadedAt: new Date().toISOString(),
         privacyStatus: metadata.privacyStatus,
         title: metadata.title
@@ -122,6 +123,7 @@ async function main() {
     writePrivateJson(paths.history, history);
     console.log('\nアップロードが完了しました。');
     console.log(`https://youtu.be/${result.id}`);
+    if (record.channelId) console.log(`チャンネルID: ${record.channelId}`);
     console.log(`公開設定: ${metadata.privacyStatus}`);
 }
 

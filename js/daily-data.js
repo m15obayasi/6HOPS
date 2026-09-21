@@ -57,19 +57,18 @@
         return `${values.year}-${values.month}-${values.day}`;
     }
 
-    function hashDate(value, salt) {
-        let hash = 2166136261;
-        const input = value + ':' + salt;
-        for (let i = 0; i < input.length; i++) {
-            hash ^= input.charCodeAt(i);
-            hash = Math.imul(hash, 16777619);
-        }
-        return hash >>> 0;
+    function getDayNumber(dateKey) {
+        const parts = dateKey.split('-').map(Number);
+        return Math.floor(Date.UTC(parts[0], parts[1] - 1, parts[2]) / 86400000);
     }
 
     function getChallenge(dateKey, locale) {
         const language = challenges[0].start[locale] ? locale : 'ja';
-        const pairIndex = hashDate(dateKey, 'pair') % challenges.length;
+        // 2026-09-21のお題を基準に、全30組を重複なしで一巡させる。
+        // 7は30と互いに素なので、日ごとの並びは散らしつつ30日間は重複しない。
+        const anchorDay = getDayNumber('2026-09-21');
+        const dayOffset = getDayNumber(dateKey) - anchorDay;
+        const pairIndex = ((17 + dayOffset * 7) % challenges.length + challenges.length) % challenges.length;
         const challenge = challenges[pairIndex];
         return {
             date: dateKey,

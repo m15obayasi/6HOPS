@@ -22,7 +22,7 @@ const LOCALE_CONFIG = {
         alertGoalSummaryFailed: '目標記事の概要の取得に失敗しました。',
         alertRouletteFailed: 'ルーレット用の記事タイトルの取得に失敗しました。',
         buttons: { retry: 'もう1回', stop: '止める', confirm: '確定', share: 'でシェアする' },
-        landing: { topicSuffix: 'のお題', dailyStart: 'START', randomStart: 'ランダムを始める', randomLink: 'ランダムで遊ぶ' },
+        landing: { topicSuffix: 'のお題', today: '本日', archiveLabel: '過去のお題', datePickerAria: '過去のDailyを選ぶ', dailyStart: 'START', randomStart: 'ランダムを始める', randomLink: 'ランダムで遊ぶ' },
         mode: { daily: 'DAILY', random: 'ランダム' },
         result: {
             successLabel: '成功',
@@ -46,7 +46,7 @@ const LOCALE_CONFIG = {
         alertGoalSummaryFailed: 'Failed to fetch target summary.',
         alertRouletteFailed: 'Failed to fetch roulette article titles.',
         buttons: { retry: 'Retry', stop: 'Stop', confirm: 'Confirm', share: 'Share' },
-        landing: { topicSuffix: ' — Today\'s challenge', dailyStart: 'START', randomStart: 'START RANDOM', randomLink: 'Play a random game' },
+        landing: { topicSuffix: ' — Daily challenge', today: 'Today', archiveLabel: 'Past challenges', datePickerAria: 'Choose a past Daily', dailyStart: 'START', randomStart: 'START RANDOM', randomLink: 'Play a random game' },
         mode: { daily: 'DAILY', random: 'RANDOM' },
         result: {
             successLabel: 'Success',
@@ -70,7 +70,7 @@ const LOCALE_CONFIG = {
         alertGoalSummaryFailed: 'Fehler beim Abrufen der Zielzusammenfassung.',
         alertRouletteFailed: 'Fehler beim Abrufen der Roulette-Artikel.',
         buttons: { retry: 'Noch einmal', stop: 'Stoppen', confirm: 'Bestätigen', share: 'Teilen' },
-        landing: { topicSuffix: ' – Tagesaufgabe', dailyStart: 'START', randomStart: 'ZUFALL STARTEN', randomLink: 'Zufällig spielen' },
+        landing: { topicSuffix: ' – Tagesaufgabe', today: 'Heute', archiveLabel: 'Frühere Aufgaben', datePickerAria: 'Frühere Daily-Aufgabe wählen', dailyStart: 'START', randomStart: 'ZUFALL STARTEN', randomLink: 'Zufällig spielen' },
         mode: { daily: 'DAILY', random: 'ZUFALL' },
         result: {
             successLabel: 'Erfolg',
@@ -94,7 +94,7 @@ const LOCALE_CONFIG = {
         alertGoalSummaryFailed: 'Échec de récupération du résumé cible.',
         alertRouletteFailed: 'Échec de récupération des titres de roulette.',
         buttons: { retry: 'Réessayer', stop: 'Arrêter', confirm: 'Confirmer', share: 'Partager' },
-        landing: { topicSuffix: ' – Défi du jour', dailyStart: 'DÉMARRER', randomStart: 'LANCER AU HASARD', randomLink: 'Jouer au hasard' },
+        landing: { topicSuffix: ' – Défi quotidien', today: 'Aujourd’hui', archiveLabel: 'Défis précédents', datePickerAria: 'Choisir un ancien Daily', dailyStart: 'DÉMARRER', randomStart: 'LANCER AU HASARD', randomLink: 'Jouer au hasard' },
         mode: { daily: 'DAILY', random: 'ALÉATOIRE' },
         result: {
             successLabel: 'Succès',
@@ -118,7 +118,7 @@ const LOCALE_CONFIG = {
         alertGoalSummaryFailed: '获取目标摘要失败。',
         alertRouletteFailed: '获取轮盘文章标题失败。',
         buttons: { retry: '再试一次', stop: '停止', confirm: '确定', share: '分享' },
-        landing: { topicSuffix: ' 今日题目', dailyStart: '开始', randomStart: '开始随机挑战', randomLink: '玩随机模式' },
+        landing: { topicSuffix: ' 每日题目', today: '今天', archiveLabel: '往期题目', datePickerAria: '选择往期每日挑战', dailyStart: '开始', randomStart: '开始随机挑战', randomLink: '玩随机模式' },
         mode: { daily: '每日', random: '随机' },
         result: {
             successLabel: '成功',
@@ -320,6 +320,8 @@ let rouletteTitlesRequest = null;
 let rouletteTitleCallbacks = [];
 let gameMode = 'daily';
 let dailyChallenge = null;
+let todayDailyDateKey = '';
+const DAILY_ARCHIVE_DAYS = 14;
 
 function setupLandingMode() {
     if (!window.SIX_HOPS_DAILY) {
@@ -327,12 +329,10 @@ function setupLandingMode() {
         return;
     }
 
-    const dateKey = window.SIX_HOPS_DAILY.getDateKey(new Date());
-    dailyChallenge = window.SIX_HOPS_DAILY.getChallenge(dateKey, locale);
-    $('.dailyTopicSuffix').text(localeConfig.landing.topicSuffix);
-    $('.dailyDate').text(formatDailyDate(dateKey)).attr('datetime', dateKey);
-    $('.rectangle').eq(0).text(dailyChallenge.start);
-    $('.rectangle').eq(1).text(dailyChallenge.goal);
+    todayDailyDateKey = window.SIX_HOPS_DAILY.getDateKey(new Date());
+    const requestedDateKey = getRequestedDailyDateKey(todayDailyDateKey);
+    buildDailyDatePicker();
+    selectDailyChallenge(requestedDateKey, false);
     $('.rectangleContainer').removeClass('prestart');
     $('.start').text(localeConfig.landing.dailyStart);
     $('.randomModeButton')
@@ -343,6 +343,93 @@ function setupLandingMode() {
     $('.randomModeButton').on('click', switchToRandomMode);
 }
 
+function getRequestedDailyDateKey(todayKey) {
+    const requested = new URLSearchParams(window.location.search).get('date') || '';
+    const earliest = shiftDailyDateKey(todayKey, -(DAILY_ARCHIVE_DAYS - 1));
+    return /^\d{4}-\d{2}-\d{2}$/.test(requested) && requested >= earliest && requested <= todayKey
+        ? requested
+        : todayKey;
+}
+
+function shiftDailyDateKey(dateKey, dayOffset) {
+    const date = new Date(dateKey + 'T12:00:00+09:00');
+    date.setUTCDate(date.getUTCDate() + dayOffset);
+    return window.SIX_HOPS_DAILY.getDateKey(date);
+}
+
+function buildDailyDatePicker() {
+    const $topic = $('.dailyTopic').empty();
+    const $picker = $('<div class="dailyDatePicker"></div>');
+    const $button = $('<button type="button" class="dailyDate" aria-haspopup="true" aria-expanded="false"></button>')
+        .attr('aria-label', localeConfig.landing.datePickerAria)
+        .append('<time></time>')
+        .append('<span class="dailyDateCaret" aria-hidden="true">⌄</span>');
+    const $archive = $('<div class="dailyArchive" hidden></div>');
+    $archive.append($('<div class="dailyArchiveHeading"></div>').text(localeConfig.landing.archiveLabel));
+
+    for (let offset = 0; offset > -DAILY_ARCHIVE_DAYS; offset--) {
+        const dateKey = shiftDailyDateKey(todayDailyDateKey, offset);
+        const challenge = window.SIX_HOPS_DAILY.getChallenge(dateKey, locale);
+        const dateLabel = offset === 0 ? localeConfig.landing.today : formatDailyArchiveDate(dateKey);
+        const $item = $('<button type="button" class="dailyArchiveItem"></button>')
+            .attr('data-date', dateKey)
+            .append($('<time></time>').attr('datetime', dateKey).text(dateLabel))
+            .append($('<span class="dailyArchivePair"></span>').text(challenge.start + ' → ' + challenge.goal));
+        $archive.append($item);
+    }
+
+    $picker.append($button);
+    $topic.append($picker)
+        .append($('<span class="dailyTopicSuffix"></span>').text(localeConfig.landing.topicSuffix))
+        .append($archive);
+
+    $button.on('click', function(event) {
+        event.stopPropagation();
+        const willOpen = $archive.prop('hidden');
+        $archive.prop('hidden', !willOpen);
+        $button.attr('aria-expanded', String(willOpen));
+    });
+
+    $archive.on('click', '.dailyArchiveItem', function(event) {
+        event.stopPropagation();
+        selectDailyChallenge($(this).attr('data-date'), true);
+        $archive.prop('hidden', true);
+        $button.attr('aria-expanded', 'false').trigger('focus');
+    });
+
+    $(document).off('click.dailyArchive keydown.dailyArchive')
+        .on('click.dailyArchive', function() {
+            $archive.prop('hidden', true);
+            $button.attr('aria-expanded', 'false');
+        })
+        .on('keydown.dailyArchive', function(event) {
+            if (event.key === 'Escape') {
+                $archive.prop('hidden', true);
+                $button.attr('aria-expanded', 'false').trigger('focus');
+            }
+        });
+}
+
+function selectDailyChallenge(dateKey, updateUrl) {
+    dailyChallenge = window.SIX_HOPS_DAILY.getChallenge(dateKey, locale);
+    const label = dateKey === todayDailyDateKey ? localeConfig.landing.today : formatDailyDate(dateKey);
+    $('.dailyDate time').text(label).attr('datetime', dateKey);
+    $('.dailyArchiveItem').removeClass('selected').removeAttr('aria-current')
+        .filter(`[data-date="${dateKey}"]`).addClass('selected').attr('aria-current', 'date');
+    $('.rectangle').eq(0).text(dailyChallenge.start);
+    $('.rectangle').eq(1).text(dailyChallenge.goal);
+
+    if (updateUrl) {
+        const url = new URL(window.location.href);
+        if (dateKey === todayDailyDateKey) {
+            url.searchParams.delete('date');
+        } else {
+            url.searchParams.set('date', dateKey);
+        }
+        window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+    }
+}
+
 function formatDailyDate(dateKey) {
     const date = new Date(dateKey + 'T12:00:00+09:00');
     const languageTag = { ja: 'ja-JP', en: 'en-US', de: 'de-DE', fr: 'fr-FR', zh: 'zh-CN' }[locale];
@@ -351,6 +438,17 @@ function formatDailyDate(dateKey) {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
+    }).format(date);
+}
+
+function formatDailyArchiveDate(dateKey) {
+    const date = new Date(dateKey + 'T12:00:00+09:00');
+    const languageTag = { ja: 'ja-JP', en: 'en-US', de: 'de-DE', fr: 'fr-FR', zh: 'zh-CN' }[locale];
+    return new Intl.DateTimeFormat(languageTag, {
+        timeZone: 'Asia/Tokyo',
+        month: 'short',
+        day: 'numeric',
+        weekday: 'short'
     }).format(date);
 }
 

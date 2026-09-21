@@ -1,1 +1,6 @@
 output/
+youtube/client_secret.json
+youtube/token.json
+youtube/upload-config.json
+youtube/upload-history.json
+youtube/logs/

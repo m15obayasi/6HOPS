@@ -1646,13 +1646,27 @@ body {
 
 @media (min-width: 1024px) {
     .dailyTopic {
-        margin-top: 2px;
-        margin-bottom: 6px;
+        margin-top: 14px;
+        margin-bottom: 22px;
     }
 
     .dailyInitial .rectangleContainer {
-        margin-top: 8px;
-        margin-bottom: 12px;
+        margin-top: 0;
+        margin-bottom: 28px;
+    }
+
+    .dailyInitial .rectangleLabel.first {
+        margin-bottom: 6px;
+    }
+
+    .dailyInitial .rectangleLabel.second {
+        margin-top: 18px;
+        margin-bottom: 6px;
+    }
+
+    .dailyInitial .rectangle {
+        margin-top: 0;
+        margin-bottom: 0;
     }
 
     .dailyInitial .startBlock {
@@ -1663,9 +1677,28 @@ body {
 @media (max-width: 600px) {
     .dailyTopic {
         width: 90vw;
-        margin-top: 4px;
-        margin-bottom: 8px;
+        margin-top: 14px;
+        margin-bottom: 20px;
         font-size: 1.1rem;
+    }
+
+    .dailyInitial .rectangleContainer {
+        margin-top: 0;
+        margin-bottom: 24px;
+    }
+
+    .dailyInitial .rectangleLabel.first {
+        margin-bottom: 6px;
+    }
+
+    .dailyInitial .rectangleLabel.second {
+        margin-top: 16px;
+        margin-bottom: 6px;
+    }
+
+    .dailyInitial .rectangle {
+        margin-top: 0;
+        margin-bottom: 0;
     }
 
     .randomModeButton {

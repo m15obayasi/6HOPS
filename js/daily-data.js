@@ -1,39 +1,44 @@
 (function(global) {
     'use strict';
 
-    // Keep this list language-aligned. A future scheduled job only needs to
-    // replace this file; the date-selection logic can stay untouched.
-    const topics = [
-        { ja: '地球', en: 'Earth', de: 'Erde', fr: 'Terre', zh: '地球' },
-        { ja: '月', en: 'Moon', de: 'Mond', fr: 'Lune', zh: '月球' },
-        { ja: '日本', en: 'Japan', de: 'Japan', fr: 'Japon', zh: '日本' },
-        { ja: 'ドイツ', en: 'Germany', de: 'Deutschland', fr: 'Allemagne', zh: '德国' },
-        { ja: 'フランス', en: 'France', de: 'Frankreich', fr: 'France', zh: '法国' },
-        { ja: '中華人民共和国', en: 'China', de: 'Volksrepublik China', fr: 'Chine', zh: '中华人民共和国' },
-        { ja: '数学', en: 'Mathematics', de: 'Mathematik', fr: 'Mathématiques', zh: '数学' },
-        { ja: '物理学', en: 'Physics', de: 'Physik', fr: 'Physique', zh: '物理学' },
-        { ja: '化学', en: 'Chemistry', de: 'Chemie', fr: 'Chimie', zh: '化学' },
-        { ja: '生物学', en: 'Biology', de: 'Biologie', fr: 'Biologie', zh: '生物学' },
-        { ja: '歴史', en: 'History', de: 'Geschichte', fr: 'Histoire', zh: '历史' },
-        { ja: '音楽', en: 'Music', de: 'Musik', fr: 'Musique', zh: '音乐' },
-        { ja: '芸術', en: 'Art', de: 'Kunst', fr: 'Art', zh: '艺术' },
-        { ja: '文学', en: 'Literature', de: 'Literatur', fr: 'Littérature', zh: '文学' },
-        { ja: 'コンピュータ', en: 'Computer', de: 'Computer', fr: 'Ordinateur', zh: '计算机' },
-        { ja: 'インターネット', en: 'Internet', de: 'Internet', fr: 'Internet', zh: '互联网' },
-        { ja: 'オリンピック競技', en: 'Olympic Games', de: 'Olympische Spiele', fr: 'Jeux olympiques', zh: '奥林匹克运动会' },
-        { ja: 'サッカー', en: 'Association football', de: 'Fußball', fr: 'Football', zh: '足球' },
-        { ja: '東京都', en: 'Tokyo', de: 'Tokio', fr: 'Tokyo', zh: '东京都' },
-        { ja: 'ベルリン', en: 'Berlin', de: 'Berlin', fr: 'Berlin', zh: '柏林' },
-        { ja: 'パリ', en: 'Paris', de: 'Paris', fr: 'Paris', zh: '巴黎' },
-        { ja: '北京市', en: 'Beijing', de: 'Peking', fr: 'Pékin', zh: '北京市' },
-        { ja: 'リンゴ', en: 'Apple', de: 'Kulturapfel', fr: 'Pomme', zh: '苹果' },
-        { ja: 'ネコ', en: 'Cat', de: 'Hauskatze', fr: 'Chat', zh: '猫' },
-        { ja: 'イヌ', en: 'Dog', de: 'Haushund', fr: 'Chien', zh: '狗' },
-        { ja: 'コーヒー', en: 'Coffee', de: 'Kaffee', fr: 'Café', zh: '咖啡' },
-        { ja: '海洋', en: 'Ocean', de: 'Ozean', fr: 'Océan', zh: '海洋' },
-        { ja: '山', en: 'Mountain', de: 'Berg', fr: 'Montagne', zh: '山' },
-        { ja: '宇宙', en: 'Outer space', de: 'Weltraum', fr: 'Univers', zh: '宇宙' },
-        { ja: '科学', en: 'Science', de: 'Wissenschaft', fr: 'Science', zh: '科学' }
+    // Daily challenges are curated as semantically distant pairs. A future
+    // scheduled job can replace or extend this list without changing the
+    // date-selection logic below.
+    function topic(ja, en, de, fr, zh) {
+        return { ja: ja, en: en, de: de, fr: fr, zh: zh };
+    }
+
+    const challenges = [
+        { start: topic('カモノハシ', 'Platypus', 'Schnabeltier', 'Ornithorynque', '鸭嘴兽'), goal: topic('ブラックホール', 'Black hole', 'Schwarzes Loch', 'Trou noir', '黑洞') },
+        { start: topic('蜂蜜', 'Honey', 'Honig', 'Miel', '蜂蜜'), goal: topic('ベルリンの壁', 'Berlin Wall', 'Berliner Mauer', 'Mur de Berlin', '柏林墙') },
+        { start: topic('寿司', 'Sushi', 'Sushi', 'Sushi', '寿司'), goal: topic('量子力学', 'Quantum mechanics', 'Quantenmechanik', 'Mécanique quantique', '量子力学') },
+        { start: topic('傘', 'Umbrella', 'Regenschirm', 'Parapluie', '傘'), goal: topic('恐竜', 'Dinosaur', 'Dinosaurier', 'Dinosaure', '恐龙') },
+        { start: topic('鉛筆', 'Pencil', 'Bleistift', 'Crayon', '铅笔'), goal: topic('サハラ砂漠', 'Sahara', 'Sahara', 'Sahara', '撒哈拉沙漠') },
+        { start: topic('カラオケ', 'Karaoke', 'Karaoke', 'Karaoké', '卡拉OK'), goal: topic('光合成', 'Photosynthesis', 'Photosynthese', 'Photosynthèse', '光合作用') },
+        { start: topic('冷蔵庫', 'Refrigerator', 'Kühlschrank', 'Réfrigérateur', '冰箱'), goal: topic('古代エジプト', 'Ancient Egypt', 'Altes Ägypten', 'Égypte antique', '古埃及') },
+        { start: topic('靴下', 'Sock', 'Socke', 'Chaussette', '袜子'), goal: topic('月', 'Moon', 'Mond', 'Lune', '月球') },
+        { start: topic('コーヒー', 'Coffee', 'Kaffee', 'Café', '咖啡'), goal: topic('南極大陸', 'Antarctica', 'Antarktika', 'Antarctique', '南极洲') },
+        { start: topic('ネコ', 'Cat', 'Hauskatze', 'Chat', '猫'), goal: topic('インターネット', 'Internet', 'Internet', 'Internet', '互联网') },
+        { start: topic('バナナ', 'Banana', 'Banane', 'Banane', '香蕉'), goal: topic('エベレスト', 'Mount Everest', 'Mount Everest', 'Everest', '珠穆朗玛峰') },
+        { start: topic('ピザ', 'Pizza', 'Pizza', 'Pizza', '披萨'), goal: topic('民主主義', 'Democracy', 'Demokratie', 'Démocratie', '民主') },
+        { start: topic('ガラス', 'Glass', 'Glas', 'Verre', '玻璃'), goal: topic('オリンピック競技', 'Olympic Games', 'Olympische Spiele', 'Jeux olympiques', '奥林匹克运动会') },
+        { start: topic('自転車', 'Bicycle', 'Fahrrad', 'Bicyclette', '自行车'), goal: topic('銀河系', 'Milky Way', 'Milchstraße', 'Voie lactée', '银河系') },
+        { start: topic('チョコレート', 'Chocolate', 'Schokolade', 'Chocolat', '巧克力'), goal: topic('火山', 'Volcano', 'Vulkan', 'Volcan', '火山') },
+        { start: topic('パン', 'Bread', 'Brot', 'Pain', '面包'), goal: topic('人工知能', 'Artificial intelligence', 'Künstliche Intelligenz', 'Intelligence artificielle', '人工智能') },
+        { start: topic('チェス', 'Chess', 'Schach', 'Échecs', '国际象棋'), goal: topic('太平洋', 'Pacific Ocean', 'Pazifischer Ozean', 'Océan Pacifique', '太平洋') },
+        { start: topic('歯ブラシ', 'Toothbrush', 'Zahnbürste', 'Brosse à dents', '牙刷'), goal: topic('フランス革命', 'French Revolution', 'Französische Revolution', 'Révolution française', '法国大革命') },
+        { start: topic('ペンギン', 'Penguin', 'Pinguine', 'Manchot', '企鹅'), goal: topic('ローマ帝国', 'Roman Empire', 'Römisches Reich', 'Empire romain', '罗马帝国') },
+        { start: topic('時計', 'Clock', 'Uhr', 'Horloge', '时钟'), goal: topic('デオキシリボ核酸', 'DNA', 'Desoxyribonukleinsäure', 'Acide désoxyribonucléique', '脱氧核糖核酸') },
+        { start: topic('茶', 'Tea', 'Tee', 'Thé', '茶'), goal: topic('火星', 'Mars', 'Mars (Planet)', 'Mars (planète)', '火星') },
+        { start: topic('ニンニク', 'Garlic', 'Knoblauch', 'Ail cultivé', '大蒜'), goal: topic('ヴォルフガング・アマデウス・モーツァルト', 'Wolfgang Amadeus Mozart', 'Wolfgang Amadeus Mozart', 'Wolfgang Amadeus Mozart', '沃尔夫冈·阿马德乌斯·莫扎特') },
+        { start: topic('トイレ', 'Toilet', 'Toilette', 'Toilettes', '厕所'), goal: topic('電気', 'Electricity', 'Elektrizität', 'Électricité', '电') },
+        { start: topic('折り紙', 'Origami', 'Origami', 'Origami', '折纸'), goal: topic('重力', 'Gravity', 'Gravitation', 'Gravitation', '重力') },
+        { start: topic('石鹸', 'Soap', 'Seife', 'Savon', '肥皂'), goal: topic('侍', 'Samurai', 'Samurai', 'Samouraï', '武士') },
+        { start: topic('カメラ', 'Camera', 'Kamera', 'Appareil photographique', '照相机'), goal: topic('ビッグバン', 'Big Bang', 'Urknall', 'Big Bang', '大爆炸') },
+        { start: topic('雪だるま', 'Snowman', 'Schneemann', 'Bonhomme de neige', '雪人'), goal: topic('資本主義', 'Capitalism', 'Kapitalismus', 'Capitalisme', '资本主义') },
+        { start: topic('サボテン', 'Cactus', 'Kakteengewächse', 'Cactus', '仙人掌'), goal: topic('第二次世界大戦', 'World War II', 'Zweiter Weltkrieg', 'Seconde Guerre mondiale', '第二次世界大战') },
+        { start: topic('掃除機', 'Vacuum cleaner', 'Staubsauger', 'Aspirateur', '吸塵器'), goal: topic('仏教', 'Buddhism', 'Buddhismus', 'Bouddhisme', '佛教') },
+        { start: topic('キノコ', 'Mushroom', 'Pilze', 'Champignon', '蘑菇'), goal: topic('国際宇宙ステーション', 'International Space Station', 'Internationale Raumstation', 'Station spatiale internationale', '国际空间站') }
     ];
 
     const timeZone = 'Asia/Tokyo';
@@ -63,22 +68,20 @@
     }
 
     function getChallenge(dateKey, locale) {
-        const language = topics[0][locale] ? locale : 'ja';
-        const startIndex = hashDate(dateKey, 'start') % topics.length;
-        const offset = 1 + (hashDate(dateKey, 'goal') % (topics.length - 1));
-        const goalIndex = (startIndex + offset) % topics.length;
+        const language = challenges[0].start[locale] ? locale : 'ja';
+        const pairIndex = hashDate(dateKey, 'pair') % challenges.length;
+        const challenge = challenges[pairIndex];
         return {
             date: dateKey,
-            start: topics[startIndex][language],
-            goal: topics[goalIndex][language],
-            startIndex: startIndex,
-            goalIndex: goalIndex
+            start: challenge.start[language],
+            goal: challenge.goal[language],
+            pairIndex: pairIndex
         };
     }
 
     global.SIX_HOPS_DAILY = {
         timeZone: timeZone,
-        topics: topics,
+        challenges: challenges,
         getDateKey: getDateKey,
         getChallenge: getChallenge
     };

@@ -341,7 +341,11 @@ function setupLandingMode() {
     $('.rectangle').eq(1).text(dailyChallenge.goal);
     $('.rectangleContainer').removeClass('prestart');
     $('.start').text(localeConfig.landing.dailyStart);
-    $('.randomModeButton').text(localeConfig.landing.randomLink);
+    $('.randomModeButton')
+        .empty()
+        .attr('aria-label', localeConfig.landing.randomLink)
+        .append($('<span class="randomLongLabel"></span>').text(localeConfig.landing.randomLink))
+        .append($('<span class="randomShortLabel" aria-hidden="true"></span>').text(localeConfig.mode.random));
     $('.randomModeButton').on('click', switchToRandomMode);
 }
 

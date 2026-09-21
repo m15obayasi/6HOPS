@@ -1590,8 +1590,8 @@ body {
 }
 
 .randomModeButton {
-    display: block;
-    margin: 14px auto 0;
+    position: static;
+    margin: 0 0 0 20px;
     padding: 7px 16px;
     border: 1px solid #a2a9b1;
     border-radius: 3px;
@@ -1600,6 +1600,9 @@ body {
     cursor: pointer;
     font-family: 'Zen Maru Gothic', sans-serif;
     font-size: 0.9rem;
+    line-height: 1.2;
+    pointer-events: auto;
+    z-index: 1;
     transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
 }
 
@@ -1609,6 +1612,10 @@ body {
     border-color: #72777d;
     background: #f8f9fa;
     outline: none;
+}
+
+.randomShortLabel {
+    display: none;
 }
 
 .resultModeSummary {
@@ -1655,6 +1662,20 @@ body {
         margin-top: 4px;
         margin-bottom: 8px;
         font-size: 1.1rem;
+    }
+
+    .randomModeButton {
+        margin-left: 12px;
+        padding: 5px 8px;
+        font-size: 0.75rem;
+    }
+
+    .randomLongLabel {
+        display: none;
+    }
+
+    .randomShortLabel {
+        display: inline;
     }
 
     .resultModeSummary {

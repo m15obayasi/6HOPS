@@ -20,7 +20,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>6HOPS</title>
-    <link rel="stylesheet" href="../css/style.min.css?v=7.6"> <!-- パラメータクエリを更新 -->
+    <link rel="stylesheet" href="../css/style.min.css?v=8.1"> <!-- パラメータクエリを更新 -->
     <link href="https://fonts.googleapis.com/css?family=Cherry+Swash:700" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+SC">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400&display=swap"> <!-- Zen Maru Gothicを追加 -->
@@ -32,7 +32,7 @@
         crossorigin="anonymous"></script> -->
 </head>
 
-<body class="challenge">
+<body class="challenge dailyInitial">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W3NNXDSG"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -70,6 +70,9 @@
         </div>
     </div>
 
+    <div class="dailyTopic">
+        <strong><time class="dailyDate"></time></strong><span class="dailyTopicSuffix"></span>
+    </div>
     <div class="challengeIntro">
         维基百科是任何人都可以编辑的自由百科全书。
     </div>
@@ -84,13 +87,15 @@
     <div class="startBlock">
         <div class="start">开始</div>
     </div>
+    <button type="button" class="randomModeButton"></button>
     <div class="aboutLink">
         <a href="./outset.html">关于本站</a>
     </div>
     <div class="wikiBlock"></div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="../js/wiki.min.js?v=6.1"></script> <!-- パラメータクエリを更新 -->
+    <script src="../js/daily-data.js?v=1.0"></script>
+    <script src="../js/wiki.min.js?v=7.1"></script> <!-- パラメータクエリを更新 -->
 
 </body>
 

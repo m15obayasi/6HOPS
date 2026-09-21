@@ -565,7 +565,6 @@ body {
         justify-content: space-between;
     }
 
-        overflow-x: auto; /* 横に広がる場合はスクロール可能に */
     .buttonContainer.roulette {
         justify-content: center;
         /* switch to flex to allow large gaps */
@@ -582,7 +581,6 @@ body {
         width: 50%; /* 画面を2分割し、隙間を作らない */
         margin: 1; /* 隙間をなくす */
     }
-        flex-direction: column;
     .buttonContainer.roulette .button.retry,
     .buttonContainer.roulette .button.confirm {
         width: 44vw;
@@ -1561,6 +1559,110 @@ body {
     cursor: pointer !important;
 }
 
+/* Daily landing: reuse the existing monochrome/blue visual language. */
+.dailyInitial .challengeIntro {
+    display: none;
+}
+
+.dailyTopic {
+    width: min(80vw, 820px);
+    margin: 8px auto 14px;
+    text-align: center;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    color: #202122;
+    font-size: clamp(1.2rem, 2.2vw, 1.65rem);
+    line-height: 1.45;
+}
+
+.resultModeBadge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: #3366cc;
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.dailyDate {
+    color: inherit;
+}
+
+.randomModeButton {
+    display: block;
+    margin: 14px auto 0;
+    padding: 7px 16px;
+    border: 1px solid #a2a9b1;
+    border-radius: 3px;
+    background: #fff;
+    color: #54595d;
+    cursor: pointer;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 0.9rem;
+    transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.randomModeButton:hover,
+.randomModeButton:focus-visible {
+    color: #202122;
+    border-color: #72777d;
+    background: #f8f9fa;
+    outline: none;
+}
+
+.resultModeSummary {
+    width: min(90%, 520px);
+    margin: 14px auto 20px;
+    padding: 14px 18px;
+    border: 1px solid #a2a9b1;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-family: 'Zen Maru Gothic', sans-serif;
+}
+
+.resultModeSummary strong {
+    font-size: 1.25rem;
+}
+
+.resultModeBadge.random {
+    background: #54595d;
+}
+
+@media (min-width: 1024px) {
+    .dailyTopic {
+        margin-top: 2px;
+        margin-bottom: 6px;
+    }
+
+    .dailyInitial .rectangleContainer {
+        margin-top: 8px;
+        margin-bottom: 12px;
+    }
+
+    .dailyInitial .startBlock {
+        transform: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .dailyTopic {
+        width: 90vw;
+        margin-top: 4px;
+        margin-bottom: 8px;
+        font-size: 1.1rem;
+    }
+
+    .resultModeSummary {
+        gap: 9px;
+        padding: 12px;
+    }
+}
+
 /* Ensure mobileTrackerTitle is usable when moved outside .desktopTracker
    (renderDesktopTracker moves the element before .wikiBlock). Keep it
    above the article content and allow JS to show/hide it. */
@@ -1625,16 +1727,6 @@ body {
 .mobileTrackerTitle .num.edge { color: #fff !important; background: #000 !important; }
 .mobileTrackerTitle .num.blue { color: #fff !important; background: #3366cc !important; }
 
-.mobileTrackerTitle .mobileGoalSummary {
-    margin-top: 8px;
-    background: #f8f9fa;
-    color: #202122;
-    padding: 8px 10px;
-    border-radius: 10px;
-    border: 1px solid #d6dbe1;
-    font-size: 0.95em;
-    line-height: 1.4;
-    text-align: left;
 .mobileTrackerTitle .mobileGoalSummary {
     margin-top: 8px;
     background: #f8f9fa;

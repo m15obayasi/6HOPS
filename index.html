@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>6HOPS</title>
-    <link rel="stylesheet" href="./css/style.min.css?v=7.6"> <!-- パラメータクエリを更新 -->
+    <link rel="stylesheet" href="./css/style.min.css?v=8.1"> <!-- パラメータクエリを更新 -->
     <link href="https://fonts.googleapis.com/css?family=Cherry+Swash:700" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+JP">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400&display=swap">
@@ -17,10 +17,11 @@
     <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8967129057333443"
         crossorigin="anonymous"></script> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> <!-- jQueryを追加 -->
-    <script src="./js/wiki.min.js?v=6.1"></script> <!-- パラメータクエリを更新 -->
+    <script src="./js/daily-data.js?v=1.0"></script>
+    <script src="./js/wiki.min.js?v=7.1"></script> <!-- パラメータクエリを更新 -->
 </head>
 
-<body class="challenge">
+<body class="challenge dailyInitial">
         <div class="fixedScreen">
                 <!-- 省略版トラッカー（スマホ用） -->
                 <div class="mobileTracker" aria-label="HOP履歴" style="display:none;">
@@ -54,6 +55,9 @@
         </div>
     </div>
 
+    <div class="dailyTopic">
+        <strong><time class="dailyDate"></time></strong><span class="dailyTopicSuffix"></span>
+    </div>
     <div class="challengeIntro">
         <span class="challengeIntroText"><span class="challengeIntroWord">ウィキペディア</span>は、<br>
         誰でも編集できるフリー百科事典です。</span>
@@ -69,6 +73,7 @@
     <div class="startBlock">
         <div class="start">START</div>
     </div>
+    <button type="button" class="randomModeButton"></button>
 
     <div class="aboutLink">
         <a href="./outset.html">このサイトについて</a>

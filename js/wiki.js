@@ -18,11 +18,12 @@ const LOCALE_CONFIG = {
         hint: { show: 'ヒント', hide: 'ヒントを隠す' },
         trackerAria: 'HOP履歴',
         goalSummaryLoading: '概要を取得中…',
-        alertRandomTitleFailed: 'ランダムな記事タイトルの取得に失敗しました。',
         alertArticleFailed: '記事の取得に失敗しました。',
         alertGoalSummaryFailed: '目標記事の概要の取得に失敗しました。',
         alertRouletteFailed: 'ルーレット用の記事タイトルの取得に失敗しました。',
         buttons: { retry: 'もう1回', stop: '止める', confirm: '確定', share: 'でシェアする' },
+        landing: { topicSuffix: 'のお題', dailyStart: 'START', randomStart: 'ランダムを始める', randomLink: 'ランダムで遊ぶ' },
+        mode: { daily: 'DAILY', random: 'ランダム' },
         result: {
             successLabel: '成功',
             failureLabel: '失敗',
@@ -41,11 +42,12 @@ const LOCALE_CONFIG = {
         hint: { show: 'Hint', hide: 'Hide hint' },
         trackerAria: 'HOP history',
         goalSummaryLoading: 'Loading summary…',
-        alertRandomTitleFailed: 'Failed to fetch random article titles.',
         alertArticleFailed: 'Failed to fetch article.',
         alertGoalSummaryFailed: 'Failed to fetch target summary.',
         alertRouletteFailed: 'Failed to fetch roulette article titles.',
         buttons: { retry: 'Retry', stop: 'Stop', confirm: 'Confirm', share: 'Share' },
+        landing: { topicSuffix: ' — Today\'s challenge', dailyStart: 'START', randomStart: 'START RANDOM', randomLink: 'Play a random game' },
+        mode: { daily: 'DAILY', random: 'RANDOM' },
         result: {
             successLabel: 'Success',
             failureLabel: 'Failure',
@@ -64,11 +66,12 @@ const LOCALE_CONFIG = {
         hint: { show: 'Hinweis', hide: 'Hinweis ausblenden' },
         trackerAria: 'HOP-Verlauf',
         goalSummaryLoading: 'Zusammenfassung wird geladen…',
-        alertRandomTitleFailed: 'Fehler beim Abrufen zufälliger Artikeltitel.',
         alertArticleFailed: 'Fehler beim Abrufen des Artikels.',
         alertGoalSummaryFailed: 'Fehler beim Abrufen der Zielzusammenfassung.',
         alertRouletteFailed: 'Fehler beim Abrufen der Roulette-Artikel.',
         buttons: { retry: 'Noch einmal', stop: 'Stoppen', confirm: 'Bestätigen', share: 'Teilen' },
+        landing: { topicSuffix: ' – Tagesaufgabe', dailyStart: 'START', randomStart: 'ZUFALL STARTEN', randomLink: 'Zufällig spielen' },
+        mode: { daily: 'DAILY', random: 'ZUFALL' },
         result: {
             successLabel: 'Erfolg',
             failureLabel: 'Fehler',
@@ -87,11 +90,12 @@ const LOCALE_CONFIG = {
         hint: { show: 'Indice', hide: 'Masquer l\'indice' },
         trackerAria: 'Historique HOP',
         goalSummaryLoading: 'Chargement du résumé…',
-        alertRandomTitleFailed: 'Échec de récupération des titres aléatoires.',
         alertArticleFailed: 'Échec de récupération de l\'article.',
         alertGoalSummaryFailed: 'Échec de récupération du résumé cible.',
         alertRouletteFailed: 'Échec de récupération des titres de roulette.',
         buttons: { retry: 'Réessayer', stop: 'Arrêter', confirm: 'Confirmer', share: 'Partager' },
+        landing: { topicSuffix: ' – Défi du jour', dailyStart: 'DÉMARRER', randomStart: 'LANCER AU HASARD', randomLink: 'Jouer au hasard' },
+        mode: { daily: 'DAILY', random: 'ALÉATOIRE' },
         result: {
             successLabel: 'Succès',
             failureLabel: 'Échec',
@@ -110,11 +114,12 @@ const LOCALE_CONFIG = {
         hint: { show: '提示', hide: '隐藏提示' },
         trackerAria: 'HOP 历史',
         goalSummaryLoading: '正在加载摘要…',
-        alertRandomTitleFailed: '获取随机文章标题失败。',
         alertArticleFailed: '获取文章失败。',
         alertGoalSummaryFailed: '获取目标摘要失败。',
         alertRouletteFailed: '获取轮盘文章标题失败。',
         buttons: { retry: '再试一次', stop: '停止', confirm: '确定', share: '分享' },
+        landing: { topicSuffix: ' 今日题目', dailyStart: '开始', randomStart: '开始随机挑战', randomLink: '玩随机模式' },
+        mode: { daily: '每日', random: '随机' },
         result: {
             successLabel: '成功',
             failureLabel: '失败',
@@ -151,13 +156,15 @@ $(document).ready(function() {
     setupInitialTitleReload();
     setupDesktopTracker();
     syncChallengeIntroFrameHeight();
+    setupLandingMode();
 
     $(window).on('resize', function() {
         syncChallengeIntroFrameHeight();
     });
 
     $('.startBlock').click(function() {
-        if ($('body').hasClass('daily')) {
+        if (gameMode === 'daily') {
+            startDailyGame();
             return;
         }
 
@@ -165,13 +172,12 @@ $(document).ready(function() {
         rouletteIntroOffset = $('.challengeIntro:visible').outerHeight(true) || 0;
         $('.challengeIntro').hide();
         $('.rectangleContainer').removeClass('prestart');
-        startRouletteSelection();
         $('.startBlock').hide(); // スタートブロックを非表示
         $('.aboutLink').hide(); // Aboutリンクを非表示
-        setTimeout(function() {
+        startRouletteSelection(function() {
             $('.progressBar').hide(); // プログレスバーを非表示
             showActionButtons(); // アクションボタンを表示
-        }, 500);
+        });
     });
 
     $('.history').on('click', 'div', function () {
@@ -201,8 +207,13 @@ $(document).ready(function() {
     if (title1 && title2) {
         localStorage.removeItem('title1');
         localStorage.removeItem('title2');
+        gameMode = 'random';
         gameStarted = true;
+        $('body').removeClass('dailyInitial');
+        $('.dailyTopic, .randomModeButton').hide();
         targetArticleTitleB = title2;
+        targetArticlePageId = null;
+        targetCanonicalTitle = title2;
         fetchWikipediaArticle(title1);
         displayGoal(title2);
         $('img.logo').hide();
@@ -295,6 +306,8 @@ function generateShareLink(mode) {
 
 let clickCount = 0;
 let targetArticleTitleB = "";
+let targetArticlePageId = null;
+let targetCanonicalTitle = "";
 let history = [];
 let startArticleTitle = "";
 let continueMode = false;
@@ -308,6 +321,61 @@ let rouletteStopStage = 0;
 let rouletteFrozenTitleA = '';
 let rouletteFrozenTitleB = '';
 let rouletteIntroOffset = 0;
+let rouletteTitlesCache = null;
+let rouletteTitlesRequest = null;
+let rouletteTitleCallbacks = [];
+let gameMode = 'daily';
+let dailyChallenge = null;
+
+function setupLandingMode() {
+    if (!window.SIX_HOPS_DAILY) {
+        switchToRandomMode();
+        return;
+    }
+
+    const dateKey = window.SIX_HOPS_DAILY.getDateKey(new Date());
+    dailyChallenge = window.SIX_HOPS_DAILY.getChallenge(dateKey, locale);
+    $('.dailyTopicSuffix').text(localeConfig.landing.topicSuffix);
+    $('.dailyDate').text(formatDailyDate(dateKey)).attr('datetime', dateKey);
+    $('.rectangle').eq(0).text(dailyChallenge.start);
+    $('.rectangle').eq(1).text(dailyChallenge.goal);
+    $('.rectangleContainer').removeClass('prestart');
+    $('.start').text(localeConfig.landing.dailyStart);
+    $('.randomModeButton').text(localeConfig.landing.randomLink);
+    $('.randomModeButton').on('click', switchToRandomMode);
+}
+
+function formatDailyDate(dateKey) {
+    const date = new Date(dateKey + 'T12:00:00+09:00');
+    const languageTag = { ja: 'ja-JP', en: 'en-US', de: 'de-DE', fr: 'fr-FR', zh: 'zh-CN' }[locale];
+    return new Intl.DateTimeFormat(languageTag, {
+        timeZone: 'Asia/Tokyo',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    }).format(date);
+}
+
+function startDailyGame() {
+    if (!dailyChallenge || gameStarted) return;
+    gameMode = 'daily';
+    $('body').removeClass('dailyInitial');
+    $('.dailyTopic, .randomModeButton').hide();
+    $('.startBlock').hide();
+    beginChallengeGame(dailyChallenge.start, dailyChallenge.goal);
+}
+
+function switchToRandomMode() {
+    gameMode = 'random';
+    dailyChallenge = null;
+    $('body').removeClass('dailyInitial');
+    $('.dailyTopic, .randomModeButton').hide();
+    $('.challengeIntro').show();
+    $('.rectangle').empty();
+    $('.rectangleContainer').addClass('prestart');
+    $('.start').text(localeConfig.landing.randomStart);
+    fetchRouletteTitles();
+}
 
 function isDesktopTrackerMode() {
     return window.matchMedia('(min-width: 1024px)').matches;
@@ -636,42 +704,6 @@ function setupInteractiveControls() {
     });
 }
 
-function fetchRandomWikipediaTitles() {
-    $.ajax({
-        url: localeConfig.wikiApi,
-        data: {
-            action: 'query',
-            generator: 'random',
-            grnnamespace: 0,
-            grnlimit: 10,
-            format: 'json',
-            origin: '*'
-        },
-        dataType: 'jsonp',
-        success: function(data) {
-            const pages = data.query.pages;
-            const titles = Object.values(pages)
-                .map(page => page.title)
-                .filter(title => title.length <= 20)
-                .slice(0, 2);
-
-            if (titles.length < 2) {
-                fetchRandomWikipediaTitles();
-            } else {
-                $('.rectangle').eq(0).text(titles[0]);
-                $('.rectangle').eq(1).text(titles[1]);
-
-                if (!startArticleTitle) {
-                    startArticleTitle = titles[0];
-                }
-            }
-        },
-        error: function(error) {
-            alert(localeConfig.alertRandomTitleFailed);
-        }
-    });
-}
-
 function showActionButtons() {
     $('.buttonContainer').remove();
 
@@ -688,7 +720,6 @@ function showActionButtons() {
 
     retryButton.click(function() {
         $('.progressBar').show();
-        startRouletteSelection();
         stopButton.removeClass('final-stop');
         confirmButton.removeClass('primary-action');
         stopButton.show();
@@ -697,10 +728,10 @@ function showActionButtons() {
         buttonContainer.addClass('single-stop');
         buttonContainer.removeClass('decision-phase');
         buttonContainer.hide();
-        setTimeout(function() {
+        startRouletteSelection(function() {
             $('.progressBar').hide();
             buttonContainer.show();
-        }, 500);
+        });
     });
 
     stopButton.click(function() {
@@ -735,6 +766,8 @@ function fetchWikipediaArticle(title) {
         },
         dataType: 'json',
         success: function(data) {
+            const parsedPageId = data.parse.pageid || null;
+            const parsedTitle = data.parse.title || title;
             const content = data.parse.text['*'];
             const $content = $('<div>').html(content);
 
@@ -759,10 +792,18 @@ function fetchWikipediaArticle(title) {
                 history.push(title);
             }
             updateHistory();
-            if (title === targetArticleTitleB) {
+            const reachedGoal = (targetArticlePageId && parsedPageId === targetArticlePageId)
+                || (!targetArticlePageId && (title === targetArticleTitleB || parsedTitle === targetCanonicalTitle));
+            if (reachedGoal) {
                 $('.progressBar').hide();
                 isLoadingArticle = false;
                 displayResult('success');
+                return;
+            }
+            if (clickCount > 5 && !continueMode) {
+                $('.progressBar').hide();
+                isLoadingArticle = false;
+                displayResult('failure');
                 return;
             }
             if (continueMode && clickCount >= 5) {
@@ -797,12 +838,15 @@ function fetchGoalSummary(title) {
             exintro: true,
             explaintext: true,
             titles: title,
+            redirects: true,
             format: 'json',
             origin: '*'
         },
         dataType: 'jsonp',
         success: function(data) {
             const page = Object.values(data.query.pages)[0];
+            targetArticlePageId = page.pageid || null;
+            targetCanonicalTitle = page.title || title;
             const summary = page.extract || '';
             // モバイルではヒントを短く（約30文字）に制限
             const isMobile = window.matchMedia('(max-width: 1023px)').matches;
@@ -841,16 +885,7 @@ function loadArticle(linkTitle) {
     updateProgress(clickCount);
     updateTitle(clickCount);
     window.scrollTo(0, 0);
-    if (clickCount > 5 && linkTitle !== targetArticleTitleB && !continueMode) {
-        displayResult('failure');
-        return;
-    }
     fetchWikipediaArticle(linkTitle);
-
-    if ($('body').hasClass('daily')) {
-        updateTitle(clickCount);
-        updateHistory();
-    }
 }
 
 function updateProgress(clickCount) {
@@ -889,11 +924,15 @@ function updateTitle(clickCount) {
 
 function displayResult(result) {
     const isSuccess = result === 'success';
+    const isDaily = gameMode === 'daily';
     const resultText = isSuccess ? localeConfig.result.successLabel : localeConfig.result.failureLabel;
     const resultMessage = isSuccess ? localeConfig.result.successMessage : localeConfig.result.failureMessage;
-    const baseMessage = isSuccess
+    let baseMessage = isSuccess
         ? localeConfig.result.successTweet(startArticleTitle, targetArticleTitleB, clickCount)
         : localeConfig.result.failureTweet(startArticleTitle, targetArticleTitleB);
+    if (isDaily) {
+        baseMessage = baseMessage.replace('#TRY_6HOPS', '#DAILY_6HOPS');
+    }
 
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(baseMessage)}&url=${encodeURIComponent(localeConfig.shareUrl)}`;
 
@@ -905,9 +944,22 @@ function displayResult(result) {
             </a>
         </div>
     `;
+    const modeSummary = isDaily ? `
+        <div class="resultModeSummary">
+            <span class="resultModeBadge">${localeConfig.mode.daily}</span>
+            <span>${formatDailyDate(dailyChallenge.date)}</span>
+            <strong>${clickCount} HOPS</strong>
+        </div>
+    ` : `
+        <div class="resultModeSummary">
+            <span class="resultModeBadge random">${localeConfig.mode.random}</span>
+            <strong>${clickCount} HOPS</strong>
+        </div>
+    `;
 
     $('.wikiBlock').html(`
         <h2>${resultText}</h2>
+        ${modeSummary}
         <p>${resultMessage}</p>
         ${shareButton}
     `);
@@ -919,25 +971,21 @@ function displayResult(result) {
     });
 }
 
-function setTitles(start, goal) {
-    startArticleTitle = start; // 明示的に設定
-    targetArticleTitleB = goal; // 明示的に設定
-    gameStarted = true;
-
-    fetchWikipediaArticle(start); // Wikipediaの記事を表示
-    displayGoal(goal); // 目標記事のタイトルと概要を表示
-    $('.rectangleContainer').remove();
-    $('.startBlock').hide();
-    $('.aboutLink').hide();
-    $('.menuIcon').show(); // ハンバーガーメニューを表示
-    $('.title').text('0 / 6HOPS'); // タイトルを初期化
-    renderDesktopTracker();
-
-    $('.shareLink').attr('href', generateShareLink('TRY'));
-}
-
 function fetchRouletteTitles(callback) {
-    $.ajax({
+    if (typeof callback === 'function') {
+        rouletteTitleCallbacks.push(callback);
+    }
+
+    if (rouletteTitlesCache) {
+        flushRouletteTitleCallbacks(rouletteTitlesCache);
+        return;
+    }
+
+    if (rouletteTitlesRequest) {
+        return;
+    }
+
+    rouletteTitlesRequest = $.ajax({
         url: localeConfig.wikiApi,
         data: {
             action: 'query',
@@ -956,19 +1004,34 @@ function fetchRouletteTitles(callback) {
 
             const uniqueTitles = [...new Set(titles)];
             if (uniqueTitles.length < 10) {
-                fetchRouletteTitles(callback);
+                rouletteTitlesRequest = null;
+                fetchRouletteTitles();
                 return;
             }
 
-            callback(uniqueTitles);
+            rouletteTitlesRequest = null;
+            rouletteTitlesCache = uniqueTitles;
+            flushRouletteTitleCallbacks(rouletteTitlesCache);
         },
         error: function() {
-            alert(localeConfig.alertRouletteFailed);
+            const shouldAlert = rouletteTitleCallbacks.length > 0;
+            rouletteTitleCallbacks = [];
+            rouletteTitlesRequest = null;
+            if (shouldAlert) {
+                alert(localeConfig.alertRouletteFailed);
+            }
         }
     });
 }
 
-function startRouletteSelection() {
+function flushRouletteTitleCallbacks(titles) {
+    const callbacks = rouletteTitleCallbacks.splice(0);
+    callbacks.forEach(function(callback) {
+        callback(titles.slice());
+    });
+}
+
+function startRouletteSelection(onStarted) {
     rouletteStopStage = 0;
     rouletteFrozenTitleA = '';
     rouletteFrozenTitleB = '';
@@ -982,6 +1045,7 @@ function startRouletteSelection() {
 
     fetchRouletteTitles(function(titles) {
         rouletteTitles = titles;
+        rouletteTitlesCache = null;
 
         $('.rectangle').eq(0).text(rouletteTitles[0]);
         $('.rectangle').eq(1).text(rouletteTitles[1]);
@@ -1000,6 +1064,10 @@ function startRouletteSelection() {
                 $('.rectangle').eq(1).text(rouletteTitles[rouletteIndexB]);
             }
         }, 120);
+
+        if (typeof onStarted === 'function') {
+            onStarted();
+        }
     });
 }
 
@@ -1052,6 +1120,8 @@ function beginChallengeGame(title1, title2) {
     gameStarted = true;
     startArticleTitle = title1;
     targetArticleTitleB = title2;
+    targetArticlePageId = null;
+    targetCanonicalTitle = title2;
     $('.challengeIntro').remove();
     rouletteIntroOffset = 0;
     fetchWikipediaArticle(title1);
@@ -1064,5 +1134,5 @@ function beginChallengeGame(title1, title2) {
     $('.title').text('0 / 6HOPS');
     renderDesktopTracker();
 
-    $('.shareLink').attr('href', generateShareLink('TRY'));
+    $('.shareLink').attr('href', generateShareLink(gameMode === 'daily' ? 'DAILY' : 'TRY'));
 }

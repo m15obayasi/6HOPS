@@ -102,7 +102,8 @@ async function main() {
     const history = readJson(paths.history, { uploads: [] });
     const previous = history.uploads.find((item) => item.sha256 === digest);
     if (previous && !args.force) {
-        throw new Error(`同じ動画は投稿済みです: https://youtu.be/${previous.videoId}\n再投稿する場合のみ --force を指定してください。`);
+        console.log(`\n新しい動画はありません。同じ動画は投稿済みです: https://youtu.be/${previous.videoId}`);
+        return;
     }
 
     console.log('\nYouTubeへアップロードしています…');

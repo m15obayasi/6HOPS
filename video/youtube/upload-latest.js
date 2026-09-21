@@ -47,8 +47,8 @@ async function initiateUpload(accessToken, filePath, metadata) {
             description: metadata.description,
             tags: metadata.tags,
             categoryId: metadata.categoryId,
-            defaultLanguage: 'ja',
-            defaultAudioLanguage: 'ja'
+            defaultLanguage: metadata.locale,
+            defaultAudioLanguage: metadata.locale
         },
         status: {
             privacyStatus: metadata.privacyStatus,

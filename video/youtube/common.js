@@ -54,11 +54,11 @@ function loadConfig() {
     return config;
 }
 
-function loadDailyChallenge(dateKey) {
+function loadDailyChallenge(dateKey, locale = 'ja') {
     const source = fs.readFileSync(paths.dailyData, 'utf8');
     const sandbox = { window: {}, Intl, Date };
     vm.runInNewContext(source, sandbox, { filename: paths.dailyData });
-    return sandbox.window.SIX_HOPS_DAILY.getChallenge(dateKey, 'ja');
+    return sandbox.window.SIX_HOPS_DAILY.getChallenge(dateKey, locale);
 }
 
 function parseDateFromFile(filePath) {
@@ -67,6 +67,10 @@ function parseDateFromFile(filePath) {
         throw new Error(`動画ファイル名から日付を取得できません: ${path.basename(filePath)}`);
     }
     return match[1];
+}
+
+function parseLocaleFromFile(filePath) {
+    return /-EN-/i.test(path.basename(filePath)) ? 'en' : 'ja';
 }
 
 function findLatestVideo() {
@@ -89,28 +93,31 @@ function renderTemplate(template, values) {
 
 function buildMetadata(filePath, config, privacyOverride) {
     const date = parseDateFromFile(filePath);
-    const challenge = loadDailyChallenge(date);
+    const locale = parseLocaleFromFile(filePath);
+    const localizedConfig = { ...config, ...(config.locales?.[locale] || {}) };
+    const challenge = loadDailyChallenge(date, locale);
     const values = {
         date,
         start: challenge.start,
         goal: challenge.goal,
-        url: config.siteUrl || 'https://myeik.net/6HOPS/'
+        url: localizedConfig.siteUrl || 'https://myeik.net/6HOPS/'
     };
-    const privacyStatus = privacyOverride || config.privacyStatus || 'private';
+    const privacyStatus = privacyOverride || localizedConfig.privacyStatus || 'private';
     if (!['private', 'unlisted', 'public'].includes(privacyStatus)) {
         throw new Error(`privacyStatusが不正です: ${privacyStatus}`);
     }
-    const title = renderTemplate(config.titleTemplate, values).slice(0, 100);
-    const description = renderTemplate(config.descriptionTemplate, values).slice(0, 5000);
+    const title = renderTemplate(localizedConfig.titleTemplate, values).slice(0, 100);
+    const description = renderTemplate(localizedConfig.descriptionTemplate, values).slice(0, 5000);
     return {
         date,
+        locale,
         challenge,
         title,
         description,
-        tags: Array.isArray(config.tags) ? config.tags : [],
-        categoryId: String(config.categoryId || '20'),
+        tags: Array.isArray(localizedConfig.tags) ? localizedConfig.tags : [],
+        categoryId: String(localizedConfig.categoryId || '20'),
         privacyStatus,
-        madeForKids: Boolean(config.madeForKids)
+        madeForKids: Boolean(localizedConfig.madeForKids)
     };
 }
 

@@ -2,15 +2,63 @@ const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright');
 
+const requestedLocale = process.argv.includes('--locale')
+    ? process.argv[process.argv.indexOf('--locale') + 1]
+    : 'ja';
+const locale = requestedLocale === 'en' ? 'en' : 'ja';
+const demo = {
+    ja: {
+        date: '2026-09-22',
+        start: '石鹸',
+        goal: '侍',
+        route: ['石鹸', '日本', '武士', '侍'],
+        introSubtitle: '— Wikipediaを使ったゲーム —',
+        todayChallenge: '今日のお題',
+        startCaption: 'スタート：「石鹸」',
+        startSubcaption: 'リンクだけを辿って「侍」を目指します',
+        firstMove: (title) => `まずは「${title}」へ`,
+        nextMove: (title) => `次は「${title}」へ`,
+        linkInstruction: '記事内のリンクをクリック',
+        remaining: (count) => `あと${count}回`,
+        goalFound: 'ゴールの「侍」を発見！',
+        successText: '成功',
+        goalCaption: (hops) => `${hops} HOPSでゴール！`,
+        goalSubcaption: '今日のDaily、クリア',
+        endTitle: 'お題は毎日変わります。',
+        endSubtitle: '今日の組み合わせに挑戦しよう'
+    },
+    en: {
+        date: '2026-09-22',
+        start: 'Soap',
+        goal: 'Samurai',
+        route: ['Soap', 'West Asia', 'Asia', 'Japan', 'Samurai'],
+        introSubtitle: '— A game using Wikipedia —',
+        todayChallenge: "Today's challenge",
+        startCaption: 'Start: “Soap”',
+        startSubcaption: 'Follow links only and reach “Samurai”',
+        firstMove: (title) => `First, go to “${title}”`,
+        nextMove: (title) => `Next: “${title}”`,
+        linkInstruction: 'Click a link inside the article',
+        remaining: (count) => `${count} hops remaining`,
+        goalFound: 'Found the goal: “Samurai”!',
+        successText: 'Success',
+        goalCaption: (hops) => `Goal in ${hops} HOPS!`,
+        goalSubcaption: "Today's Daily cleared",
+        endTitle: 'A new challenge every day.',
+        endSubtitle: "Take on today's pair"
+    }
+}[locale];
+
 const projectRoot = path.resolve(__dirname, '..');
 const outputDir = path.join(__dirname, 'output');
-const rawVideoPath = path.join(outputDir, '6hops-daily-demo-ja-raw.webm');
+const rawVideoPath = path.join(outputDir, `6hops-daily-demo-${locale}-raw.webm`);
 const baseUrl = process.env.SIX_HOPS_URL || 'http://127.0.0.1:8770/';
 const edgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
 
 fs.mkdirSync(outputDir, { recursive: true });
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const timingScale = process.env.SIX_HOPS_FAST === '1' ? 0.05 : 1;
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, Math.max(20, Math.round(ms * timingScale))));
 
 async function addDemoStyles(page) {
     await page.addStyleTag({ content: `
@@ -196,8 +244,24 @@ async function waitForArticle(page, title) {
 }
 
 async function highlightLink(page, title) {
-    const link = page.locator(`.wikiBlock a[title="${title}"]`).first();
-    await link.waitFor({ state: 'visible', timeout: 30000 });
+    const currentHeading = await page.locator('.wikiBlock > h2').first().textContent().catch(() => '');
+    console.log(`Finding link: ${currentHeading || '(result)'} -> ${title}`);
+    const links = page.locator(`.wikiBlock a[title="${title}"]`);
+    await page.waitForFunction((expectedTitle) => (
+        [...document.querySelectorAll('.wikiBlock a')].some((element) => (
+            element.getAttribute('title') === expectedTitle && element.getClientRects().length > 0
+        ))
+    ), title, { timeout: 30000 });
+    const count = await links.count();
+    let link = null;
+    for (let index = 0; index < count; index += 1) {
+        const candidate = links.nth(index);
+        if (await candidate.isVisible()) {
+            link = candidate;
+            break;
+        }
+    }
+    if (!link) throw new Error(`表示可能なリンクが見つかりません: ${title}`);
     await link.scrollIntoViewIfNeeded();
     await page.waitForTimeout(350);
     await link.evaluate((element) => element.classList.add('sixhops-demo-link'));
@@ -234,68 +298,68 @@ async function main() {
         html, body { width: 100%; height: 100%; margin: 0; }
         body { display:flex; align-items:center; justify-content:center; background:#f8f9fa; color:#202122;
             font-family:'Yu Gothic UI','Noto Sans JP',sans-serif; text-align:center; }
-        .kicker { color:#3366cc; font-size:18px; font-weight:800; letter-spacing:.16em; margin-bottom:18px; }
-        h1 { margin:0; font-size:76px; line-height:1; letter-spacing:.03em; }
-        p { margin:22px 0 0; color:#54595d; font-size:30px; font-weight:700; }
-        .challenge { display:inline-flex; align-items:center; gap:20px; margin-top:30px; padding:13px 24px;
-            border:1px solid #a2a9b1; background:#fff; font-weight:800; }
-        .date { color:#54595d; font-size:18px; letter-spacing:.04em; }
-        .pair { color:#202122; font-size:28px; }
-        .rule { width:96px; height:3px; margin:32px auto 0; background:#202122; }
-    </style></head><body><main><div class="kicker">DAILY MODE</div><h1>6HOPS</h1><p>— Wikipediaを使ったゲーム —</p><div class="challenge"><span class="date">2026-09-22</span><span class="pair">石鹸 → 侍</span></div><div class="rule"></div></main></body></html>`);
+        main { width:min(1080px,calc(100% - 80px)); }
+        .kicker { color:#3366cc; font-size:24px; font-weight:800; letter-spacing:.18em; margin-bottom:18px; }
+        h1 { margin:0; font-size:132px; line-height:.95; letter-spacing:.035em; }
+        p { margin:24px 0 0; color:#54595d; font-size:38px; font-weight:700; }
+        .challenge { width:min(900px,90%); display:grid; grid-template-columns:220px 1fr; align-items:center;
+            margin:36px auto 0; border:2px solid #a2a9b1; background:#fff; font-weight:800; }
+        .date { padding:18px 22px; border-right:1px solid #a2a9b1; color:#54595d; font-size:25px; letter-spacing:.04em; }
+        .pair { padding:15px 24px; color:#202122; font-size:44px; line-height:1.2; }
+        .rule { width:120px; height:4px; margin:34px auto 0; background:#202122; }
+    </style></head><body><main><div class="kicker">DAILY MODE</div><h1>6HOPS</h1><p>${demo.introSubtitle}</p><div class="challenge"><span class="date">${demo.date}</span><span class="pair">${demo.start} → ${demo.goal}</span></div><div class="rule"></div></main></body></html>`);
     await sleep(3800);
 
-    await page.goto(`${baseUrl}?date=2026-09-22`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    const localePath = locale === 'en' ? 'en/' : '';
+    await page.goto(`${baseUrl}${localePath}?date=${demo.date}`, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForSelector('.startBlock', { state: 'visible', timeout: 30000 });
-    await page.waitForFunction(() => {
+    await page.waitForFunction((expected) => {
         const boxes = [...document.querySelectorAll('.rectangle')];
-        return boxes.length >= 2 && boxes[0].textContent.trim() === '石鹸' && boxes[1].textContent.trim() === '侍';
-    }, null, { timeout: 30000 });
+        return boxes.length >= 2 && boxes[0].textContent.trim() === expected.start && boxes[1].textContent.trim() === expected.goal;
+    }, { start: demo.start, goal: demo.goal }, { timeout: 30000 });
     await addDemoStyles(page);
 
-    await showCaption(page, '今日のお題', '石鹸 → 侍', true);
+    await showCaption(page, demo.todayChallenge, `${demo.start} → ${demo.goal}`, true);
     await sleep(3600);
     await hideCaption(page);
 
     await page.locator('.startBlock').click();
-    await waitForArticle(page, '石鹸');
+    await waitForArticle(page, demo.start);
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-    await showCaption(page, 'スタート：「石鹸」', 'リンクだけを辿って「侍」を目指します');
+    await showCaption(page, demo.startCaption, demo.startSubcaption);
     await sleep(2500);
     await hideCaption(page);
 
-    const japanLink = await highlightLink(page, '日本');
-    await showCaption(page, 'まずは「日本」へ', '記事内のリンクをクリック');
-    await sleep(1500);
-    await hideCaption(page);
-    await japanLink.click();
-    await waitForArticle(page, '日本');
-    await showCaption(page, '1 HOP', '石鹸 → 日本', true);
-    await sleep(2400);
-    await hideCaption(page);
+    for (let index = 1; index < demo.route.length; index += 1) {
+        const title = demo.route[index];
+        const isGoal = index === demo.route.length - 1;
+        const link = await highlightLink(page, title);
+        const moveCaption = isGoal
+            ? demo.goalFound
+            : (index === 1 ? demo.firstMove(title) : demo.nextMove(title));
+        await showCaption(page, moveCaption, isGoal ? '' : demo.linkInstruction);
+        await sleep(isGoal ? 1500 : 1300);
+        await hideCaption(page);
+        await link.click();
 
-    const warriorLink = await highlightLink(page, '武士');
-    await showCaption(page, '次は「武士」へ');
-    await sleep(1200);
-    await hideCaption(page);
-    await warriorLink.click();
-    await waitForArticle(page, '武士');
-    await showCaption(page, '2 HOPS', 'あと4回', true);
-    await sleep(3000);
-    await hideCaption(page);
+        if (isGoal) {
+            await page.waitForFunction((successText) => document.body.textContent.includes(successText), demo.successText, { timeout: 30000 });
+        } else {
+            await waitForArticle(page, title);
+            const hopLabel = `${index} ${index === 1 ? 'HOP' : 'HOPS'}`;
+            await showCaption(page, hopLabel, demo.remaining(6 - index), true);
+            await sleep(index === 2 ? 3000 : 2400);
+            await hideCaption(page);
+        }
+    }
 
-    const samuraiLink = await highlightLink(page, '侍');
-    await showCaption(page, 'ゴールの「侍」を発見！');
-    await sleep(1500);
-    await hideCaption(page);
-    await samuraiLink.click();
-    await page.waitForFunction(() => document.body.textContent.includes('成功'), null, { timeout: 30000 });
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-    await showCaption(page, '3 HOPSでゴール！', '今日のDaily、クリア', true);
+    const hops = demo.route.length - 1;
+    await showCaption(page, demo.goalCaption(hops), demo.goalSubcaption, true);
     await sleep(4300);
     await hideCaption(page);
 
-    await showCard(page, '6HOPS DAILY', 'お題は毎日変わります。', '今日の組み合わせに挑戦しよう', 5000);
+    await showCard(page, '6HOPS DAILY', demo.endTitle, demo.endSubtitle, 5000);
     await context.close();
     await video.saveAs(rawVideoPath);
     await browser.close();

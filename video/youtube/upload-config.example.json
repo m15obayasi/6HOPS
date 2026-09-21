@@ -11,5 +11,19 @@
     "ウィキペディア",
     "ゲーム",
     "Daily Challenge"
-  ]
+  ],
+  "locales": {
+    "en": {
+      "siteUrl": "https://myeik.net/6HOPS/en/",
+      "titleTemplate": "6HOPS Solution｜{date}｜{start} → {goal}",
+      "descriptionTemplate": "A Daily playthrough of 6HOPS — the game where you follow Wikipedia links and try to reach the goal in six hops or fewer.\n\nToday's challenge: {start} → {goal}\nPlay here: {url}\n\nA new challenge every day.\n\n#6HOPS #Wikipedia #Game",
+      "tags": [
+        "6HOPS",
+        "Wikipedia",
+        "Wikipedia game",
+        "Daily Challenge",
+        "Web game"
+      ]
+    }
+  }
 }

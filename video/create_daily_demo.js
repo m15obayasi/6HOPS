@@ -15,32 +15,36 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function addDemoStyles(page) {
     await page.addStyleTag({ content: `
         #sixhops-demo-caption,
-        #sixhops-demo-card,
-        #sixhops-demo-watermark {
+        #sixhops-demo-card {
             font-family: 'Zen Maru Gothic', 'Noto Sans JP', 'Yu Gothic UI', sans-serif;
             box-sizing: border-box;
             pointer-events: none;
         }
         #sixhops-demo-caption {
             position: fixed;
-            left: 50%;
-            bottom: 34px;
-            transform: translate(-50%, 12px);
-            width: max-content;
-            max-width: calc(100vw - 80px);
-            padding: 14px 24px;
-            border: 1px solid #a2a9b1;
-            background: rgba(255, 255, 255, 0.96);
-            color: #202122;
-            box-shadow: 0 8px 26px rgba(32, 33, 34, 0.16);
+            left: 0;
+            right: 0;
+            bottom: 0;
+            min-height: 112px;
+            padding: 18px 48px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.28);
+            background: rgba(45, 49, 54, 0.78);
+            color: #fff;
+            box-shadow: 0 -8px 28px rgba(32, 33, 34, 0.12);
+            backdrop-filter: blur(3px);
             text-align: center;
             opacity: 0;
+            transform: translateY(12px);
             transition: opacity 180ms ease, transform 180ms ease;
             z-index: 2147483646;
         }
         #sixhops-demo-caption.visible {
             opacity: 1;
-            transform: translate(-50%, 0);
+            transform: translateY(0);
         }
         #sixhops-demo-caption .demo-main {
             display: block;
@@ -52,16 +56,17 @@ async function addDemoStyles(page) {
         #sixhops-demo-caption .demo-sub {
             display: block;
             margin-top: 4px;
-            color: #54595d;
+            color: rgba(255, 255, 255, 0.78);
             font-size: 16px;
             font-weight: 700;
         }
         #sixhops-demo-caption.accent {
-            border-color: #3366cc;
-            box-shadow: 0 8px 28px rgba(51, 102, 204, 0.2);
+            border-top-color: rgba(132, 168, 255, 0.8);
+            background: rgba(39, 49, 67, 0.82);
+            box-shadow: 0 -8px 28px rgba(51, 102, 204, 0.16);
         }
         #sixhops-demo-caption.accent .demo-main {
-            color: #3366cc;
+            color: #fff;
         }
         #sixhops-demo-card {
             position: fixed;
@@ -104,19 +109,6 @@ async function addDemoStyles(page) {
             margin-top: 30px;
             background: #202122;
         }
-        #sixhops-demo-watermark {
-            position: fixed;
-            right: 22px;
-            bottom: 18px;
-            padding: 7px 10px;
-            border: 1px solid rgba(162, 169, 177, 0.75);
-            background: rgba(248, 249, 250, 0.88);
-            color: #54595d;
-            font-size: 13px;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-            z-index: 2147483645;
-        }
         .sixhops-demo-link {
             position: relative !important;
             border-bottom: 3px solid #3366cc !important;
@@ -127,12 +119,6 @@ async function addDemoStyles(page) {
         }
     ` });
 
-    await page.evaluate(() => {
-        const watermark = document.createElement('div');
-        watermark.id = 'sixhops-demo-watermark';
-        watermark.textContent = '6HOPS DAILY';
-        document.body.appendChild(watermark);
-    });
 }
 
 async function showCaption(page, main, sub = '', accent = false) {

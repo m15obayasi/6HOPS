@@ -12,7 +12,6 @@ const demo = {
         start: '石鹸',
         goal: '侍',
         route: ['石鹸', '日本', '武士', '侍'],
-        introSubtitle: '— Wikipediaを使ったゲーム —',
         todayChallenge: '今日のお題',
         startCaption: 'スタート：「石鹸」',
         startSubcaption: 'リンクだけを辿って「侍」を目指します',
@@ -32,7 +31,6 @@ const demo = {
         start: 'Soap',
         goal: 'Samurai',
         route: ['Soap', 'West Asia', 'Asia', 'Japan', 'Samurai'],
-        introSubtitle: '— A game using Wikipedia —',
         todayChallenge: "Today's challenge",
         startCaption: 'Start: “Soap”',
         startSubcaption: 'Follow links only and reach “Samurai”',
@@ -298,16 +296,11 @@ async function main() {
         html, body { width: 100%; height: 100%; margin: 0; }
         body { display:flex; align-items:center; justify-content:center; background:#f8f9fa; color:#202122;
             font-family:'Yu Gothic UI','Noto Sans JP',sans-serif; text-align:center; }
-        main { width:min(1080px,calc(100% - 80px)); }
-        .kicker { color:#3366cc; font-size:24px; font-weight:800; letter-spacing:.18em; margin-bottom:18px; }
-        h1 { margin:0; font-size:132px; line-height:.95; letter-spacing:.035em; }
-        p { margin:24px 0 0; color:#54595d; font-size:38px; font-weight:700; }
-        .challenge { width:min(900px,90%); display:grid; grid-template-columns:220px 1fr; align-items:center;
-            margin:36px auto 0; border:2px solid #a2a9b1; background:#fff; font-weight:800; }
-        .date { padding:18px 22px; border-right:1px solid #a2a9b1; color:#54595d; font-size:25px; letter-spacing:.04em; }
-        .pair { padding:15px 24px; color:#202122; font-size:44px; line-height:1.2; }
-        .rule { width:120px; height:4px; margin:34px auto 0; background:#202122; }
-    </style></head><body><main><div class="kicker">DAILY MODE</div><h1>6HOPS</h1><p>${demo.introSubtitle}</p><div class="challenge"><span class="date">${demo.date}</span><span class="pair">${demo.start} → ${demo.goal}</span></div><div class="rule"></div></main></body></html>`);
+        main { width:min(1160px,calc(100% - 72px)); }
+        h1 { margin:0; font-size:154px; line-height:.95; letter-spacing:.035em; }
+        .pair { margin-top:54px; color:#202122; font-size:clamp(52px,6.4vw,86px); font-weight:900;
+            line-height:1.18; overflow-wrap:anywhere; }
+    </style></head><body><main><h1>6HOPS</h1><div class="pair">${demo.start} → ${demo.goal}</div></main></body></html>`);
     await sleep(3800);
 
     const localePath = locale === 'en' ? 'en/' : '';

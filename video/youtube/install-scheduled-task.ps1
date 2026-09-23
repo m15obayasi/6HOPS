@@ -1,6 +1,6 @@
 param(
     [ValidatePattern('^([01]\d|2[0-3]):[0-5]\d$')]
-    [string]$At = '09:00',
+    [string]$At = '00:00',
     [ValidateSet('private', 'unlisted', 'public')]
     [string]$Privacy = 'public'
 )

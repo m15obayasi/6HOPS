@@ -57,6 +57,15 @@ npm run daily:dry-run
 .\run-daily.ps1 -Date '2026-09-23' -Privacy public
 ```
 
+## 6. PCを起動せずGitHub Actionsで毎日実行
+
+リポジトリのActions Secretsに次の2項目を登録します。
+
+- `YOUTUBE_CLIENT_SECRET_JSON`: `client_secret.json` の内容全体
+- `YOUTUBE_TOKEN_JSON`: `token.json` の内容全体
+
+`.github/workflows/daily-youtube.yml` が、日本時間の毎日0時に日本語版・英語版を生成して公開します。Actions画面の「Run workflow」から日付と公開範囲を指定して手動実行することもできます。同じ日を再実行した場合に二重投稿しにくいよう、投稿履歴を同日用キャッシュへ保存します。
+
 ## 公開について
 
 新規または未監査のYouTube APIプロジェクトでは、API投稿動画が非公開に制限される場合があります。最初は非公開で運用し、YouTube Studioで内容を確認してから公開してください。

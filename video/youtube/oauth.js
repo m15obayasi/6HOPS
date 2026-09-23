@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { loadOAuthClient, paths, readJson, writePrivateJson } = require('./common');
+const { loadOAuthClient, paths, readJson, readJsonEnvironment, writePrivateJson } = require('./common');
 
 const tokenEndpoint = 'https://oauth2.googleapis.com/token';
 
@@ -17,11 +17,11 @@ async function exchangeToken(parameters) {
 }
 
 async function getAccessToken() {
-    if (!fs.existsSync(paths.token)) {
-        throw new Error('YouTube認証が未完了です。先に node authenticate.js を実行してください。');
-    }
     const client = loadOAuthClient();
-    const token = readJson(paths.token);
+    const token = readJsonEnvironment('YOUTUBE_TOKEN_JSON') || readJson(paths.token, null);
+    if (!token) {
+        throw new Error('YouTube認証が未完了です。YOUTUBE_TOKEN_JSONを設定するか、先に node authenticate.js を実行してください。');
+    }
     const marginMs = 60 * 1000;
     if (token.access_token && token.expires_at && Date.now() < token.expires_at - marginMs) {
         return token.access_token;
@@ -41,7 +41,7 @@ async function getAccessToken() {
         refresh_token: refreshed.refresh_token || token.refresh_token,
         expires_at: Date.now() + (refreshed.expires_in * 1000)
     };
-    writePrivateJson(paths.token, updated);
+    if (!process.env.YOUTUBE_TOKEN_JSON) writePrivateJson(paths.token, updated);
     return updated.access_token;
 }
 

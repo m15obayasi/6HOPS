@@ -24,6 +24,16 @@ function readJson(filePath, fallback) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
+function readJsonEnvironment(name) {
+    const value = process.env[name];
+    if (!value) return null;
+    try {
+        return JSON.parse(value);
+    } catch (_) {
+        throw new Error(`${name}に有効なJSONが設定されていません。`);
+    }
+}
+
 function writePrivateJson(filePath, value) {
     fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, { encoding: 'utf8', mode: 0o600 });
     try {
@@ -34,12 +44,13 @@ function writePrivateJson(filePath, value) {
 }
 
 function loadOAuthClient() {
-    if (!fs.existsSync(paths.clientSecret)) {
+    const raw = readJsonEnvironment('YOUTUBE_CLIENT_SECRET_JSON')
+        || readJson(paths.clientSecret, null);
+    if (!raw) {
         throw new Error(
-            `OAuthクライアント情報がありません。Google Cloudから取得したJSONを次へ保存してください:\n${paths.clientSecret}`
+            `OAuthクライアント情報がありません。YOUTUBE_CLIENT_SECRET_JSONを設定するか、Google Cloudから取得したJSONを次へ保存してください:\n${paths.clientSecret}`
         );
     }
-    const raw = readJson(paths.clientSecret);
     const client = raw.installed || raw.web;
     if (!client || !client.client_id || !client.client_secret) {
         throw new Error('client_secret.jsonの形式を確認してください。デスクトップアプリ用OAuthクライアントを使用します。');
@@ -147,6 +158,7 @@ module.exports = {
     paths,
     readJson,
     writePrivateJson,
+    readJsonEnvironment,
     loadOAuthClient,
     loadConfig,
     loadDailyChallenge,

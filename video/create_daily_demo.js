@@ -58,6 +58,8 @@ const rawVideoPath = path.join(outputDir, `6HOPS-Daily-Playthrough-${localeCode}
 const thumbnailPath = path.join(__dirname, `6HOPS-Daily-Playthrough-${localeCode}-${date}-thumbnail.jpg`);
 const baseUrl = process.env.SIX_HOPS_URL || 'https://myeik.net/6HOPS/';
 const edgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
+const browserPath = process.env.PLAYWRIGHT_EXECUTABLE_PATH
+    || (process.platform === 'win32' ? edgePath : chromium.executablePath());
 
 fs.mkdirSync(outputDir, { recursive: true });
 
@@ -275,7 +277,7 @@ async function highlightLink(page, title) {
 async function main() {
     const browser = await chromium.launch({
         headless: true,
-        executablePath: edgePath,
+        executablePath: browserPath,
         args: [
             '--disable-gpu-sandbox',
             '--window-size=1280,720',

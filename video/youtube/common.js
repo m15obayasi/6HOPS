@@ -133,7 +133,7 @@ function parseArgs(argv) {
         const value = argv[index];
         if (!value.startsWith('--')) continue;
         const key = value.slice(2);
-        if (['dry-run', 'force'].includes(key)) {
+        if (['dry-run', 'force', 'offline', 'skip-upload'].includes(key)) {
             result[key] = true;
         } else {
             result[key] = argv[index + 1];

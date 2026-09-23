@@ -160,7 +160,8 @@ async function main() {
         videoId: result.id,
         channelId: result.snippet?.channelId || null,
         uploadedAt: new Date().toISOString(),
-        privacyStatus: metadata.privacyStatus,
+        privacyStatus: result.status?.privacyStatus || metadata.privacyStatus,
+        requestedPrivacyStatus: metadata.privacyStatus,
         title: metadata.title,
         thumbnailStatus
     };
@@ -169,7 +170,10 @@ async function main() {
     console.log('\nアップロードが完了しました。');
     console.log(`https://youtu.be/${result.id}`);
     if (record.channelId) console.log(`チャンネルID: ${record.channelId}`);
-    console.log(`公開設定: ${metadata.privacyStatus}`);
+    console.log(`公開設定: ${record.privacyStatus}`);
+    if (record.privacyStatus !== metadata.privacyStatus) {
+        console.warn(`注意: ${metadata.privacyStatus}を指定しましたが、YouTube側では${record.privacyStatus}になりました。APIプロジェクトの監査状態を確認してください。`);
+    }
     if (thumbnailError) {
         throw new Error(`動画はアップロードされましたが、${thumbnailError.message}`);
     }

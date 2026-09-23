@@ -1,6 +1,10 @@
 output/
+node_modules/
+6HOPS-Daily-Playthrough-*.mp4
+6HOPS-Daily-Playthrough-*-thumbnail.jpg
 youtube/client_secret.json
 youtube/token.json
 youtube/upload-config.json
 youtube/upload-history.json
 youtube/logs/
+youtube/daily-logs/

@@ -1,25 +1,32 @@
 const fs = require('fs');
 const path = require('path');
-const { chromium } = require('playwright');
+const { chromium } = require('playwright-core');
+const { loadDailyChallenge, parseArgs } = require('./youtube/common');
 
-const requestedLocale = process.argv.includes('--locale')
-    ? process.argv[process.argv.indexOf('--locale') + 1]
-    : 'ja';
+const args = parseArgs(process.argv.slice(2));
+const requestedLocale = args.locale || 'ja';
 const locale = requestedLocale === 'en' ? 'en' : 'ja';
+const date = args.date || new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit'
+}).format(new Date());
+const challenge = loadDailyChallenge(date, locale);
+const route = args.route ? JSON.parse(args.route) : [challenge.start, challenge.goal];
+if (!Array.isArray(route) || route.length < 2 || route.length > 7) {
+    throw new Error('経路はスタートとゴールを含む2〜7記事で指定してください。');
+}
+if (route[0] !== challenge.start || route[route.length - 1] !== challenge.goal) {
+    throw new Error(`経路がお題と一致しません: ${challenge.start} → ${challenge.goal}`);
+}
 const demo = {
     ja: {
-        date: '2026-09-22',
-        start: '石鹸',
-        goal: '侍',
-        route: ['石鹸', '日本', '武士', '侍'],
         todayChallenge: '今日のお題',
-        startCaption: 'スタート：「石鹸」',
-        startSubcaption: 'リンクだけを辿って「侍」を目指します',
+        startCaption: (start) => `スタート：「${start}」`,
+        startSubcaption: (goal) => `リンクだけを辿って「${goal}」を目指します`,
         firstMove: (title) => `まずは「${title}」へ`,
         nextMove: (title) => `次は「${title}」へ`,
         linkInstruction: '記事内のリンクをクリック',
         remaining: (count) => `あと${count}回`,
-        goalFound: 'ゴールの「侍」を発見！',
+        goalFound: (goal) => `ゴールの「${goal}」を発見！`,
         successText: '成功',
         goalCaption: (hops) => `${hops} HOPSでゴール！`,
         goalSubcaption: '今日のDaily、クリア',
@@ -27,18 +34,14 @@ const demo = {
         endSubtitle: '今日の組み合わせに挑戦しよう'
     },
     en: {
-        date: '2026-09-22',
-        start: 'Soap',
-        goal: 'Samurai',
-        route: ['Soap', 'West Asia', 'Asia', 'Japan', 'Samurai'],
         todayChallenge: "Today's challenge",
-        startCaption: 'Start: “Soap”',
-        startSubcaption: 'Follow links only and reach “Samurai”',
+        startCaption: (start) => `Start: “${start}”`,
+        startSubcaption: (goal) => `Follow links only and reach “${goal}”`,
         firstMove: (title) => `First, go to “${title}”`,
         nextMove: (title) => `Next: “${title}”`,
         linkInstruction: 'Click a link inside the article',
         remaining: (count) => `${count} hops remaining`,
-        goalFound: 'Found the goal: “Samurai”!',
+        goalFound: (goal) => `Found the goal: “${goal}”!`,
         successText: 'Success',
         goalCaption: (hops) => `Goal in ${hops} HOPS!`,
         goalSubcaption: "Today's Daily cleared",
@@ -46,11 +49,14 @@ const demo = {
         endSubtitle: "Take on today's pair"
     }
 }[locale];
+Object.assign(demo, { date, start: challenge.start, goal: challenge.goal, route });
 
 const projectRoot = path.resolve(__dirname, '..');
 const outputDir = path.join(__dirname, 'output');
-const rawVideoPath = path.join(outputDir, `6hops-daily-demo-${locale}-raw.webm`);
-const baseUrl = process.env.SIX_HOPS_URL || 'http://127.0.0.1:8770/';
+const localeCode = locale.toUpperCase();
+const rawVideoPath = path.join(outputDir, `6HOPS-Daily-Playthrough-${localeCode}-${date}-raw.webm`);
+const thumbnailPath = path.join(__dirname, `6HOPS-Daily-Playthrough-${localeCode}-${date}-thumbnail.jpg`);
+const baseUrl = process.env.SIX_HOPS_URL || 'https://myeik.net/6HOPS/';
 const edgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
 
 fs.mkdirSync(outputDir, { recursive: true });
@@ -301,6 +307,7 @@ async function main() {
         .pair { margin-top:54px; color:#202122; font-size:clamp(52px,6.4vw,86px); font-weight:900;
             line-height:1.18; overflow-wrap:anywhere; }
     </style></head><body><main><h1>6HOPS</h1><div class="pair">${demo.start} → ${demo.goal}</div></main></body></html>`);
+    await page.screenshot({ path: thumbnailPath, type: 'jpeg', quality: 92 });
     await sleep(3800);
 
     const localePath = locale === 'en' ? 'en/' : '';
@@ -319,7 +326,7 @@ async function main() {
     await page.locator('.startBlock').click();
     await waitForArticle(page, demo.start);
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-    await showCaption(page, demo.startCaption, demo.startSubcaption);
+    await showCaption(page, demo.startCaption(demo.start), demo.startSubcaption(demo.goal));
     await sleep(2500);
     await hideCaption(page);
 
@@ -328,7 +335,7 @@ async function main() {
         const isGoal = index === demo.route.length - 1;
         const link = await highlightLink(page, title);
         const moveCaption = isGoal
-            ? demo.goalFound
+            ? demo.goalFound(demo.goal)
             : (index === 1 ? demo.firstMove(title) : demo.nextMove(title));
         await showCaption(page, moveCaption, isGoal ? '' : demo.linkInstruction);
         await sleep(isGoal ? 1500 : 1300);
@@ -358,6 +365,7 @@ async function main() {
     await browser.close();
 
     console.log(rawVideoPath);
+    console.log(thumbnailPath);
 }
 
 main().catch((error) => {

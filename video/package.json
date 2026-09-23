@@ -1,0 +1,15 @@
+{
+  "name": "6hops-daily-video",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Daily video generation and YouTube publishing for 6HOPS",
+  "scripts": {
+    "daily": "node create_daily_videos.js",
+    "daily:dry-run": "node create_daily_videos.js --dry-run"
+  },
+  "dependencies": {
+    "cheerio": "^1.1.2",
+    "ffmpeg-static": "^5.2.0",
+    "playwright-core": "^1.55.0"
+  }
+}

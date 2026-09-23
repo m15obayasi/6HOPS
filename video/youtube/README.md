@@ -64,7 +64,7 @@ npm run daily:dry-run
 - `YOUTUBE_CLIENT_SECRET_JSON`: `client_secret.json` の内容全体
 - `YOUTUBE_TOKEN_JSON`: `token.json` の内容全体
 
-`.github/workflows/daily-youtube.yml` が、日本時間の毎日0時に日本語版・英語版を生成して公開します。Actions画面の「Run workflow」から日付と公開範囲を指定して手動実行することもできます。同じ日を再実行した場合に二重投稿しにくいよう、投稿履歴を同日用キャッシュへ保存します。
+`.github/workflows/daily-youtube.yml` が、日本時間の毎日18時に日本語版・英語版を生成して公開します。Actions画面の「Run workflow」から日付と公開範囲を指定して手動実行することもできます。同じ日を再実行した場合に二重投稿しにくいよう、投稿履歴を同日用キャッシュへ保存します。
 
 ## 公開について
 

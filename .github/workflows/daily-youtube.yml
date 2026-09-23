@@ -2,8 +2,8 @@ name: Daily YouTube videos
 
 on:
   schedule:
-    # 00:00 in Japan (15:00 UTC on the previous calendar day)
-    - cron: '0 15 * * *'
+    # 18:00 in Japan (09:00 UTC)
+    - cron: '0 9 * * *'
   workflow_dispatch:
     inputs:
       date:

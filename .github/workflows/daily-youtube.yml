@@ -46,10 +46,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -75,7 +75,7 @@ jobs:
 
       - name: Restore same-day upload history
         id: upload-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: video/youtube/upload-history.json
           key: youtube-upload-${{ steps.challenge.outputs.date }}
@@ -95,7 +95,7 @@ jobs:
 
       - name: Preserve upload history for safe retry
         if: always() && github.event.inputs.upload != 'false' && hashFiles('video/youtube/upload-history.json') != '' && steps.upload-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: video/youtube/upload-history.json
           key: youtube-upload-${{ steps.challenge.outputs.date }}

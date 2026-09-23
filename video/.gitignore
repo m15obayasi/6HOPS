@@ -1,5 +1,6 @@
 output/
 node_modules/
+.playwright/
 6HOPS-Daily-Playthrough-*.mp4
 6HOPS-Daily-Playthrough-*-thumbnail.jpg
 youtube/client_secret.json

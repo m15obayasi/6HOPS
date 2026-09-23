@@ -11,8 +11,9 @@ $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
 $runner = Join-Path $scriptDirectory 'run-daily.ps1'
 $actionArguments = "-NoProfile -ExecutionPolicy Bypass -File `"$runner`" -Privacy $Privacy"
 $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument $actionArguments
-$trigger = New-ScheduledTaskTrigger -Daily -At $At
-$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -WakeToRun -MultipleInstances IgnoreNew -RestartCount 2 -RestartInterval (New-TimeSpan -Minutes 20) -ExecutionTimeLimit (New-TimeSpan -Hours 3)
+$dailyTrigger = New-ScheduledTaskTrigger -Daily -At $At
+$logonTrigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
+$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -WakeToRun -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew -RestartCount 2 -RestartInterval (New-TimeSpan -Minutes 20) -ExecutionTimeLimit (New-TimeSpan -Hours 3)
 
-Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Settings $settings -Description '6HOPSの日英Daily動画を生成し、YouTubeへ投稿します。' -Force | Out-Null
-Write-Output "タスクを登録しました: $taskName（毎日 $At、公開設定: $Privacy）"
+Register-ScheduledTask -TaskName $taskName -Action $action -Trigger @($dailyTrigger, $logonTrigger) -Settings $settings -Description '6HOPSの日英Daily動画を毎日0時に生成・投稿し、未実行時は次回サインイン時に補完します。' -Force | Out-Null
+Write-Output "タスクを登録しました: $taskName（毎日 $At＋サインイン時、公開設定: $Privacy）"

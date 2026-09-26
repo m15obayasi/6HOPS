@@ -10,6 +10,11 @@ on:
         description: 'Challenge date (YYYY-MM-DD); blank prepares tomorrow in Japan'
         required: false
         type: string
+      deploy:
+        description: 'Deploy the current validated Daily data even when no override changed'
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -60,10 +65,12 @@ jobs:
         run: node prepare_daily_challenge.js --date "${{ steps.challenge.outputs.date }}"
 
       - name: Commit a date override when the challenge changed
+        id: override
         shell: bash
         run: |
           if git diff --quiet -- ../js/daily-data.js; then
             echo "The scheduled challenge is valid; no override was needed."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
@@ -71,3 +78,27 @@ jobs:
           git add ../js/daily-data.js
           git commit -m "Replace invalid Daily challenge for ${{ steps.challenge.outputs.date }}"
           git push origin HEAD:main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy validated Daily data to myeik.net
+        if: steps.override.outputs.changed == 'true' || github.event.inputs.deploy == 'true'
+        shell: bash
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          for name in FTP_HOST FTP_USERNAME FTP_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "Required secret is missing: $name" >&2
+              exit 1
+            fi
+          done
+          curl --fail --silent --show-error --ssl-reqd --ftp-create-dirs \
+            --user "$FTP_USERNAME:$FTP_PASSWORD" \
+            --upload-file ../js/daily-data.js \
+            "ftp://$FTP_HOST/myeik.net/6HOPS/js/daily-data.js"
+          curl --fail --silent --show-error --ssl-reqd --ftp-create-dirs \
+            --user "$FTP_USERNAME:$FTP_PASSWORD" \
+            --upload-file ../js/.htaccess \
+            "ftp://$FTP_HOST/myeik.net/6HOPS/js/.htaccess"

@@ -66,7 +66,7 @@ npm run daily:dry-run
 
 `.github/workflows/daily-youtube.yml` が、日本時間の毎日18時に日本語版・英語版を生成して公開します。Actions画面の「Run workflow」から日付と公開範囲を指定して手動実行することもできます。同じ日を再実行した場合に二重投稿しにくいよう、投稿履歴を同日用キャッシュへ保存します。
 
-前日の日本時間23時には `.github/workflows/prepare-daily-challenge.yml` が翌日のお題を日英両方の実在リンクで検証します。6 HOPS以内の経路が確認できない場合は、検証済みの別候補を日付別のお題として自動保存してから公開します。
+前日の日本時間23時には `.github/workflows/prepare-daily-challenge.yml` が翌日のお題を日英両方の実在リンクで検証します。6 HOPS以内の経路が確認できない場合は、検証済みの別候補を日付別のお題としてGitHubへ保存し、FTPSで `myeik.net` に自動公開します。接続情報は `FTP_HOST`、`FTP_USERNAME`、`FTP_PASSWORD` のActions Secretsとして保存します。
 
 ## 公開について
 

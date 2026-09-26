@@ -87,6 +87,7 @@ jobs:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FORCE_DEPLOY: ${{ github.event.inputs.deploy }}
         run: |
           for name in FTP_HOST FTP_USERNAME FTP_PASSWORD; do
             if [ -z "${!name}" ]; then
@@ -102,3 +103,19 @@ jobs:
             --user "$FTP_USERNAME:$FTP_PASSWORD" \
             --upload-file ../js/.htaccess \
             "ftp://$FTP_HOST/myeik.net/6HOPS/js/.htaccess"
+          if [ "$FORCE_DEPLOY" = "true" ]; then
+            temp_dir=$(mktemp -d)
+            trap 'rm -rf "$temp_dir"' EXIT
+            for page in index.html en/index.html de/index.html fr/index.html zh/index.html; do
+              local_file="$temp_dir/${page//\//-}"
+              curl --fail --silent --show-error --ssl-reqd \
+                --user "$FTP_USERNAME:$FTP_PASSWORD" \
+                --output "$local_file" \
+                "ftp://$FTP_HOST/myeik.net/6HOPS/$page"
+              perl -0pi -e 's/daily-data\.js\?v=[^"]+/daily-data.js?v=1.4/g' "$local_file"
+              curl --fail --silent --show-error --ssl-reqd \
+                --user "$FTP_USERNAME:$FTP_PASSWORD" \
+                --upload-file "$local_file" \
+                "ftp://$FTP_HOST/myeik.net/6HOPS/$page"
+            done
+          fi

@@ -38,6 +38,7 @@ jobs:
     timeout-minutes: 30
     env:
       TZ: Asia/Tokyo
+      SIX_HOPS_URL: http://127.0.0.1:4173/
       YOUTUBE_CLIENT_SECRET_JSON: ${{ secrets.YOUTUBE_CLIENT_SECRET_JSON }}
       YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
     defaults:
@@ -79,6 +80,20 @@ jobs:
         with:
           path: video/youtube/upload-history.json
           key: youtube-upload-${{ steps.challenge.outputs.date }}
+
+      - name: Start the repository version of the site
+        shell: bash
+        run: |
+          mkdir -p output
+          node serve-site.js > output/site-server.log 2>&1 &
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:4173/js/daily-data.js > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat output/site-server.log
+          exit 1
 
       - name: Generate and publish Japanese and English videos
         shell: bash

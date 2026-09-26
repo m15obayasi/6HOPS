@@ -65,11 +65,15 @@ function loadConfig() {
     return config;
 }
 
-function loadDailyChallenge(dateKey, locale = 'ja') {
+function loadDailyData() {
     const source = fs.readFileSync(paths.dailyData, 'utf8');
     const sandbox = { window: {}, Intl, Date };
     vm.runInNewContext(source, sandbox, { filename: paths.dailyData });
-    return sandbox.window.SIX_HOPS_DAILY.getChallenge(dateKey, locale);
+    return sandbox.window.SIX_HOPS_DAILY;
+}
+
+function loadDailyChallenge(dateKey, locale = 'ja') {
+    return loadDailyData().getChallenge(dateKey, locale);
 }
 
 function parseDateFromFile(filePath) {
@@ -161,6 +165,7 @@ module.exports = {
     readJsonEnvironment,
     loadOAuthClient,
     loadConfig,
+    loadDailyData,
     loadDailyChallenge,
     findLatestVideo,
     buildMetadata,

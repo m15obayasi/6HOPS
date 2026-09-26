@@ -41,6 +41,12 @@
         { start: topic('キノコ', 'Mushroom', 'Pilze', 'Champignon', '蘑菇'), goal: topic('国際宇宙ステーション', 'International Space Station', 'Internationale Raumstation', 'Station spatiale internationale', '国际空间站') }
     ];
 
+    // BEGIN GENERATED DAILY OVERRIDES
+    const dateOverrides = {
+        "2026-09-26": 23
+    };
+    // END GENERATED DAILY OVERRIDES
+
     const timeZone = 'Asia/Tokyo';
 
     function getDateKey(date) {
@@ -68,7 +74,10 @@
         // 7は30と互いに素なので、日ごとの並びは散らしつつ30日間は重複しない。
         const anchorDay = getDayNumber('2026-09-21');
         const dayOffset = getDayNumber(dateKey) - anchorDay;
-        const pairIndex = ((17 + dayOffset * 7) % challenges.length + challenges.length) % challenges.length;
+        const generatedIndex = ((17 + dayOffset * 7) % challenges.length + challenges.length) % challenges.length;
+        const pairIndex = Object.prototype.hasOwnProperty.call(dateOverrides, dateKey)
+            ? dateOverrides[dateKey]
+            : generatedIndex;
         const challenge = challenges[pairIndex];
         return {
             date: dateKey,
@@ -81,6 +90,7 @@
     global.SIX_HOPS_DAILY = {
         timeZone: timeZone,
         challenges: challenges,
+        dateOverrides: dateOverrides,
         getDateKey: getDateKey,
         getChallenge: getChallenge
     };

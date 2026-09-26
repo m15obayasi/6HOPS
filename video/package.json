@@ -5,7 +5,8 @@
   "description": "Daily video generation and YouTube publishing for 6HOPS",
   "scripts": {
     "daily": "node create_daily_videos.js",
-    "daily:dry-run": "node create_daily_videos.js --dry-run"
+    "daily:dry-run": "node create_daily_videos.js --dry-run",
+    "prepare-daily": "node prepare_daily_challenge.js"
   },
   "dependencies": {
     "cheerio": "^1.1.2",

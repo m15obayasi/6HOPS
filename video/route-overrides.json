@@ -2,5 +2,7 @@
   "ja:石鹸→侍": ["石鹸", "日本", "武士", "侍"],
   "en:Soap→Samurai": ["Soap", "West Asia", "Asia", "Japan", "Samurai"],
   "ja:蜂蜜→ベルリンの壁": ["蜂蜜", "西ドイツ", "ベルリンの壁"],
-  "en:Honey→Berlin Wall": ["Honey", "Ancient Egypt", "History of Germany", "Berlin Wall"]
+  "en:Honey→Berlin Wall": ["Honey", "Ancient Egypt", "History of Germany", "Berlin Wall"],
+  "ja:折り紙→重力": ["折り紙", "数学", "科学", "重力"],
+  "en:Origami→Gravity": ["Origami", "Kite", "Europe", "Early modern period", "Gravity"]
 }

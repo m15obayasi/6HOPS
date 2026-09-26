@@ -41,6 +41,7 @@ function encodeVideo(rawPath, finalPath) {
     try {
         run(ffmpegPath, [
             '-y', '-i', rawPath,
+            '-vf', 'scale=1080:1920:flags=lanczos',
             '-c:v', 'libx264', '-preset', 'medium', '-crf', '22',
             '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an',
             tempPath
@@ -111,4 +112,3 @@ main().catch((error) => {
     console.error(`\nエラー: ${error.message || error}`);
     process.exitCode = 1;
 });
-

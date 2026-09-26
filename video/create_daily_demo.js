@@ -60,6 +60,8 @@ const baseUrl = process.env.SIX_HOPS_URL || 'https://myeik.net/6HOPS/';
 const edgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
 const browserPath = process.env.PLAYWRIGHT_EXECUTABLE_PATH
     || (process.platform === 'win32' ? edgePath : chromium.executablePath());
+const viewport = { width: 720, height: 1280 };
+const videoSize = viewport;
 
 fs.mkdirSync(outputDir, { recursive: true });
 
@@ -76,23 +78,24 @@ async function addDemoStyles(page) {
         }
         #sixhops-demo-caption {
             position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            min-height: 112px;
-            padding: 18px 48px 20px;
+            left: 18px;
+            right: 92px;
+            bottom: 132px;
+            min-height: 126px;
+            padding: 22px 28px 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.28);
-            background: rgba(45, 49, 54, 0.78);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 14px;
+            background: rgba(45, 49, 54, 0.88);
             color: #fff;
             box-shadow: 0 -8px 28px rgba(32, 33, 34, 0.12);
             backdrop-filter: blur(3px);
             text-align: center;
             opacity: 0;
-            transform: translateY(12px);
+            transform: translateY(16px);
             transition: opacity 180ms ease, transform 180ms ease;
             z-index: 2147483646;
         }
@@ -102,7 +105,7 @@ async function addDemoStyles(page) {
         }
         #sixhops-demo-caption .demo-main {
             display: block;
-            font-size: 28px;
+            font-size: 34px;
             font-weight: 800;
             line-height: 1.25;
             letter-spacing: 0.02em;
@@ -111,12 +114,12 @@ async function addDemoStyles(page) {
             display: block;
             margin-top: 4px;
             color: rgba(255, 255, 255, 0.78);
-            font-size: 16px;
+            font-size: 20px;
             font-weight: 700;
         }
         #sixhops-demo-caption.accent {
-            border-top-color: rgba(132, 168, 255, 0.8);
-            background: rgba(39, 49, 67, 0.82);
+            border-color: rgba(132, 168, 255, 0.85);
+            background: rgba(39, 49, 67, 0.92);
             box-shadow: 0 -8px 28px rgba(51, 102, 204, 0.16);
         }
         #sixhops-demo-caption.accent .demo-main {
@@ -129,7 +132,7 @@ async function addDemoStyles(page) {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 60px;
+            padding: 90px 58px 210px;
             background: #f8f9fa;
             color: #202122;
             text-align: center;
@@ -139,22 +142,22 @@ async function addDemoStyles(page) {
         }
         #sixhops-demo-card.visible { opacity: 1; }
         #sixhops-demo-card .demo-kicker {
-            margin-bottom: 20px;
+            margin-bottom: 26px;
             color: #3366cc;
-            font-size: 18px;
+            font-size: 22px;
             font-weight: 800;
             letter-spacing: 0.15em;
         }
         #sixhops-demo-card .demo-card-title {
-            font-size: 64px;
+            font-size: 60px;
             font-weight: 900;
             line-height: 1.18;
             letter-spacing: 0.02em;
         }
         #sixhops-demo-card .demo-card-subtitle {
-            margin-top: 18px;
+            margin-top: 24px;
             color: #54595d;
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
         }
         #sixhops-demo-card .demo-rule {
@@ -280,20 +283,20 @@ async function main() {
         executablePath: browserPath,
         args: [
             '--disable-gpu-sandbox',
-            '--window-size=1280,720',
+            `--window-size=${viewport.width},${viewport.height}`,
             '--force-device-scale-factor=1',
             '--high-dpi-support=1'
         ]
     });
     const context = await browser.newContext({
-        viewport: { width: 1280, height: 720 },
-        screen: { width: 1280, height: 720 },
+        viewport,
+        screen: viewport,
         locale: 'ja-JP',
         timezoneId: 'Asia/Tokyo',
-        deviceScaleFactor: 1,
+        deviceScaleFactor: 1.5,
         recordVideo: {
             dir: outputDir,
-            size: { width: 1280, height: 720 }
+            size: videoSize
         }
     });
     const page = await context.newPage();
@@ -304,10 +307,10 @@ async function main() {
         html, body { width: 100%; height: 100%; margin: 0; }
         body { display:flex; align-items:center; justify-content:center; background:#f8f9fa; color:#202122;
             font-family:'Yu Gothic UI','Noto Sans JP',sans-serif; text-align:center; }
-        main { width:min(1160px,calc(100% - 72px)); }
-        h1 { margin:0; font-size:154px; line-height:.95; letter-spacing:.035em; }
-        .pair { margin-top:54px; color:#202122; font-size:clamp(52px,6.4vw,86px); font-weight:900;
-            line-height:1.18; overflow-wrap:anywhere; }
+        main { width:min(640px,calc(100% - 64px)); transform:translateY(-70px); }
+        h1 { margin:0; font-size:132px; line-height:.95; letter-spacing:.035em; }
+        .pair { margin-top:72px; color:#202122; font-size:clamp(52px,9vw,72px); font-weight:900;
+            line-height:1.22; overflow-wrap:anywhere; text-wrap:balance; }
     </style></head><body><main><h1>6HOPS</h1><div class="pair">${demo.start} → ${demo.goal}</div></main></body></html>`);
     await page.screenshot({ path: thumbnailPath, type: 'jpeg', quality: 92 });
     await sleep(3800);

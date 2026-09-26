@@ -20,7 +20,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>6HOPS</title>
-    <link rel="stylesheet" href="../css/style.min.css?v=8.9"> <!-- パラメータクエリを更新 -->
+    <link rel="stylesheet" href="../css/style.css?v=9.9">
     <link href="https://fonts.googleapis.com/css?family=Cherry+Swash:700" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+SC">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400&display=swap"> <!-- Zen Maru Gothicを追加 -->
@@ -45,8 +45,9 @@
         <div class="menuIcon" style="display: none;">&#9776;</div> <!-- 汉堡菜单 -->
         <div class="titleContainer">
             <div class="title">6HOPS</div>
-            <button type="button" class="randomModeButton"></button>
         </div>
+        <a class="randomModeButton" href="./index.html?mode=random">随机</a>
+        <a class="customModeButton" href="./custom.html">自定义</a>
         <div class="titleUnderline"></div> <!-- 在标题下添加下划线 -->
         <hr>
     </div>
@@ -74,6 +75,7 @@
     <div class="dailyTopic">
         <strong><time class="dailyDate"></time></strong><span class="dailyTopicSuffix"></span>
     </div>
+    <div class="modeHeading randomModeHeading" hidden>随机模式</div>
     <div class="challengeIntro">
         维基百科是任何人都可以编辑的自由百科全书。
     </div>
@@ -95,7 +97,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="../js/daily-data.js?v=1.4"></script>
-    <script src="../js/wiki.min.js?v=7.6"></script> <!-- パラメータクエリを更新 -->
+    <script src="../js/wiki.js?v=8.6"></script>
 
 </body>
 

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6HOPS - Eigener Modus</title>
+    <link rel="stylesheet" href="../css/style.css?v=9.9">
+    <link href="https://fonts.googleapis.com/css?family=Cherry+Swash:700" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400&display=swap">
+    <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+    <meta property="og:image" content="../img/wikiLogo.png">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="../js/daily-data.js?v=1.4"></script>
+    <script src="../js/wiki.js?v=8.6"></script>
+</head>
+<body class="challenge customPage customInitial">
+    <div class="fixedScreen">
+        <div class="mobileTracker" aria-label="HOP-Verlauf" style="display:none;"><span class="mobileTrackerStep">0 / 6 HOPS</span></div>
+        <div class="menuIcon" style="display: none;">&#9776;</div>
+        <div class="titleContainer"><div class="title">6HOPS</div></div>
+        <a class="randomModeButton" href="./index.html?mode=random">Zufall</a>
+        <a class="customModeButton" href="./index.html">Daily</a>
+        <div class="titleUnderline"></div>
+        <hr>
+    </div>
+    <div class="sideMenu" style="display: none;">
+        <div class="menuHeader"><div class="closeMenu">SCHLIESSEN</div><h2></h2></div>
+        <h2> </h2><div class="history"></div><div class="goalTitle"></div>
+        <div class="hintBlock">Hinweis</div><div class="goalSummary"></div><h2> </h2>
+        <h2 class="homeLink">Zurück zur Startseite</h2>
+        <div class="shareButton"><a href="#" class="shareLink" target="_blank" rel="noopener noreferrer"><img src="../img/logo-black.png" alt="Share Logo" class="shareLogo">Teilen</a></div>
+    </div>
+    <div class="modeHeading customModeHeading">Eigener Modus</div>
+    <div class="customModePanel" hidden>
+        <div class="customArticleField">
+            <label for="customStartArticle">Startartikel</label>
+            <input id="customStartArticle" class="customArticleInput" data-index="0" type="search" autocomplete="off" placeholder="Artikel suchen" aria-autocomplete="list" aria-controls="customStartSuggestions" aria-expanded="false">
+            <div id="customStartSuggestions" class="customSuggestions" role="listbox" hidden></div>
+        </div>
+        <div class="customArticleField">
+            <label for="customGoalArticle">Zielartikel</label>
+            <input id="customGoalArticle" class="customArticleInput" data-index="1" type="search" autocomplete="off" placeholder="Artikel suchen" aria-autocomplete="list" aria-controls="customGoalSuggestions" aria-expanded="false">
+            <div id="customGoalSuggestions" class="customSuggestions" role="listbox" hidden></div>
+        </div>
+    </div>
+    <div class="customActions">
+        <div class="startBlock"><div class="start">START</div></div>
+        <a class="customShareButton" href="#" target="_blank" rel="noopener noreferrer" hidden>Auf X teilen</a>
+    </div>
+    <div class="progressBar" style="display: none;"></div>
+    <div class="wikiBlock"></div>
+</body>
+</html>

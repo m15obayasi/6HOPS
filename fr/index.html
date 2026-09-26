@@ -21,7 +21,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>6HOPS</title>
-    <link rel="stylesheet" href="../css/style.min.css?v=8.9"> <!-- パラメータクエリを更新 -->
+    <link rel="stylesheet" href="../css/style.css?v=9.9">
     <link href="https://fonts.googleapis.com/css?family=Cherry+Swash:700" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400&display=swap"> <!-- Zen Maru Gothicを追加 -->
@@ -46,8 +46,9 @@
         <div class="menuIcon" style="display: none;">&#9776;</div> <!-- Hamburger Menu -->
         <div class="titleContainer">
             <div class="title">6HOPS</div>
-            <button type="button" class="randomModeButton"></button>
         </div>
+        <a class="randomModeButton" href="./index.html?mode=random">ALÉATOIRE</a>
+        <a class="customModeButton" href="./custom.html">PERSONNALISÉ</a>
         <div class="titleUnderline"></div> <!-- タイトルの下に線を追加 -->
         <hr>
     </div>
@@ -75,6 +76,7 @@
     <div class="dailyTopic">
         <strong><time class="dailyDate"></time></strong><span class="dailyTopicSuffix"></span>
     </div>
+    <div class="modeHeading randomModeHeading" hidden>Mode aléatoire</div>
     <div class="challengeIntro">
         Wikipédia est une encyclopédie libre que chacun peut modifier.
     </div>
@@ -96,7 +98,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="../js/daily-data.js?v=1.4"></script>
-    <script src="../js/wiki.min.js?v=7.6"></script> <!-- パラメータクエリを更新 -->
+    <script src="../js/wiki.js?v=8.6"></script>
 
 </body>
 

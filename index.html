@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>6HOPS</title>
-    <link rel="stylesheet" href="./css/style.min.css?v=8.9"> <!-- パラメータクエリを更新 -->
+    <link rel="stylesheet" href="./css/style.css?v=9.9">
     <link href="https://fonts.googleapis.com/css?family=Cherry+Swash:700" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+JP">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400&display=swap">
@@ -18,7 +18,7 @@
         crossorigin="anonymous"></script> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> <!-- jQueryを追加 -->
     <script src="./js/daily-data.js?v=1.4"></script>
-    <script src="./js/wiki.min.js?v=7.6"></script> <!-- パラメータクエリを更新 -->
+    <script src="./js/wiki.js?v=8.6"></script>
 </head>
 
 <body class="challenge dailyInitial">
@@ -30,8 +30,9 @@
         <div class="menuIcon" style="display: none;">&#9776;</div>
         <div class="titleContainer">
             <div class="title">6HOPS</div>
-            <button type="button" class="randomModeButton"></button>
         </div>
+        <a class="randomModeButton" href="./index.html?mode=random"></a>
+        <a class="customModeButton" href="./custom.html">カスタム</a>
         <div class="titleUnderline"></div>
         <hr>
     </div>
@@ -59,6 +60,7 @@
     <div class="dailyTopic">
         <strong><time class="dailyDate"></time></strong><span class="dailyTopicSuffix"></span>
     </div>
+    <div class="modeHeading randomModeHeading" hidden>ランダムモード</div>
     <div class="challengeIntro">
         <span class="challengeIntroText"><span class="challengeIntroWord">ウィキペディア</span>は、<br>
         誰でも編集できるフリー百科事典です。</span>

@@ -685,6 +685,12 @@ body {
     display: none;
 }
 
+.wiki-static-text {
+    color: #333;
+    cursor: default;
+    text-decoration: none;
+}
+
 .wikiBlock.loaded {
     background-color: #fff;
     /* 記事読み込み後の背景色 (変更なし) */
@@ -1055,6 +1061,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    height: 100%;
 }
 
 .shareLink:hover, .wikiBlockShareLink:hover {
@@ -1621,7 +1629,8 @@ body {
     display: none;
 }
 
-.dailyTopic {
+.dailyTopic,
+.modeHeading {
     position: relative;
     width: min(80vw, 820px);
     margin: 8px auto 14px;
@@ -1633,6 +1642,10 @@ body {
     color: #202122;
     font-size: clamp(1.2rem, 2.2vw, 1.65rem);
     line-height: 1.45;
+}
+
+.modeHeading {
+    padding: 3px 0;
 }
 
 .resultModeBadge {
@@ -1698,7 +1711,7 @@ body {
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.05em;
-    z-index: 1;
+    z-index: 20;
 }
 
 .dailyArchiveItem {
@@ -1754,12 +1767,17 @@ body {
     right: 20px;
     width: 68px;
     height: 68px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin: 0;
     padding: 5px;
     border: 1px solid #a2a9b1;
     border-radius: 0;
     background: #fff;
     color: #54595d;
+    text-decoration: none;
     cursor: pointer;
     font-family: 'Zen Maru Gothic', sans-serif;
     font-size: 0.72rem;
@@ -1767,8 +1785,188 @@ body {
     white-space: normal;
     overflow-wrap: anywhere;
     pointer-events: auto;
-    z-index: 1;
+    z-index: 20;
     transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.customModeButton {
+    position: absolute;
+    right: 94px;
+    width: 68px;
+    height: 68px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 5px;
+    border: 1px solid #a2a9b1;
+    border-radius: 0;
+    background: #fff;
+    color: #54595d;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 0.72rem;
+    line-height: 1.25;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    pointer-events: auto;
+    z-index: 20;
+    transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.randomModeButton.nav-left {
+    right: 94px;
+}
+
+.customModeButton.nav-right {
+    right: 20px;
+}
+
+.customModeButton:hover,
+.customModeButton:focus-visible,
+.customModeButton.active {
+    color: #fff;
+    border-color: #000;
+    background: #000;
+    outline: none;
+}
+
+.customModePanel {
+    width: calc(min(60vw, 900px) + 22px);
+    min-height: 260px;
+    margin: 4px auto 8px;
+}
+
+.modeHeading[hidden] {
+    display: none;
+}
+
+.customArticleField {
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.customArticleField:last-child {
+    margin-bottom: 8px;
+}
+
+.customArticleField label {
+    display: block;
+    margin-bottom: 2px;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: bold;
+    color: #54595d;
+    text-align: center;
+}
+
+.customArticleInput {
+    width: 100%;
+    min-height: 60px;
+    box-sizing: border-box;
+    padding: 10px 14px;
+    border: 1px solid #a2a9b1;
+    border-radius: 0;
+    background: #fff;
+    color: #202122;
+    font: 1.1rem 'Noto Sans JP', sans-serif;
+}
+
+.customArticleInput:focus {
+    border-color: #3366cc;
+    outline: 2px solid #3366cc;
+    outline-offset: 1px;
+}
+
+.customSuggestions {
+    position: static;
+    z-index: 20;
+    max-height: 260px;
+    margin-top: 2px;
+    overflow-y: auto;
+    border: 1px solid #a2a9b1;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+}
+
+.customSuggestions[hidden],
+.customModePanel[hidden] {
+    display: none;
+}
+
+.customSuggestion {
+    display: block;
+    width: 100%;
+    padding: 10px 14px;
+    border: 0;
+    border-bottom: 1px solid #eaecf0;
+    background: #fff;
+    color: #202122;
+    cursor: pointer;
+    font: 1rem 'Noto Sans JP', sans-serif;
+    text-align: left;
+}
+
+.customSuggestion:last-child {
+    border-bottom: 0;
+}
+
+.customSuggestion:hover,
+.customSuggestion:focus-visible {
+    background: #eaf3ff;
+    outline: none;
+}
+
+.startBlock.is-disabled {
+    opacity: 0.48;
+    cursor: not-allowed;
+    background-color: #f8f9fa;
+    color: #72777d;
+    pointer-events: none;
+}
+
+.startBlock.is-disabled:hover {
+    cursor: not-allowed;
+    background-color: #f8f9fa;
+    color: #72777d;
+}
+
+.customActions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.customActions .startBlock {
+    margin: 0 auto;
+}
+
+.customShareButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(90vw, 240px);
+    min-height: 44px;
+    box-sizing: border-box;
+    border: 1px solid #202122;
+    background: #202122;
+    color: #fff;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    text-decoration: none;
+}
+
+.customShareButton:hover,
+.customShareButton:focus-visible {
+    background: #404244;
+    outline: 2px solid #3366cc;
+    outline-offset: 2px;
+}
+
+.customShareButton[hidden] {
+    display: none;
 }
 
 .randomModeButton:hover,
@@ -1784,21 +1982,126 @@ body {
 }
 
 .resultModeSummary {
-    width: min(90%, 520px);
-    margin: 14px auto 20px;
+    width: min(90%, 680px);
+    min-height: 156px;
+    margin: 36px auto;
     padding: 14px 18px;
+    box-sizing: border-box;
     border: 1px solid #a2a9b1;
-    background: #fff;
+    background: linear-gradient(120deg, #f8fafc 0%, #8e9cac 30%, #ffffff 55%, #b9c4cf 78%, #f8fafc 100%);
+    background-size: 400% 400%;
+    color: #202122;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 14px;
     flex-wrap: wrap;
     font-family: 'Zen Maru Gothic', sans-serif;
+    animation: hopsGradient 6s ease-in-out infinite alternate;
 }
 
 .resultModeSummary strong {
-    font-size: 1.25rem;
+    font-size: 3.75rem;
+}
+
+.resultActions {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 10px;
+    width: min(90%, 680px);
+    margin: 36px auto 0;
+}
+
+.wikiBlock .shareButton,
+.kofiButton {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    height: auto;
+    margin: 0;
+    padding: 14px 28px;
+    flex: 1 1 0;
+    border: 1px solid #222;
+    border-radius: 0;
+    background: #fff;
+    color: #222;
+    font-weight: bold;
+    line-height: normal;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+.wikiBlock .shareButton {
+    width: auto;
+    padding: 0;
+}
+
+.wikiBlock .shareLink {
+    font-size: inherit;
+    width: 100%;
+    height: 100%;
+    padding: 14px 28px;
+    box-sizing: border-box;
+}
+
+.wikiBlock .shareButton:hover,
+.kofiButton:hover {
+    background: #222;
+    color: #fff;
+}
+
+.wikiBlock .shareButton:hover .shareLink {
+    color: #fff !important;
+}
+
+.wikiBlock .kofiButton,
+.wikiBlock .kofiButton:visited {
+    background: #fff;
+    border: 1px solid #222;
+    color: #222;
+    gap: 8px;
+}
+
+.wikiBlock .kofiButton:hover {
+    background: #222;
+    color: #fff;
+    border-bottom-color: #222;
+}
+
+.kofiSymbol {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.wikiBlock .kofiButton:hover .kofiSymbol {
+    filter: invert(1);
+}
+
+@keyframes hopsGradient {
+    from {
+        background-position: 0% 50%;
+    }
+    to {
+        background-position: 100% 50%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .resultModeSummary {
+        animation: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .resultActions {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
 .resultModeBadge.random {
@@ -1806,7 +2109,8 @@ body {
 }
 
 @media (min-width: 1024px) {
-    .dailyTopic {
+    .dailyTopic,
+    .modeHeading {
         margin-top: 14px;
         margin-bottom: 22px;
     }
@@ -1838,17 +2142,34 @@ body {
         transform: none;
     }
 
+    .customInitial .startBlock {
+        transform: none;
+    }
+
+    .customModePanel {
+        min-height: 204px;
+        margin-top: 0;
+        margin-bottom: 28px;
+    }
+
     .challenge.randomInitial .buttonContainer.roulette {
         transform: none;
     }
 }
 
 @media (max-width: 600px) {
-    .dailyTopic {
+    .dailyTopic,
+    .modeHeading {
         width: 90vw;
         margin-top: 14px;
         margin-bottom: 20px;
         font-size: 1.1rem;
+    }
+
+    .customModePanel {
+        min-height: 257px;
+        margin-top: 0;
+        margin-bottom: 24px;
     }
 
     .dailyArchiveItem {
@@ -1882,10 +2203,46 @@ body {
 
     .randomModeButton {
         right: 8px;
-        width: 52px;
-        height: 52px;
+        width: 44px;
+        height: 44px;
         padding: 4px;
-        font-size: 0.62rem;
+        font-size: 0.58rem;
+    }
+
+    .customModeButton {
+        right: 58px;
+        width: 44px;
+        height: 44px;
+        padding: 4px;
+        font-size: 0.58rem;
+    }
+
+    .randomModeButton.nav-left {
+        right: 58px;
+    }
+
+    .customModeButton.nav-right {
+        right: 8px;
+    }
+
+    .customModePanel {
+        width: calc(85vw + 22px);
+        margin-top: 4px;
+        margin-bottom: 8px;
+    }
+
+    .customArticleField {
+        margin-bottom: 4px;
+    }
+
+    .customArticleField label {
+        margin-bottom: 0;
+        font-size: 0.92em;
+    }
+
+    .customArticleInput {
+        min-height: 48px;
+        font-size: 1rem;
     }
 
     .randomLongLabel {

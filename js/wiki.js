@@ -23,7 +23,12 @@ const LOCALE_CONFIG = {
         alertRouletteFailed: 'ルーレット用の記事タイトルの取得に失敗しました。',
         buttons: { retry: 'もう1回', stop: '止める', confirm: '確定', share: 'でシェアする' },
         landing: { topicSuffix: 'のお題', today: '本日', archiveLabel: '過去のお題', datePickerAria: '過去のDailyを選ぶ', dailyStart: 'START', randomStart: 'ランダムを始める', randomLink: 'ランダムで遊ぶ', dailyLink: 'デイリーチャレンジ', dailyShort: 'デイリー' },
-        mode: { daily: 'DAILY', random: 'ランダム' },
+        mode: { daily: 'DAILY', random: 'ランダム', custom: 'カスタム' },
+        customMode: {
+            heading: 'カスタムモード', randomHeading: 'ランダムモード',
+            startArticle: '最初の記事', goalArticle: '6つ目の記事', placeholder: '記事名を入力', shareButton: 'Xでシェアする',
+            shareText: (start, goal, url) => `6HOPSで「${start}」から「${goal}」へチャレンジ！\n\n${url}`
+        },
         result: {
             successLabel: '成功',
             failureLabel: '失敗',
@@ -47,7 +52,12 @@ const LOCALE_CONFIG = {
         alertRouletteFailed: 'Failed to fetch roulette article titles.',
         buttons: { retry: 'Retry', stop: 'Stop', confirm: 'Confirm', share: 'Share' },
         landing: { topicSuffix: ' — Daily challenge', today: 'Today', archiveLabel: 'Past challenges', datePickerAria: 'Choose a past Daily', dailyStart: 'START', randomStart: 'START RANDOM', randomLink: 'Play a random game', dailyLink: 'Daily challenge', dailyShort: 'Daily' },
-        mode: { daily: 'DAILY', random: 'RANDOM' },
+        mode: { daily: 'DAILY', random: 'Random', custom: 'Custom' },
+        customMode: {
+            heading: 'Custom mode', randomHeading: 'Random mode',
+            startArticle: 'Starting article', goalArticle: 'Target article', placeholder: 'Search for an article', shareButton: 'Share on X',
+            shareText: (start, goal, url) => `Challenge 6HOPS from "${start}" to "${goal}"!\n\n${url}`
+        },
         result: {
             successLabel: 'Success',
             failureLabel: 'Failure',
@@ -71,7 +81,12 @@ const LOCALE_CONFIG = {
         alertRouletteFailed: 'Fehler beim Abrufen der Roulette-Artikel.',
         buttons: { retry: 'Noch einmal', stop: 'Stoppen', confirm: 'Bestätigen', share: 'Teilen' },
         landing: { topicSuffix: ' – Tagesaufgabe', today: 'Heute', archiveLabel: 'Frühere Aufgaben', datePickerAria: 'Frühere Daily-Aufgabe wählen', dailyStart: 'START', randomStart: 'ZUFALL STARTEN', randomLink: 'Zufällig spielen', dailyLink: 'Tagesaufgabe', dailyShort: 'Daily' },
-        mode: { daily: 'DAILY', random: 'ZUFALL' },
+        mode: { daily: 'DAILY', random: 'Zufall', custom: 'Eigene' },
+        customMode: {
+            heading: 'Eigener Modus', randomHeading: 'Zufallsmodus',
+            startArticle: 'Startartikel', goalArticle: 'Zielartikel', placeholder: 'Artikel suchen', shareButton: 'Auf X teilen',
+            shareText: (start, goal, url) => `6HOPS-Herausforderung: von „${start}“ nach „${goal}“!\n\n${url}`
+        },
         result: {
             successLabel: 'Erfolg',
             failureLabel: 'Fehler',
@@ -95,7 +110,12 @@ const LOCALE_CONFIG = {
         alertRouletteFailed: 'Échec de récupération des titres de roulette.',
         buttons: { retry: 'Réessayer', stop: 'Arrêter', confirm: 'Confirmer', share: 'Partager' },
         landing: { topicSuffix: ' – Défi quotidien', today: 'Aujourd’hui', archiveLabel: 'Défis précédents', datePickerAria: 'Choisir un ancien Daily', dailyStart: 'DÉMARRER', randomStart: 'LANCER AU HASARD', randomLink: 'Jouer au hasard', dailyLink: 'Défi quotidien', dailyShort: 'Daily' },
-        mode: { daily: 'DAILY', random: 'ALÉATOIRE' },
+        mode: { daily: 'DAILY', random: 'Aléatoire', custom: 'Personnalisé' },
+        customMode: {
+            heading: 'Mode personnalisé', randomHeading: 'Mode aléatoire',
+            startArticle: 'Article de départ', goalArticle: 'Article cible', placeholder: 'Rechercher un article', shareButton: 'Partager sur X',
+            shareText: (start, goal, url) => `Défi 6HOPS : de « ${start} » à « ${goal} » !\n\n${url}`
+        },
         result: {
             successLabel: 'Succès',
             failureLabel: 'Échec',
@@ -119,7 +139,12 @@ const LOCALE_CONFIG = {
         alertRouletteFailed: '获取轮盘文章标题失败。',
         buttons: { retry: '再试一次', stop: '停止', confirm: '确定', share: '分享' },
         landing: { topicSuffix: ' 每日题目', today: '今天', archiveLabel: '往期题目', datePickerAria: '选择往期每日挑战', dailyStart: '开始', randomStart: '开始随机挑战', randomLink: '玩随机模式', dailyLink: '每日挑战', dailyShort: '每日' },
-        mode: { daily: '每日', random: '随机' },
+        mode: { daily: '每日', random: '随机', custom: '自定义' },
+        customMode: {
+            heading: '自定义模式', randomHeading: '随机模式',
+            startArticle: '起始词条', goalArticle: '目标词条', placeholder: '输入词条名称', shareButton: '分享到 X',
+            shareText: (start, goal, url) => `挑战6HOPS：从「${start}」到「${goal}」！\n\n${url}`
+        },
         result: {
             successLabel: '成功',
             failureLabel: '失败',
@@ -167,6 +192,10 @@ $(document).ready(function() {
             startDailyGame();
             return;
         }
+        if (gameMode === 'custom') {
+            startCustomGame();
+            return;
+        }
         startRandomRoulette();
     });
 
@@ -194,7 +223,8 @@ $(document).ready(function() {
         gameMode = 'random';
         gameStarted = true;
         $('body').removeClass('dailyInitial');
-        $('.dailyTopic, .randomModeButton').hide();
+        $('.randomModeButton, .customModeButton').hide();
+        $('.dailyTopic').hide();
         targetArticleTitleB = title2;
         targetArticlePageId = null;
         targetCanonicalTitle = title2;
@@ -312,9 +342,18 @@ let rouletteRunId = 0;
 let gameMode = 'daily';
 let dailyChallenge = null;
 let todayDailyDateKey = '';
+let customArticleSelections = ['', ''];
+let customSearchRequestIds = [0, 0];
 const DAILY_ARCHIVE_DAYS = 14;
 
 function setupLandingMode() {
+    setupCustomArticleSearch();
+    $('.customModeHeading').text(localeConfig.customMode.heading);
+    $('.randomModeHeading').text(localeConfig.customMode.randomHeading);
+    $('.customArticleField label').eq(0).text(localeConfig.customMode.startArticle);
+    $('.customArticleField label').eq(1).text(localeConfig.customMode.goalArticle);
+    $('.customArticleInput').attr('placeholder', localeConfig.customMode.placeholder);
+    $('.customShareButton').text(localeConfig.customMode.shareButton);
     if (!window.SIX_HOPS_DAILY) {
         switchToRandomMode();
         return;
@@ -327,20 +366,199 @@ function setupLandingMode() {
     $('.rectangleContainer').removeClass('prestart');
     $('.start').text(localeConfig.landing.dailyStart);
     configureModeSwitch('random');
+    if (new URLSearchParams(window.location.search).get('mode') === 'random') {
+        switchToRandomMode();
+    }
+    if ($('body').hasClass('customPage')) {
+        switchToCustomMode();
+        const params = new URLSearchParams(window.location.search);
+        const sharedStart = params.get('start') || '';
+        const sharedGoal = params.get('goal') || '';
+        if (sharedStart && sharedGoal) {
+            customArticleSelections = [sharedStart, sharedGoal];
+            $('.customArticleInput').eq(0).val(sharedStart);
+            $('.customArticleInput').eq(1).val(sharedGoal);
+            updateCustomStartState();
+            if (params.get('play') === '1') {
+                startCustomGame();
+            }
+        }
+    }
 }
 
 function configureModeSwitch(targetMode) {
     const showRandom = targetMode === 'random';
-    const longLabel = showRandom ? localeConfig.landing.randomLink : localeConfig.landing.dailyLink;
+    const longLabel = showRandom ? localeConfig.mode.random : localeConfig.landing.dailyShort;
     const shortLabel = showRandom ? localeConfig.mode.random : localeConfig.landing.dailyShort;
     $('.randomModeButton')
         .empty()
         .show()
+        .toggleClass('nav-left', !showRandom)
         .attr('aria-label', longLabel)
+        .attr('href', showRandom ? './index.html?mode=random' : './index.html')
         .append($('<span class="randomLongLabel"></span>').text(longLabel))
-        .append($('<span class="randomShortLabel" aria-hidden="true"></span>').text(shortLabel))
-        .off('click.modeSwitch')
-        .on('click.modeSwitch', showRandom ? switchToRandomMode : switchToDailyMode);
+        .append($('<span class="randomShortLabel" aria-hidden="true"></span>').text(shortLabel));
+    $('.customModeButton')
+        .removeClass('active')
+        .toggleClass('nav-right', !showRandom)
+        .text($('body').hasClass('customPage') ? localeConfig.landing.dailyShort : localeConfig.mode.custom)
+        .attr('aria-pressed', 'false');
+}
+
+function setupCustomArticleSearch() {
+    $('.customArticleInput').on('keydown', function(event) {
+        if (event.key !== 'ArrowDown') return;
+        const index = Number($(this).attr('data-index'));
+        const $firstSuggestion = $('.customSuggestions').eq(index).find('.customSuggestion').first();
+        if (!$firstSuggestion.length) return;
+        event.preventDefault();
+        $firstSuggestion.trigger('focus');
+    });
+
+    $('.customArticleInput').on('input', function() {
+        const index = Number($(this).attr('data-index'));
+        const query = $(this).val().trim();
+        const $suggestions = $('.customSuggestions').eq(index).empty();
+        customArticleSelections[index] = '';
+        customSearchRequestIds[index]++;
+        const requestId = customSearchRequestIds[index];
+        $(this).attr('aria-expanded', 'false');
+        updateCustomStartState();
+
+        if (!query) {
+            $suggestions.prop('hidden', true);
+            return;
+        }
+
+        $.ajax({
+                url: localeConfig.wikiApi,
+                data: {
+                    action: 'opensearch',
+                    search: query,
+                    namespace: 0,
+                    limit: 8,
+                    format: 'json',
+                    origin: '*'
+                },
+                dataType: 'jsonp',
+                success: function(data) {
+                    if (requestId !== customSearchRequestIds[index]) return;
+                    const results = Array.isArray(data[1]) ? data[1] : [];
+                    results.forEach(function(title) {
+                        $('<button type="button" class="customSuggestion" role="option"></button>')
+                            .attr('data-index', index)
+                            .attr('data-title', title)
+                            .text(title)
+                            .appendTo($suggestions);
+                    });
+                    $suggestions.prop('hidden', results.length === 0);
+                    $('.customArticleInput').eq(index).attr('aria-expanded', String(results.length > 0));
+                },
+                error: function() {
+                    if (requestId !== customSearchRequestIds[index]) return;
+                    $suggestions.prop('hidden', true);
+                    $('.customArticleInput').eq(index).attr('aria-expanded', 'false');
+                }
+            });
+    });
+
+    $('.customSuggestions').on('keydown', '.customSuggestion', function(event) {
+        const index = Number($(this).attr('data-index'));
+        const $suggestions = $('.customSuggestions').eq(index).find('.customSuggestion');
+        const currentIndex = $suggestions.index(this);
+        if (event.key === 'ArrowDown' && currentIndex < $suggestions.length - 1) {
+            event.preventDefault();
+            $suggestions.eq(currentIndex + 1).trigger('focus');
+        } else if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            if (currentIndex > 0) {
+                $suggestions.eq(currentIndex - 1).trigger('focus');
+            } else {
+                $('.customArticleInput').eq(index).trigger('focus');
+            }
+        } else if (event.key === 'Enter') {
+            event.preventDefault();
+            $(this).trigger('click');
+        } else if (event.key === 'Escape') {
+            event.preventDefault();
+            $('.customArticleInput').eq(index).trigger('focus').attr('aria-expanded', 'false');
+            $('.customSuggestions').eq(index).empty().prop('hidden', true);
+        }
+    });
+
+    $('.customSuggestions').on('click', '.customSuggestion', function() {
+        const index = Number($(this).attr('data-index'));
+        const title = $(this).attr('data-title');
+        customArticleSelections[index] = title;
+        $('.customArticleInput').eq(index).val(title).attr('aria-expanded', 'false').trigger('focus');
+        $('.customSuggestions').eq(index).empty().prop('hidden', true);
+        updateCustomStartState();
+    });
+}
+
+function updateCustomStartState() {
+    const $inputs = $('.customArticleInput');
+    const titles = customArticleSelections.map((title, index) => title || $inputs.eq(index).val().trim());
+    const hasBothArticles = titles.every(Boolean);
+    $('.startBlock')
+        .toggleClass('is-disabled', !hasBothArticles)
+        .attr('aria-disabled', String(!hasBothArticles));
+    $('.customShareButton').prop('hidden', !hasBothArticles);
+    if (hasBothArticles) {
+        const challengeUrl = new URL('./custom.html', window.location.href);
+        challengeUrl.searchParams.set('start', titles[0]);
+        challengeUrl.searchParams.set('goal', titles[1]);
+        challengeUrl.searchParams.set('play', '1');
+        const shareUrl = new URL('https://twitter.com/intent/tweet');
+        shareUrl.searchParams.set('text', localeConfig.customMode.shareText(titles[0], titles[1], challengeUrl.href));
+        $('.customShareButton').attr('href', shareUrl.href);
+    }
+}
+
+function switchToCustomMode() {
+    if (gameStarted || gameMode === 'custom') return;
+    gameMode = 'custom';
+    rouletteRunId++;
+    if (rouletteTimer) {
+        clearInterval(rouletteTimer);
+        rouletteTimer = null;
+    }
+    rouletteStopStage = 0;
+    rouletteFrozenTitleA = '';
+    rouletteFrozenTitleB = '';
+    $('.buttonContainer').remove();
+    $('.progressBar').hide();
+    $('body').removeClass('dailyInitial randomInitial').addClass('customInitial');
+    $('.dailyTopic, .randomModeHeading').hide();
+    $('.challengeIntro').hide();
+    $('.rectangleContainer').hide();
+    $('.customModePanel').prop('hidden', false).show();
+    $('.startBlock').show();
+    $('.start').text(localeConfig.landing.dailyStart);
+    $('.aboutLink').hide();
+    customArticleSelections = ['', ''];
+    customSearchRequestIds = customSearchRequestIds.map(id => id + 1);
+    $('.customArticleInput').val('').attr('aria-expanded', 'false');
+    $('.customSuggestions').empty().prop('hidden', true);
+    updateCustomStartState();
+}
+
+function startCustomGame() {
+    if (gameStarted) return;
+    const $inputs = $('.customArticleInput');
+    const title1 = customArticleSelections[0] || $inputs.eq(0).val().trim();
+    const title2 = customArticleSelections[1] || $inputs.eq(1).val().trim();
+    if (!title1) {
+        $inputs.eq(0).trigger('focus');
+        return;
+    }
+    if (!title2) {
+        $inputs.eq(1).trigger('focus');
+        return;
+    }
+    $('.randomModeButton, .customModeButton').hide();
+    $('.customModePanel, .customActions, .modeHeading').hide();
+    beginChallengeGame(title1, title2);
 }
 
 function getRequestedDailyDateKey(todayKey) {
@@ -455,7 +673,7 @@ function startDailyGame() {
     if (!dailyChallenge || gameStarted) return;
     gameMode = 'daily';
     $('body').removeClass('dailyInitial');
-    $('.dailyTopic, .randomModeButton').hide();
+    $('.dailyTopic, .randomModeHeading').hide();
     $('.startBlock').hide();
     beginChallengeGame(dailyChallenge.start, dailyChallenge.goal);
 }
@@ -463,8 +681,11 @@ function startDailyGame() {
 function switchToRandomMode() {
     if (gameStarted || gameMode === 'random') return;
     gameMode = 'random';
-    $('body').removeClass('dailyInitial').addClass('randomInitial');
-    $('.dailyTopic').hide();
+    $('body').removeClass('dailyInitial customInitial').addClass('randomInitial');
+    $('.dailyTopic, .customModePanel').hide();
+    $('.randomModeHeading').show();
+    $('.rectangleContainer').show();
+    $('.startBlock').removeClass('is-disabled').removeAttr('aria-disabled');
     $('.rectangle').empty();
     configureModeSwitch('daily');
     startRandomRoulette();
@@ -483,10 +704,13 @@ function switchToDailyMode() {
     rouletteFrozenTitleB = '';
     $('.buttonContainer').remove();
     $('.progressBar').hide();
-    $('body').removeClass('randomInitial').addClass('dailyInitial');
+    $('body').removeClass('randomInitial customInitial').addClass('dailyInitial');
     $('.dailyTopic').show();
-    $('.rectangleContainer').removeClass('prestart');
-    $('.startBlock').show();
+    $('.randomModeHeading').hide();
+    $('.aboutLink').show();
+    $('.customModePanel').hide();
+    $('.rectangleContainer').show().removeClass('prestart');
+    $('.startBlock').show().removeClass('is-disabled').removeAttr('aria-disabled');
     $('.start').text(localeConfig.landing.dailyStart);
     selectDailyChallenge(dailyChallenge.date, false);
     configureModeSwitch('random');
@@ -799,6 +1023,22 @@ function fetchWikipediaArticle(title) {
                 return $('<span>').text($(this).text()).css('color', '#333');
             });
 
+            // 画像のみを内包するリンク（ファイルページへの遷移など）はリンクを解除し、画像だけを残す
+            $content.find('a').each(function() {
+                const $link = $(this);
+                if ($link.find('img').length && !$link.text().trim()) {
+                    $link.contents().unwrap();
+                }
+            });
+
+            // 記事へ遷移できない残りのリンクは非活性なテキストとして表示する
+            $content.find('a').each(function() {
+                const $link = $(this);
+                if (!$link.attr('title')) {
+                    $link.replaceWith($('<span>').addClass('wiki-static-text').html($link.html()));
+                }
+            });
+
             $('.wikiBlock').empty().append($('<h2>').text(parsedTitle)).append($content.contents());
             setupLinkClickHandlers();
             history = history.slice(0, clickCount);
@@ -877,18 +1117,20 @@ function fetchGoalSummary(title) {
 function setupLinkClickHandlers() {
     $('.wikiBlock').off('click', 'a');
     $('.wikiBlock').on('click', 'a', function(event) {
+        const linkTitle = $(this).attr('title');
+        if (!linkTitle) {
+            // シェア/支援ボタンなど記事リンク以外は通常のナビゲーションに任せる
+            return;
+        }
         event.preventDefault();
         if (isLoadingArticle) {
             return;
         }
-        const linkTitle = $(this).attr('title');
-        if (linkTitle) {
-            $('.wikiBlock').html('<div class="loadingBar"></div>');
-            $('.title').append('<div class="loadingBar"></div>');
-            setTimeout(function() {
-                loadArticle(linkTitle);
-            }, 500);
-        }
+        $('.wikiBlock').html('<div class="loadingBar"></div>');
+        $('.title').append('<div class="loadingBar"></div>');
+        setTimeout(function() {
+            loadArticle(linkTitle);
+        }, 500);
     });
 }
 
@@ -948,6 +1190,7 @@ function displayResult(result) {
     const isDaily = gameMode === 'daily';
     const resultText = isSuccess ? localeConfig.result.successLabel : localeConfig.result.failureLabel;
     const resultMessage = isSuccess ? localeConfig.result.successMessage : localeConfig.result.failureMessage;
+    const resultMessageMarkup = isSuccess ? '' : `<p>${resultMessage}</p>`;
     let baseMessage = isSuccess
         ? localeConfig.result.successTweet(startArticleTitle, targetArticleTitleB, clickCount)
         : localeConfig.result.failureTweet(startArticleTitle, targetArticleTitleB);
@@ -965,31 +1208,28 @@ function displayResult(result) {
             </a>
         </div>
     `;
-    const modeSummary = isDaily ? `
+    const modeSummary = `
         <div class="resultModeSummary">
-            <span class="resultModeBadge">${localeConfig.mode.daily}</span>
-            <span>${formatDailyDate(dailyChallenge.date)}</span>
-            <strong>${clickCount} HOPS</strong>
-        </div>
-    ` : `
-        <div class="resultModeSummary">
-            <span class="resultModeBadge random">${localeConfig.mode.random}</span>
             <strong>${clickCount} HOPS</strong>
         </div>
     `;
+    const kofiLabel = locale === 'ja' ? '6HOPSを支援する' : 'Support me on 6HOPS';
+    const kofiButton = isSuccess ? `
+        <a href="https://ko-fi.com/G0M227IEGD" target="_blank" rel="noopener noreferrer" class="kofiButton">
+            <img src="${assetPrefix}img/kofi_symbol.png" alt="" class="kofiSymbol">
+            ${kofiLabel}
+        </a>
+    ` : '';
 
     $('.wikiBlock').html(`
         <h2>${resultText}</h2>
         ${modeSummary}
-        <p>${resultMessage}</p>
-        ${shareButton}
+        ${resultMessageMarkup}
+        <div class="resultActions">
+            ${shareButton}
+            ${kofiButton}
+        </div>
     `);
-
-    $('.shareLink').off('click').on('click', function(event) {
-        event.preventDefault();
-        const url = $(this).attr('href');
-        window.open(url, '_blank');
-    });
 }
 
 function fetchRouletteTitles(callback) {
@@ -1139,7 +1379,9 @@ function flashRouletteStop(rectangleIndex) {
 
 function beginChallengeGame(title1, title2) {
     gameStarted = true;
-    $('body').removeClass('dailyInitial randomInitial');
+    $('.randomModeButton, .customModeButton').hide();
+    $('body').removeClass('dailyInitial randomInitial customInitial');
+    $('.modeHeading').hide();
     startArticleTitle = title1;
     targetArticleTitleB = title2;
     targetArticlePageId = null;

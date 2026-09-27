@@ -12,6 +12,8 @@ const date = args.date || new Intl.DateTimeFormat('en-CA', {
 const privacy = args.privacy || 'public';
 const locales = args.locale ? [args.locale === 'en' ? 'en' : 'ja'] : ['ja', 'en'];
 const outputDir = path.join(__dirname, 'output');
+const metronomeSource = 'sine=frequency=880:sample_rate=48000';
+const metronomeFilter = '[1:a]volume=if(lt(mod(t\\,0.7142857)\\,0.045)\\,0.45\\,0):eval=frame[a]';
 
 function run(command, commandArgs, options = {}) {
     const result = spawnSync(command, commandArgs, {
@@ -41,9 +43,13 @@ function encodeVideo(rawPath, finalPath) {
     try {
         run(ffmpegPath, [
             '-y', '-i', rawPath,
+            '-f', 'lavfi', '-i', metronomeSource,
+            '-filter_complex', metronomeFilter,
             '-vf', 'scale=1080:1920:flags=lanczos',
+            '-map', '0:v:0', '-map', '[a]',
             '-c:v', 'libx264', '-preset', 'medium', '-crf', '22',
-            '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an',
+            '-c:a', 'aac', '-b:a', '128k',
+            '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-shortest',
             tempPath
         ]);
         fs.renameSync(tempPath, finalPath);

@@ -67,6 +67,12 @@ fs.mkdirSync(outputDir, { recursive: true });
 
 const timingScale = process.env.SIX_HOPS_FAST === '1' ? 0.05 : 1;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, Math.max(20, Math.round(ms * timingScale))));
+const escapeHtml = (value) => String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 
 async function addDemoStyles(page) {
     await page.addStyleTag({ content: `
@@ -307,11 +313,14 @@ async function main() {
         html, body { width: 100%; height: 100%; margin: 0; }
         body { display:flex; align-items:center; justify-content:center; background:#f8f9fa; color:#202122;
             font-family:'Yu Gothic UI','Noto Sans JP',sans-serif; text-align:center; }
-        main { width:min(640px,calc(100% - 64px)); transform:translateY(-70px); }
-        h1 { margin:0; font-size:132px; line-height:.95; letter-spacing:.035em; }
-        .pair { margin-top:72px; color:#202122; font-size:clamp(52px,9vw,72px); font-weight:900;
-            line-height:1.22; overflow-wrap:anywhere; text-wrap:balance; }
-    </style></head><body><main><h1>6HOPS</h1><div class="pair">${demo.start} → ${demo.goal}</div></main></body></html>`);
+        main { width:min(620px,calc(100% - 72px)); transform:translateY(-18px); }
+        h1 { margin:0; font-size:104px; line-height:1; letter-spacing:.035em; }
+        .pair { margin-top:86px; color:#202122; display:flex; flex-direction:column; align-items:center;
+            font-size:clamp(66px,11.5vw,92px); font-weight:900; line-height:1.12; overflow-wrap:anywhere;
+            text-wrap:balance; }
+        .term { max-width:100%; }
+        .arrow { margin:24px 0; font-size:68px; line-height:1; font-weight:700; }
+    </style></head><body><main><h1>6HOPS</h1><div class="pair"><span class="term">${escapeHtml(demo.start)}</span><span class="arrow">→</span><span class="term">${escapeHtml(demo.goal)}</span></div></main></body></html>`);
     await page.screenshot({ path: thumbnailPath, type: 'jpeg', quality: 92 });
     await sleep(3800);
 

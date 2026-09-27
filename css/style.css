@@ -1782,8 +1782,8 @@ body {
     font-family: 'Zen Maru Gothic', sans-serif;
     font-size: 0.72rem;
     line-height: 1.25;
-    white-space: normal;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
+    overflow-wrap: normal;
     pointer-events: auto;
     z-index: 20;
     transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
@@ -1810,8 +1810,8 @@ body {
     font-family: 'Zen Maru Gothic', sans-serif;
     font-size: 0.72rem;
     line-height: 1.25;
-    white-space: normal;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
+    overflow-wrap: normal;
     pointer-events: auto;
     z-index: 20;
     transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
@@ -2206,7 +2206,10 @@ body {
         width: 44px;
         height: 44px;
         padding: 4px;
-        font-size: 0.58rem;
+        font-size: 0.5rem;
+        line-height: 1;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
     }
 
     .customModeButton {
@@ -2214,7 +2217,10 @@ body {
         width: 44px;
         height: 44px;
         padding: 4px;
-        font-size: 0.58rem;
+        font-size: 0.5rem;
+        line-height: 1;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
     }
 
     .randomModeButton.nav-left {

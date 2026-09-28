@@ -13,7 +13,7 @@ const privacy = args.privacy || 'public';
 const locales = args.locale ? [args.locale === 'en' ? 'en' : 'ja'] : ['ja', 'en'];
 const outputDir = path.join(__dirname, 'output');
 const metronomeSource = 'sine=frequency=880:sample_rate=48000';
-const metronomeFilter = '[1:a]volume=if(lt(mod(t\\,0.7142857)\\,0.045)\\,0.45\\,0):eval=frame[a]';
+const chimeSource = 'sine=frequency=1320:sample_rate=48000';
 
 function run(command, commandArgs, options = {}) {
     const result = spawnSync(command, commandArgs, {
@@ -38,13 +38,45 @@ function pathsFor(locale) {
     };
 }
 
+function probeDuration(filePath) {
+    const result = spawnSync(ffmpegPath, ['-i', filePath], {
+        cwd: __dirname,
+        encoding: 'utf8',
+        windowsHide: true
+    });
+    if (result.error) throw result.error;
+    const match = `${result.stderr || ''}\n${result.stdout || ''}`.match(/Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)/);
+    if (!match) throw new Error(`動画の長さを取得できませんでした: ${filePath}`);
+    return (Number(match[1]) * 3600) + (Number(match[2]) * 60) + Number(match[3]);
+}
+
+function readChimeTime(rawPath, duration) {
+    const timingPath = rawPath.replace(/-raw\.webm$/i, '-timing.json');
+    if (fs.existsSync(timingPath)) {
+        const timing = JSON.parse(fs.readFileSync(timingPath, 'utf8'));
+        if (Number.isFinite(timing.chimeAt) && timing.chimeAt >= 0 && timing.chimeAt < duration) {
+            return timing.chimeAt;
+        }
+    }
+    return Math.max(0, duration - 5.05);
+}
+
 function encodeVideo(rawPath, finalPath) {
     const tempPath = `${finalPath}.tmp.mp4`;
     try {
+        const duration = probeDuration(rawPath);
+        const chimeAt = readChimeTime(rawPath, duration);
+        const chimeDelay = Math.round(chimeAt * 1000);
+        const audioFilter = [
+            `[1:a]volume=0.45*lt(t\\,${chimeAt.toFixed(3)})*lt(mod(t\\,1)\\,0.045):eval=frame[metro]`,
+            `[2:a]atrim=duration=1.8,afade=t=out:st=0.15:d=1.65,volume=3.5,aecho=0.8:0.4:90|180:0.28|0.16,adelay=${chimeDelay}[chime]`,
+            '[metro][chime]amix=inputs=2:duration=first:normalize=0[a]'
+        ].join(';');
         run(ffmpegPath, [
             '-y', '-i', rawPath,
             '-f', 'lavfi', '-i', metronomeSource,
-            '-filter_complex', metronomeFilter,
+            '-f', 'lavfi', '-i', chimeSource,
+            '-filter_complex', audioFilter,
             '-vf', 'scale=1080:1920:flags=lanczos',
             '-map', '0:v:0', '-map', '[a]',
             '-c:v', 'libx264', '-preset', 'medium', '-crf', '22',

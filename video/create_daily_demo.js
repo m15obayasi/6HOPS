@@ -29,9 +29,7 @@ const demo = {
         goalFound: (goal) => `ゴールの「${goal}」を発見！`,
         successText: '成功',
         goalCaption: (hops) => `${hops} HOPSでゴール！`,
-        goalSubcaption: '今日のDaily、クリア',
-        endTitle: 'お題は毎日変わります。',
-        endSubtitle: '今日の組み合わせに挑戦しよう'
+        goalSubcaption: '今日のDaily、クリア'
     },
     en: {
         todayChallenge: "Today's challenge",
@@ -44,9 +42,7 @@ const demo = {
         goalFound: (goal) => `Found the goal: “${goal}”!`,
         successText: 'Success',
         goalCaption: (hops) => `Goal in ${hops} HOPS!`,
-        goalSubcaption: "Today's Daily cleared",
-        endTitle: 'A new challenge every day.',
-        endSubtitle: "Take on today's pair"
+        goalSubcaption: "Today's Daily cleared"
     }
 }[locale];
 Object.assign(demo, { date, start: challenge.start, goal: challenge.goal, route });
@@ -55,6 +51,7 @@ const projectRoot = path.resolve(__dirname, '..');
 const outputDir = path.join(__dirname, 'output');
 const localeCode = locale.toUpperCase();
 const rawVideoPath = path.join(outputDir, `6HOPS-Daily-Playthrough-${localeCode}-${date}-raw.webm`);
+const timingPath = path.join(outputDir, `6HOPS-Daily-Playthrough-${localeCode}-${date}-timing.json`);
 const thumbnailPath = path.join(__dirname, `6HOPS-Daily-Playthrough-${localeCode}-${date}-thumbnail.jpg`);
 const baseUrl = process.env.SIX_HOPS_URL || 'https://myeik.net/6HOPS/';
 const edgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
@@ -74,10 +71,36 @@ const escapeHtml = (value) => String(value)
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 
+function titlePageHtml() {
+    return `<!doctype html><html lang="${locale}"><head><meta charset="utf-8"><style>
+        * { box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; margin: 0; }
+        body { display:flex; align-items:center; justify-content:center; background:#f8f9fa; color:#202122;
+            font-family:'Yu Gothic UI','Noto Sans JP',sans-serif; text-align:center; }
+        main { width:min(620px,calc(100% - 72px)); transform:translateY(-18px); }
+        h1 { margin:0; font-size:104px; line-height:1; letter-spacing:.035em; }
+        .pair { margin-top:86px; color:#202122; display:flex; flex-direction:column; align-items:center;
+            font-size:clamp(66px,11.5vw,92px); font-weight:900; line-height:1.12; overflow-wrap:anywhere;
+            text-wrap:balance; }
+        .term { max-width:100%; }
+        .arrow { margin:24px 0; font-size:68px; line-height:1; font-weight:700; }
+    </style></head><body><main><h1>6HOPS</h1><div class="pair"><span class="term">${escapeHtml(demo.start)}</span><span class="arrow">↓</span><span class="term">${escapeHtml(demo.goal)}</span></div></main></body></html>`;
+}
+
+function beatPageHtml(text) {
+    return `<!doctype html><html lang="${locale}"><head><meta charset="utf-8"><style>
+        * { box-sizing: border-box; }
+        html, body { width:100%; height:100%; margin:0; }
+        body { display:flex; align-items:center; justify-content:center; padding:72px; background:#202122; color:#fff;
+            font-family:'Yu Gothic UI','Noto Sans JP',sans-serif; text-align:center; }
+        main { max-width:620px; font-size:clamp(82px,15vw,124px); font-weight:900; line-height:1.12;
+            overflow-wrap:anywhere; text-wrap:balance; }
+    </style></head><body><main>${escapeHtml(text)}</main></body></html>`;
+}
+
 async function addDemoStyles(page) {
     await page.addStyleTag({ content: `
-        #sixhops-demo-caption,
-        #sixhops-demo-card {
+        #sixhops-demo-caption {
             font-family: 'Zen Maru Gothic', 'Noto Sans JP', 'Yu Gothic UI', sans-serif;
             box-sizing: border-box;
             pointer-events: none;
@@ -131,47 +154,6 @@ async function addDemoStyles(page) {
         #sixhops-demo-caption.accent .demo-main {
             color: #fff;
         }
-        #sixhops-demo-card {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 90px 58px 210px;
-            background: #f8f9fa;
-            color: #202122;
-            text-align: center;
-            opacity: 0;
-            transition: opacity 300ms ease;
-            z-index: 2147483647;
-        }
-        #sixhops-demo-card.visible { opacity: 1; }
-        #sixhops-demo-card .demo-kicker {
-            margin-bottom: 26px;
-            color: #3366cc;
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: 0.15em;
-        }
-        #sixhops-demo-card .demo-card-title {
-            font-size: 60px;
-            font-weight: 900;
-            line-height: 1.18;
-            letter-spacing: 0.02em;
-        }
-        #sixhops-demo-card .demo-card-subtitle {
-            margin-top: 24px;
-            color: #54595d;
-            font-size: 32px;
-            font-weight: 700;
-        }
-        #sixhops-demo-card .demo-rule {
-            width: 96px;
-            height: 3px;
-            margin-top: 30px;
-            background: #202122;
-        }
         .sixhops-demo-link {
             position: relative !important;
             border-bottom: 3px solid #3366cc !important;
@@ -215,40 +197,6 @@ async function hideCaption(page) {
         if (caption) caption.classList.remove('visible');
     });
     await sleep(220);
-}
-
-async function showCard(page, kicker, title, subtitle, duration) {
-    await page.evaluate(({ kicker, title, subtitle }) => {
-        let card = document.querySelector('#sixhops-demo-card');
-        if (!card) {
-            card = document.createElement('div');
-            card.id = 'sixhops-demo-card';
-            document.body.appendChild(card);
-        }
-        card.innerHTML = '';
-        const kickerLine = document.createElement('div');
-        kickerLine.className = 'demo-kicker';
-        kickerLine.textContent = kicker;
-        const titleLine = document.createElement('div');
-        titleLine.className = 'demo-card-title';
-        titleLine.textContent = title;
-        const subtitleLine = document.createElement('div');
-        subtitleLine.className = 'demo-card-subtitle';
-        subtitleLine.textContent = subtitle;
-        const rule = document.createElement('div');
-        rule.className = 'demo-rule';
-        card.append(kickerLine, titleLine, subtitleLine, rule);
-        requestAnimationFrame(() => card.classList.add('visible'));
-    }, { kicker, title, subtitle });
-    await sleep(duration);
-}
-
-async function hideCard(page) {
-    await page.evaluate(() => {
-        const card = document.querySelector('#sixhops-demo-card');
-        if (card) card.classList.remove('visible');
-    });
-    await sleep(380);
 }
 
 async function waitForArticle(page, title) {
@@ -307,20 +255,10 @@ async function main() {
     });
     const page = await context.newPage();
     const video = page.video();
+    const recordingStartedAt = Date.now();
+    let chimeAt = null;
 
-    await page.setContent(`<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>
-        * { box-sizing: border-box; }
-        html, body { width: 100%; height: 100%; margin: 0; }
-        body { display:flex; align-items:center; justify-content:center; background:#f8f9fa; color:#202122;
-            font-family:'Yu Gothic UI','Noto Sans JP',sans-serif; text-align:center; }
-        main { width:min(620px,calc(100% - 72px)); transform:translateY(-18px); }
-        h1 { margin:0; font-size:104px; line-height:1; letter-spacing:.035em; }
-        .pair { margin-top:86px; color:#202122; display:flex; flex-direction:column; align-items:center;
-            font-size:clamp(66px,11.5vw,92px); font-weight:900; line-height:1.12; overflow-wrap:anywhere;
-            text-wrap:balance; }
-        .term { max-width:100%; }
-        .arrow { margin:24px 0; font-size:68px; line-height:1; font-weight:700; }
-    </style></head><body><main><h1>6HOPS</h1><div class="pair"><span class="term">${escapeHtml(demo.start)}</span><span class="arrow">→</span><span class="term">${escapeHtml(demo.goal)}</span></div></main></body></html>`);
+    await page.setContent(titlePageHtml());
     await page.screenshot({ path: thumbnailPath, type: 'jpeg', quality: 92 });
     await sleep(3800);
 
@@ -373,10 +311,19 @@ async function main() {
     await sleep(4300);
     await hideCaption(page);
 
-    await showCard(page, '6HOPS DAILY', demo.endTitle, demo.endSubtitle, 5000);
+    await page.setContent(beatPageHtml(demo.start));
+    await sleep(1000);
+    await page.setContent(beatPageHtml(demo.goal));
+    await sleep(1000);
+    await page.setContent(beatPageHtml('6HOPS'));
+    await sleep(1000);
+    await page.setContent(titlePageHtml());
+    chimeAt = (Date.now() - recordingStartedAt) / 1000;
+    await sleep(4000);
     await context.close();
     await video.saveAs(rawVideoPath);
     await browser.close();
+    fs.writeFileSync(timingPath, `${JSON.stringify({ chimeAt }, null, 2)}\n`, 'utf8');
 
     console.log(rawVideoPath);
     console.log(thumbnailPath);

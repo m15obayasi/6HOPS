@@ -121,7 +121,14 @@ function buildMetadata(filePath, config, privacyOverride) {
     if (!['private', 'unlisted', 'public'].includes(privacyStatus)) {
         throw new Error(`privacyStatusが不正です: ${privacyStatus}`);
     }
-    const title = renderTemplate(localizedConfig.titleTemplate, values).slice(0, 100);
+    const renderedTitle = renderTemplate(localizedConfig.titleTemplate, values);
+    const fallbackTitle = locale === 'en'
+        ? `${challenge.start} to ${challenge.goal}: Can you make it?`
+        : `${challenge.start}から${challenge.goal}へ辿れる？`;
+    const title = (renderedTitle.length <= 100 ? renderedTitle : fallbackTitle).slice(0, 100);
+    if (!title.includes(challenge.start) || !title.includes(challenge.goal)) {
+        throw new Error(`動画タイトルにお題の両方を収められません: ${challenge.start} / ${challenge.goal}`);
+    }
     const description = renderTemplate(localizedConfig.descriptionTemplate, values).slice(0, 5000);
     return {
         date,

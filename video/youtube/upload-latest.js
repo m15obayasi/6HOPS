@@ -11,6 +11,7 @@ const {
     parseArgs
 } = require('./common');
 const { getAccessToken } = require('./oauth');
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function printPlan(filePath, metadata) {
     console.log('YouTube投稿内容');
@@ -114,6 +115,11 @@ async function uploadThumbnail(accessToken, videoId, thumbnailPath) {
     if (!response.ok) {
         throw new Error(`サムネイルの設定に失敗しました (${response.status}): ${await response.text()}`);
     }
+    const payload = await response.json();
+    if (!Array.isArray(payload.items) || payload.items.length === 0) {
+        throw new Error('YouTubeからサムネイル設定の確認情報が返されませんでした。');
+    }
+    return payload;
 }
 
 async function main() {
@@ -145,10 +151,12 @@ async function main() {
     let thumbnailStatus = metadata.thumbnailPath ? 'pending' : 'not-provided';
     let thumbnailError = null;
     if (metadata.thumbnailPath) {
-        console.log('サムネイルを設定しています…');
+        console.log('動画処理のため20秒待ってからサムネイルを設定します…');
         try {
+            await sleep(20000);
             await uploadThumbnail(accessToken, result.id, metadata.thumbnailPath);
             thumbnailStatus = 'uploaded';
+            console.log('YouTubeがカスタムサムネイルを受理しました。');
         } catch (error) {
             thumbnailStatus = 'failed';
             thumbnailError = error;

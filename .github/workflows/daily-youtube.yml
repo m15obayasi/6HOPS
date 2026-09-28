@@ -109,11 +109,11 @@ jobs:
             "${EXTRA_ARGS[@]}"
 
       - name: Save generated Shorts thumbnails
-        if: always() && hashFiles('video/6HOPS-Daily-Playthrough-*-thumbnail.jpg') != ''
+        if: ${{ always() && hashFiles(format('video/6HOPS-Daily-Playthrough-*-{0}-thumbnail.jpg', steps.challenge.outputs.date)) != '' }}
         uses: actions/upload-artifact@v7
         with:
           name: daily-shorts-thumbnails-${{ steps.challenge.outputs.date }}
-          path: video/6HOPS-Daily-Playthrough-*-thumbnail.jpg
+          path: video/6HOPS-Daily-Playthrough-*-${{ steps.challenge.outputs.date }}-thumbnail.jpg
           retention-days: 14
 
       - name: Preserve upload history for safe retry

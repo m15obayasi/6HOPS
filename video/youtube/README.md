@@ -70,4 +70,6 @@ npm run daily:dry-run
 
 ## 公開について
 
+画像は一覧用の `*-thumbnail.jpg`（1280×720）と、動画内・Shorts用の `*-shorts-cover.jpg`（1080×1920）を別々に生成します。字幕は画面中央に表示し、終盤は走査線・テープ風の歪み・低いノイズと余韻の長いチャイムを加えます。投稿済み動画のサムネイルだけ再設定する場合は `node youtube/upload-latest.js --video-id VIDEO_ID --thumbnail IMAGE_PATH` を使用します。同じ動画の再実行時にもサムネイル設定を再試行します。APIの受理は各YouTube画面への表示確認とは異なるため、表示を確認する際は配信画像や実際の一覧も確認してください。
+
 新規または未監査のYouTube APIプロジェクトでは、API投稿動画が非公開に制限される場合があります。最初は非公開で運用し、YouTube Studioで内容を確認してから公開してください。

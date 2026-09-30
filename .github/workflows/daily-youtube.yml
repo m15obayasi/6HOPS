@@ -113,7 +113,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: daily-shorts-thumbnails-${{ steps.challenge.outputs.date }}
-          path: video/6HOPS-Daily-Playthrough-*-${{ steps.challenge.outputs.date }}-thumbnail.jpg
+          path: |
+            video/6HOPS-Daily-Playthrough-*-${{ steps.challenge.outputs.date }}-thumbnail.jpg
+            video/6HOPS-Daily-Playthrough-*-${{ steps.challenge.outputs.date }}-shorts-cover.jpg
           retention-days: 14
 
       - name: Preserve upload history for safe retry

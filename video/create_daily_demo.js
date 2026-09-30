@@ -53,6 +53,7 @@ const localeCode = locale.toUpperCase();
 const rawVideoPath = path.join(outputDir, `6HOPS-Daily-Playthrough-${localeCode}-${date}-raw.webm`);
 const timingPath = path.join(outputDir, `6HOPS-Daily-Playthrough-${localeCode}-${date}-timing.json`);
 const thumbnailPath = path.join(__dirname, `6HOPS-Daily-Playthrough-${localeCode}-${date}-thumbnail.jpg`);
+const coverPath = path.join(__dirname, `6HOPS-Daily-Playthrough-${localeCode}-${date}-shorts-cover.jpg`);
 const baseUrl = process.env.SIX_HOPS_URL || 'https://myeik.net/6HOPS/';
 const edgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
 const browserPath = process.env.PLAYWRIGHT_EXECUTABLE_PATH
@@ -71,7 +72,7 @@ const escapeHtml = (value) => String(value)
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 
-function titlePageHtml() {
+function titlePageHtml(listing = false, horror = false) {
     return `<!doctype html><html lang="${locale}"><head><meta charset="utf-8"><style>
         * { box-sizing: border-box; }
         html, body { width: 100%; height: 100%; margin: 0; }
@@ -84,7 +85,30 @@ function titlePageHtml() {
             text-wrap:balance; }
         .term { max-width:100%; }
         .arrow { margin:24px 0; font-size:68px; line-height:1; font-weight:700; }
+        ${listing ? 'main { width:560px; transform:none; } h1 { font-size:62px; } .pair { margin-top:24px; font-size:68px; } .arrow { margin:14px 0; font-size:46px; }' : ''}
+        ${horror ? analogStyles() : ''}
     </style></head><body><main><h1>6HOPS</h1><div class="pair"><span class="term">${escapeHtml(demo.start)}</span><span class="arrow">↓</span><span class="term">${escapeHtml(demo.goal)}</span></div></main></body></html>`;
+}
+
+function analogStyles() {
+    return `body { background:#101210; color:#d9ddd4; }
+        .pair { color:inherit; } main { text-shadow:2px 0 #62685c,-1px 0 #889082; }
+        body::after { content:''; position:fixed; inset:0; pointer-events:none;
+            background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.24) 3px 5px);
+            box-shadow:inset 0 0 180px 50px #0009; }
+        main { animation:tape-drift 2.4s steps(1) infinite; }
+        @keyframes tape-drift { 0%,86%,100% { opacity:1; filter:blur(.4px); }
+            87%,90% { opacity:.65; filter:blur(1.2px); translate:3px 0; } }
+    `;
+}
+
+async function fitTitle(page) {
+    await page.evaluate(async () => {
+        await document.fonts.ready;
+        const main=document.querySelector('main');
+        const available=innerHeight-120;
+        if(main && main.scrollHeight>available) main.style.zoom=String(available/main.scrollHeight);
+    });
 }
 
 function beatPageHtml(text) {
@@ -95,6 +119,7 @@ function beatPageHtml(text) {
             font-family:'Yu Gothic UI','Noto Sans JP',sans-serif; text-align:center; }
         main { max-width:620px; font-size:clamp(82px,15vw,124px); font-weight:900; line-height:1.12;
             overflow-wrap:anywhere; text-wrap:balance; }
+        ${analogStyles()}
     </style></head><body><main>${escapeHtml(text)}</main></body></html>`;
 }
 
@@ -107,9 +132,9 @@ async function addDemoStyles(page) {
         }
         #sixhops-demo-caption {
             position: fixed;
-            left: 18px;
+            left: 36px;
             right: 92px;
-            bottom: 132px;
+            top: 50%;
             min-height: 126px;
             padding: 22px 28px 24px;
             display: flex;
@@ -124,13 +149,13 @@ async function addDemoStyles(page) {
             backdrop-filter: blur(3px);
             text-align: center;
             opacity: 0;
-            transform: translateY(16px);
+            transform: translateY(calc(-50% + 12px));
             transition: opacity 180ms ease, transform 180ms ease;
             z-index: 2147483646;
         }
         #sixhops-demo-caption.visible {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(-50%);
         }
         #sixhops-demo-caption .demo-main {
             display: block;
@@ -258,8 +283,21 @@ async function main() {
     const recordingStartedAt = Date.now();
     let chimeAt = null;
 
+    const imagePage = await browser.newPage({ viewport: { width:1280, height:720 }, deviceScaleFactor:1 });
+    await imagePage.setContent(titlePageHtml(true));
+    await fitTitle(imagePage);
+    await imagePage.screenshot({ path: thumbnailPath, type: 'jpeg', quality: 95 });
+    await imagePage.close();
     await page.setContent(titlePageHtml());
-    await page.screenshot({ path: thumbnailPath, type: 'jpeg', quality: 92 });
+    await fitTitle(page);
+    await page.screenshot({ path: coverPath, type: 'jpeg', quality: 95 });
+    if(args['images-only']) {
+        await context.close();
+        await browser.close();
+        console.log(thumbnailPath);
+        console.log(coverPath);
+        return;
+    }
     await sleep(3800);
 
     const localePath = locale === 'en' ? 'en/' : '';
@@ -311,19 +349,23 @@ async function main() {
     await sleep(4300);
     await hideCaption(page);
 
+    const outroAt = (Date.now() - recordingStartedAt) / 1000;
     await page.setContent(beatPageHtml(demo.start));
     await sleep(1000);
     await page.setContent(beatPageHtml(demo.goal));
     await sleep(1000);
     await page.setContent(beatPageHtml('6HOPS'));
     await sleep(1000);
-    await page.setContent(titlePageHtml());
+    await page.setContent(titlePageHtml(false, true));
+    await fitTitle(page);
     chimeAt = (Date.now() - recordingStartedAt) / 1000;
     await sleep(4000);
+    await page.setContent('<html style="background:#000"><body></body></html>');
+    await sleep(240);
     await context.close();
     await video.saveAs(rawVideoPath);
     await browser.close();
-    fs.writeFileSync(timingPath, `${JSON.stringify({ chimeAt }, null, 2)}\n`, 'utf8');
+    fs.writeFileSync(timingPath, `${JSON.stringify({ chimeAt, outroAt }, null, 2)}\n`, 'utf8');
 
     console.log(rawVideoPath);
     console.log(thumbnailPath);

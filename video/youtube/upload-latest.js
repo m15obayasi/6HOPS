@@ -122,8 +122,29 @@ async function uploadThumbnail(accessToken, videoId, thumbnailPath) {
     return payload;
 }
 
+async function setThumbnail(accessToken, videoId, thumbnailPath) {
+    let lastError;
+    for (let attempt=0; attempt<3; attempt+=1) {
+        try {
+            const payload=await uploadThumbnail(accessToken,videoId,thumbnailPath);
+            console.log(`サムネイル設定受理: ${videoId} (${payload.items.length}件)`);
+            return;
+        } catch(error) {
+            lastError=error;
+            if(attempt<2) await sleep(15000);
+        }
+    }
+    throw lastError;
+}
+
 async function main() {
     const args = parseArgs(process.argv.slice(2));
+    if(args['video-id']) {
+        const thumbnailPath=path.resolve(args.thumbnail || '');
+        if(!args.thumbnail || !fs.existsSync(thumbnailPath)) throw new Error('--thumbnail に画像を指定してください。');
+        await setThumbnail(await getAccessToken(),args['video-id'],thumbnailPath);
+        return;
+    }
     const filePath = args.file ? path.resolve(args.file) : findLatestVideo();
     if (!fs.existsSync(filePath)) throw new Error(`動画が見つかりません: ${filePath}`);
     const config = loadConfig();
@@ -140,6 +161,12 @@ async function main() {
     const history = readJson(paths.history, { uploads: [] });
     const previous = history.uploads.find((item) => item.sha256 === digest);
     if (previous && !args.force) {
+        if(metadata.thumbnailPath) {
+            await setThumbnail(await getAccessToken(), previous.videoId, metadata.thumbnailPath);
+            previous.thumbnailStatus='uploaded';
+            previous.thumbnailUpdatedAt=new Date().toISOString();
+            writePrivateJson(paths.history,history);
+        }
         console.log(`\n新しい動画はありません。同じ動画は投稿済みです: https://youtu.be/${previous.videoId}`);
         return;
     }
@@ -154,7 +181,7 @@ async function main() {
         console.log('動画処理のため20秒待ってからサムネイルを設定します…');
         try {
             await sleep(20000);
-            await uploadThumbnail(accessToken, result.id, metadata.thumbnailPath);
+            await setThumbnail(accessToken, result.id, metadata.thumbnailPath);
             thumbnailStatus = 'uploaded';
             console.log('YouTubeがカスタムサムネイルを受理しました。');
         } catch (error) {

@@ -14,6 +14,7 @@ const locales = args.locale ? [args.locale === 'en' ? 'en' : 'ja'] : ['ja', 'en'
 const outputDir = path.join(__dirname, 'output');
 const metronomeSource = 'sine=frequency=880:sample_rate=48000';
 const chimeSource = 'sine=frequency=1320:sample_rate=48000';
+const noiseSource = 'anoisesrc=color=brown:sample_rate=48000:amplitude=0.025:seed=6';
 
 function run(command, commandArgs, options = {}) {
     const result = spawnSync(command, commandArgs, {
@@ -34,7 +35,8 @@ function pathsFor(locale) {
     return {
         raw: path.join(outputDir, `${stem}-raw.webm`),
         final: path.join(__dirname, `${stem}.mp4`),
-        thumbnail: path.join(__dirname, `${stem}-thumbnail.jpg`)
+        thumbnail: path.join(__dirname, `${stem}-thumbnail.jpg`),
+        cover: path.join(__dirname, `${stem}-shorts-cover.jpg`)
     };
 }
 
@@ -50,32 +52,34 @@ function probeDuration(filePath) {
     return (Number(match[1]) * 3600) + (Number(match[2]) * 60) + Number(match[3]);
 }
 
-function readChimeTime(rawPath, duration) {
+function readTiming(rawPath, duration) {
     const timingPath = rawPath.replace(/-raw\.webm$/i, '-timing.json');
     if (fs.existsSync(timingPath)) {
         const timing = JSON.parse(fs.readFileSync(timingPath, 'utf8'));
         if (Number.isFinite(timing.chimeAt) && timing.chimeAt >= 0 && timing.chimeAt < duration) {
-            return timing.chimeAt;
+            return { chimeAt:timing.chimeAt, outroAt:Number.isFinite(timing.outroAt) ? timing.outroAt : Math.max(0,timing.chimeAt-3) };
         }
     }
-    return Math.max(0, duration - 5.05);
+    return { chimeAt:Math.max(0, duration-5.05), outroAt:Math.max(0,duration-8.05) };
 }
 
 function encodeVideo(rawPath, finalPath) {
     const tempPath = `${finalPath}.tmp.mp4`;
     try {
         const duration = probeDuration(rawPath);
-        const chimeAt = readChimeTime(rawPath, duration);
+        const { chimeAt, outroAt } = readTiming(rawPath, duration);
         const chimeDelay = Math.round(chimeAt * 1000);
         const audioFilter = [
-            `[1:a]volume=0.45*lt(t\\,${chimeAt.toFixed(3)})*lt(mod(t\\,1)\\,0.045):eval=frame[metro]`,
-            `[2:a]atrim=duration=1.8,afade=t=out:st=0.15:d=1.65,volume=3.5,aecho=0.8:0.4:90|180:0.28|0.16,adelay=${chimeDelay}[chime]`,
-            '[metro][chime]amix=inputs=2:duration=first:normalize=0[a]'
+            `[1:a]volume=0.45*lt(t\\,${chimeAt.toFixed(3)})*lt(mod(if(lt(t\\,${outroAt.toFixed(3)})\\,t\\,t-${outroAt.toFixed(3)})\\,1)\\,0.045):eval=frame[metro]`,
+            `[2:a]atrim=duration=3.8,afade=t=out:st=0.12:d=3.68,volume=3.5,aecho=0.8:0.4:160|310:0.28|0.16,adelay=${chimeDelay}[chime]`,
+            `[3:a]volume=gte(t\\,${outroAt.toFixed(3)}):eval=frame,afade=t=out:st=${Math.max(0,duration-.5).toFixed(3)}:d=0.5[noise]`,
+            '[metro][chime][noise]amix=inputs=3:duration=first:normalize=0,alimiter=limit=0.8:level=0[a]'
         ].join(';');
         run(ffmpegPath, [
             '-y', '-i', rawPath,
             '-f', 'lavfi', '-i', metronomeSource,
             '-f', 'lavfi', '-i', chimeSource,
+            '-f', 'lavfi', '-i', noiseSource,
             '-filter_complex', audioFilter,
             '-vf', 'scale=1080:1920:flags=lanczos',
             '-map', '0:v:0', '-map', '[a]',
@@ -84,6 +88,7 @@ function encodeVideo(rawPath, finalPath) {
             '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-shortest',
             tempPath
         ]);
+        run(ffmpegPath,['-v','error','-i',tempPath,'-f','null','-']);
         fs.renameSync(tempPath, finalPath);
     } finally {
         if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
@@ -114,7 +119,7 @@ async function main() {
     const generated = [];
     for (const locale of locales) {
         const files = pathsFor(locale);
-        if (!args.force && fs.existsSync(files.final) && fs.existsSync(files.thumbnail)) {
+        if (!args.force && fs.existsSync(files.final) && fs.existsSync(files.thumbnail) && fs.existsSync(files.cover)) {
             console.log(`既存の動画を使用します: ${files.final}`);
         } else {
             console.log(`${locale.toUpperCase()}版を生成しています…`);

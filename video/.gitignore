@@ -3,6 +3,7 @@ node_modules/
 .playwright/
 6HOPS-Daily-Playthrough-*.mp4
 6HOPS-Daily-Playthrough-*-thumbnail.jpg
+6HOPS-Daily-Playthrough-*-shorts-cover.jpg
 youtube/client_secret.json
 youtube/token.json
 youtube/upload-config.json

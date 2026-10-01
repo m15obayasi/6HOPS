@@ -85,7 +85,7 @@ function titlePageHtml(listing = false, horror = false) {
             text-wrap:balance; }
         .term { max-width:100%; }
         .arrow { margin:24px 0; font-size:68px; line-height:1; font-weight:700; }
-        ${listing ? 'main { width:560px; transform:none; } h1 { font-size:62px; } .pair { margin-top:24px; font-size:68px; } .arrow { margin:14px 0; font-size:46px; }' : ''}
+        ${listing ? 'main { width:960px; transform:none; } h1 { font-size:90px; } .pair { margin-top:24px; font-size:100px; } .arrow { margin:12px 0; font-size:60px; }' : ''}
         ${horror ? analogStyles() : ''}
     </style></head><body><main><h1>6HOPS</h1><div class="pair"><span class="term">${escapeHtml(demo.start)}</span><span class="arrow">↓</span><span class="term">${escapeHtml(demo.goal)}</span></div></main></body></html>`;
 }
@@ -134,7 +134,7 @@ async function addDemoStyles(page) {
             position: fixed;
             left: 36px;
             right: 92px;
-            top: 50%;
+            top: 32%;
             min-height: 126px;
             padding: 22px 28px 24px;
             display: flex;
@@ -351,17 +351,14 @@ async function main() {
 
     const outroAt = (Date.now() - recordingStartedAt) / 1000;
     await page.setContent(beatPageHtml(demo.start));
-    await sleep(1000);
+    await sleep(500);
     await page.setContent(beatPageHtml(demo.goal));
-    await sleep(1000);
+    await sleep(500);
     await page.setContent(beatPageHtml('6HOPS'));
-    await sleep(1000);
-    await page.setContent(titlePageHtml(false, true));
-    await fitTitle(page);
-    chimeAt = (Date.now() - recordingStartedAt) / 1000;
-    await sleep(4000);
+    await sleep(500);
     await page.setContent('<html style="background:#000"><body></body></html>');
-    await sleep(240);
+    chimeAt = (Date.now() - recordingStartedAt) / 1000;
+    await sleep(1000);
     await context.close();
     await video.saveAs(rawVideoPath);
     await browser.close();

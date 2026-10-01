@@ -13,7 +13,7 @@ const privacy = args.privacy || 'public';
 const locales = args.locale ? [args.locale === 'en' ? 'en' : 'ja'] : ['ja', 'en'];
 const outputDir = path.join(__dirname, 'output');
 const metronomeSource = 'sine=frequency=880:sample_rate=48000';
-const chimeSource = 'sine=frequency=1320:sample_rate=48000';
+const chimeSource = 'sine=frequency=1000:sample_rate=48000';
 const noiseSource = 'anoisesrc=color=brown:sample_rate=48000:amplitude=0.025:seed=6';
 
 function run(command, commandArgs, options = {}) {
@@ -57,10 +57,10 @@ function readTiming(rawPath, duration) {
     if (fs.existsSync(timingPath)) {
         const timing = JSON.parse(fs.readFileSync(timingPath, 'utf8'));
         if (Number.isFinite(timing.chimeAt) && timing.chimeAt >= 0 && timing.chimeAt < duration) {
-            return { chimeAt:timing.chimeAt, outroAt:Number.isFinite(timing.outroAt) ? timing.outroAt : Math.max(0,timing.chimeAt-3) };
+            return { chimeAt:timing.chimeAt, outroAt:Number.isFinite(timing.outroAt) ? timing.outroAt : Math.max(0,timing.chimeAt-1.5) };
         }
     }
-    return { chimeAt:Math.max(0, duration-5.05), outroAt:Math.max(0,duration-8.05) };
+    throw new Error(`終盤のタイミング情報がありません。録画を再生成してください: ${timingPath}`);
 }
 
 function encodeVideo(rawPath, finalPath) {
@@ -69,10 +69,11 @@ function encodeVideo(rawPath, finalPath) {
         const duration = probeDuration(rawPath);
         const { chimeAt, outroAt } = readTiming(rawPath, duration);
         const chimeDelay = Math.round(chimeAt * 1000);
+        const endAt = chimeAt + 1;
         const audioFilter = [
-            `[1:a]volume=0.45*lt(t\\,${chimeAt.toFixed(3)})*lt(mod(if(lt(t\\,${outroAt.toFixed(3)})\\,t\\,t-${outroAt.toFixed(3)})\\,1)\\,0.045):eval=frame[metro]`,
-            `[2:a]atrim=duration=3.8,afade=t=out:st=0.12:d=3.68,volume=3.5,aecho=0.8:0.4:160|310:0.28|0.16,adelay=${chimeDelay}[chime]`,
-            `[3:a]volume=gte(t\\,${outroAt.toFixed(3)}):eval=frame,afade=t=out:st=${Math.max(0,duration-.5).toFixed(3)}:d=0.5[noise]`,
+            `[1:a]volume=0.45*lt(t\\,${chimeAt.toFixed(3)})*lt(mod(if(lt(t\\,${outroAt.toFixed(3)})\\,t\\,t-${outroAt.toFixed(3)})\\,if(lt(t\\,${outroAt.toFixed(3)})\\,1\\,0.5))\\,0.045):eval=frame[metro]`,
+            `[2:a]atrim=duration=1,volume=1.2,adelay=${chimeDelay}[chime]`,
+            `[3:a]volume=gte(t\\,${outroAt.toFixed(3)})*lt(t\\,${chimeAt.toFixed(3)}):eval=frame[noise]`,
             '[metro][chime][noise]amix=inputs=3:duration=first:normalize=0,alimiter=limit=0.8:level=0[a]'
         ].join(';');
         run(ffmpegPath, [
@@ -85,7 +86,7 @@ function encodeVideo(rawPath, finalPath) {
             '-map', '0:v:0', '-map', '[a]',
             '-c:v', 'libx264', '-preset', 'medium', '-crf', '22',
             '-c:a', 'aac', '-b:a', '128k',
-            '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-shortest',
+            '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-shortest', '-t', endAt.toFixed(3),
             tempPath
         ]);
         run(ffmpegPath,['-v','error','-i',tempPath,'-f','null','-']);

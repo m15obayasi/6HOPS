@@ -58,10 +58,10 @@ jobs:
             video/6HOPS-Daily-Playthrough-*-thumbnail.jpg
             video/6HOPS-Daily-Playthrough-*-shorts-cover.jpg
             video/output/*-ios-recording.json
-          video/output/*-home-*.png
-          video/output/*-ready-*.png
-          video/output/*-article-*.png
-          video/output/*-result-*.png
+            video/output/*-home-*.png
+            video/output/*-ready-*.png
+            video/output/*-article-*.png
+            video/output/*-result-*.png
             video/output/*-ios-test.log
             video/output/ios-build.log
             video/output/*-ios-raw.mov

@@ -74,22 +74,27 @@ function compose(manifestPath) {
     const pixels = 80 * 142;
     const frames = spawnSync(ffmpeg, ['-v','error','-i',normalized,'-vf','fps=10,scale=80:142,format=gray','-f','rawvideo','-'], {maxBuffer:512*1024*1024});
     if (frames.status !== 0) throw new Error('Could not inspect recording frames');
-    const home = m.events.find(e => e.stage === 'home');
-    const reference = spawnSync(ffmpeg, ['-v','error','-i',home.screenshot,'-vf','scale=-2:1920,pad=1080:1920:(ow-iw)/2:0:black,scale=80:142,format=gray','-frames:v','1','-f','rawvideo','-']);
-    if (reference.status !== 0 || reference.stdout.length !== pixels) throw new Error('Missing native home screenshot');
     function mse(buffer, offset, expected) {
         let sum=0;
         for(let j=0;j<pixels;j++) sum+=(buffer[offset+j]-expected[j])**2;
         return sum/pixels;
     }
-    const scores=[];
-    for(let i=0;i<frames.stdout.length/pixels;i++) scores.push(mse(frames.stdout,i*pixels,reference.stdout));
-    const minimum=Math.min(...scores);
-    if(minimum>40) throw new Error(`Home screen not found in recording: ${minimum}`);
-    const lastHome=scores.findLastIndex(v=>v<=minimum+4)/10;
-    const clockCorrection=m.homeDepartureEpoch-m.started-lastHome;
-    if(!Number.isFinite(clockCorrection)) throw new Error('Missing media clock calibration');
-    const calibration={method:'native-home-screenshot-and-real-tap',minimum,lastHome,clockCorrection};
+    const anchors=[];
+    for(const e of m.events.filter(e=>e.screenshot)) {
+        const reference=spawnSync(ffmpeg,['-v','error','-i',e.screenshot,'-vf','scale=-2:1920,pad=1080:1920:(ow-iw)/2:0:black,scale=80:142,format=gray','-frames:v','1','-f','rawvideo','-']);
+        if(reference.status!==0 || reference.stdout.length!==pixels) throw new Error(`Missing ${e.stage} screenshot`);
+        const scores=[];
+        const previous=anchors.at(-1)?.last ?? -1;
+        for(let i=0;i<frames.stdout.length/pixels;i++) scores.push(i/10>previous ? mse(frames.stdout,i*pixels,reference.stdout) : Infinity);
+        const minimum=Math.min(...scores);
+        if(minimum>40) throw new Error(`Actual ${e.stage}:${e.index} screen not found (${minimum})`);
+        const threshold=Math.min(50,minimum+20);
+        const first=scores.findIndex(v=>v<=threshold)/10;
+        let last=first;
+        for(let i=Math.round(first*10);i<scores.length && scores[i]<=threshold;i++) last=i/10;
+        anchors.push({stage:e.stage,index:e.index,first,last,minimum});
+    }
+    const calibration={method:'native-stage-screenshots',anchors};
     const clips = [];
     let total = 0;
     const segments = [];
@@ -123,19 +128,11 @@ function compose(manifestPath) {
     function real(stage, index, duration, caption) {
         const e = m.events.find((e) => e.stage === stage && e.index === index);
         if (!e) throw new Error(`Missing real-app event ${stage}:${index}`);
-        const epoch = stage === 'tap' ? e.realTapEpoch : e.epoch;
-        if (!Number.isFinite(epoch))
-            throw new Error('Missing real input timestamp');
-        const offset = epoch - m.started - clockCorrection + (stage === 'tap' ? -0.08 : 0.12);
-        if (offset < 0) throw new Error('Invalid recording clock');
-        let screenMse;
-        if (stage !== 'tap') {
-            const ref = spawnSync(ffmpeg, ['-v','error','-i',e.screenshot,'-vf','scale=-2:1920,pad=1080:1920:(ow-iw)/2:0:black,scale=80:142,format=gray','-frames:v','1','-f','rawvideo','-']);
-            if(ref.status!==0 || ref.stdout.length!==pixels) throw new Error(`Missing ${stage} screenshot`);
-            const frameIndex=Math.round(offset*10);
-            screenMse=mse(frames.stdout,frameIndex*pixels,ref.stdout);
-            if(!Number.isFinite(screenMse) || screenMse>50) throw new Error(`Recording does not match ${stage}:${index} screenshot (${screenMse})`);
-        }
+        const anchor=anchors.find(a=>a.stage===(stage==='tap'?'article':stage) && a.index===(stage==='tap'?index-1:index));
+        if(!anchor) throw new Error(`Missing visual anchor ${stage}:${index}`);
+        const offset=stage==='tap' ? Math.max(0,anchor.last-0.08) : anchor.first;
+        const sourceDuration=stage==='tap' ? duration : Math.min(duration,Math.max(0.1,anchor.last-anchor.first));
+        const screenMse=stage==='tap' ? undefined : anchor.minimum;
         const out = path.join(dir, `clip-${clips.length}.mp4`);
         const argv = ['-y', '-ss', offset.toFixed(3), '-i', normalized];
         if (caption !== undefined)
@@ -173,6 +170,7 @@ function compose(manifestPath) {
             stage,
             index,
             rawOffset: offset,
+            sourceDuration,
             screenMse,
             duration,
             finalOffset: total,
@@ -264,7 +262,7 @@ function compose(manifestPath) {
         JSON.stringify(
             {
                 source: 'iphone-simulator',
-        calibration,
+                calibration,
                 manifest: manifestPath,
                 final,
                 total,

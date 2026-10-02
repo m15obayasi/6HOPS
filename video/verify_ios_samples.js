@@ -36,8 +36,8 @@ for (const locale of ['ja', 'en']) {
         ),
     );
     assert.equal(manifest.source, 'iphone-simulator');
-    assert.equal(edit.calibration.method, 'native-home-screenshot-and-real-tap');
-    assert(edit.calibration.minimum <= 40);
+    assert.equal(edit.calibration.method, 'native-stage-screenshots');
+    assert(edit.calibration.anchors.every(a => a.minimum <= 40));
     assert(edit.segments.filter(s => s.stage !== 'tap').every(s => Number.isFinite(s.screenMse) && s.screenMse <= 50));
     assert.equal(
         manifest.events.filter((e) => e.stage === 'tap').length,
@@ -54,6 +54,22 @@ for (const locale of ['ja', 'en']) {
             .readFileSync(manifest.logPath, 'utf8')
             .includes('** TEST EXECUTE SUCCEEDED **'),
     );
+    const visualScores=[];
+    for(const segment of edit.segments.filter(s=>s.stage !== 'tap')) {
+        const event=manifest.events.find(e=>e.stage===segment.stage && e.index===segment.index);
+        const reference=decode(['-v','error','-i',event.screenshot,'-vf','scale=-2:1920,pad=1080:1920:(ow-iw)/2:0:black,scale=80:142,format=gray','-frames:v','1','-f','rawvideo','-']);
+        const at=segment.finalOffset+Math.min(segment.duration-0.05,2.15);
+        const actual=decode(['-v','error','-ss',String(at),'-i',file,'-vf','scale=80:142,format=gray','-frames:v','1','-f','rawvideo','-']);
+        assert.equal(actual.length,reference.length);
+        let sum=0,count=0;
+        for(let i=0;i<actual.length;i++) for(const step of [1,80]) {
+            if(i+step>=actual.length || (step===1 && i%80===79)) continue;
+            sum+=((actual[i+step]-actual[i])-(reference[i+step]-reference[i]))**2; count++;
+        }
+        const mse=sum/count;
+        assert(mse<=80, `Final ${locale} ${segment.stage}:${segment.index} does not show its real screenshot: ${mse}`);
+        visualScores.push({stage:segment.stage,index:segment.index,mse});
+    }
     const info = spawnSync(ffmpeg, ['-i', file], { encoding: 'utf8' }).stderr;
     assert(info.includes('1080x1920'));
     assert(info.includes('30 fps'));
@@ -139,6 +155,7 @@ for (const locale of ['ja', 'en']) {
     assert(metadata.title.includes(manifest.route[0]));
     assert(metadata.title.includes(manifest.route.at(-1)));
     report.push({
+        visualScores,
         locale,
         file,
         route: manifest.route,

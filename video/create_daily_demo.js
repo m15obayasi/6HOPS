@@ -133,10 +133,10 @@ async function addDemoStyles(page) {
         #sixhops-demo-caption {
             position: fixed;
             left: 36px;
-            right: 92px;
+            width: 520px;
+            height: 520px;
             top: 32%;
-            min-height: 126px;
-            padding: 22px 28px 24px;
+            padding: 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -159,16 +159,16 @@ async function addDemoStyles(page) {
         }
         #sixhops-demo-caption .demo-main {
             display: block;
-            font-size: 34px;
+            font-size: 46px;
             font-weight: 800;
             line-height: 1.25;
             letter-spacing: 0.02em;
         }
         #sixhops-demo-caption .demo-sub {
             display: block;
-            margin-top: 4px;
+            margin-top: 20px;
             color: rgba(255, 255, 255, 0.78);
-            font-size: 20px;
+            font-size: 28px;
             font-weight: 700;
         }
         #sixhops-demo-caption.accent {

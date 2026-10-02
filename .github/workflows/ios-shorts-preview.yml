@@ -1,0 +1,65 @@
+name: iPhone Shorts preview (no upload)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'ios/**'
+      - 'video/**'
+      - '.github/workflows/ios-shorts-preview.yml'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: Daily date (YYYY-MM-DD), blank uses today in Japan
+        required: false
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: ios-shorts-preview
+  cancel-in-progress: false
+jobs:
+  preview:
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      TZ: Asia/Tokyo
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: video/package-lock.json
+      - run: npm ci
+        working-directory: video
+      - name: Build actual app, play Daily, record, compose both locales
+        id: recording
+        working-directory: video
+        env:
+          INPUT_DATE: ${{ inputs.date || (github.event_name == 'pull_request' && '2026-10-02') || '' }}
+        run: |
+          DATE="$INPUT_DATE"
+          if [ -z "$DATE" ]; then DATE=$(date +%F); fi
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          node create_daily_videos.js --source ios --date "$DATE" --skip-upload
+      - name: Verify both media files, real-app evidence and audio
+        working-directory: video
+        env:
+          CHALLENGE_DATE: ${{ steps.recording.outputs.date }}
+        run: node verify_ios_samples.js --date "$CHALLENGE_DATE"
+      - name: Save previews and real-app evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: iphone-shorts-preview
+          retention-days: 7
+          path: |
+            video/6HOPS-Daily-Playthrough-*.mp4
+            video/6HOPS-Daily-Playthrough-*-thumbnail.jpg
+            video/6HOPS-Daily-Playthrough-*-shorts-cover.jpg
+            video/output/*-ios-recording.json
+            video/output/*-ios-test.log
+            video/output/ios-build.log
+            video/output/*-ios-raw.mov
+            video/output/ios-verification-*.json
+            video/output/*-assets/edit.json

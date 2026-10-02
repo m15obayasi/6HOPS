@@ -36,6 +36,9 @@ for (const locale of ['ja', 'en']) {
         ),
     );
     assert.equal(manifest.source, 'iphone-simulator');
+    assert.equal(edit.calibration.method, 'native-home-screenshot-and-real-tap');
+    assert(edit.calibration.minimum <= 40);
+    assert(edit.segments.filter(s => s.stage !== 'tap').every(s => Number.isFinite(s.screenMse) && s.screenMse <= 50));
     assert.equal(
         manifest.events.filter((e) => e.stage === 'tap').length,
         manifest.route.length - 1,

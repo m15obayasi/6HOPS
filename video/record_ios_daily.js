@@ -119,6 +119,8 @@ with open(sys.argv[2],'wb') as f:plistlib.dump(p,f)
         const lines = pending.split('\n');
         pending = lines.pop();
         for (const line of lines) {
+            const screen = line.match(/SIXHOPS_SCREEN (\w+) (\d+) ([A-Za-z0-9+/=]+)/);
+            if (screen) fs.writeFileSync(path.join(output, `${stem}-${screen[1]}-${screen[2]}.png`), Buffer.from(screen[3], 'base64'));
             const m = line.match(/SIXHOPS_EVENT (\{.*\})/);
             if (m) {
                 const e = JSON.parse(m[1]);
@@ -186,6 +188,15 @@ with open(sys.argv[2],'wb') as f:plistlib.dump(p,f)
             .some((e) => !Number.isFinite(e.realTapEpoch))
     )
         throw new Error('Missing actual tap timing; do not compose.');
+    const completeLog = fs.readFileSync(logPath, 'utf8');
+    const testStart = completeLog.match(/Start Test at ([\d-]+ [\d:.]+)/);
+    if (!testStart) throw new Error('Missing test clock');
+    const startEpoch = Date.parse(testStart[1].replace(' ', 'T') + 'Z') / 1000;
+    const homeBlock = completeLog.split('\"stage\":\"home\"}')[1]?.split('SIXHOPS_EVENT')[0];
+    const departure = homeBlock?.match(/t =\s*([\d.]+)s\s+Synthesize event/);
+    if (!departure) throw new Error('Missing actual home departure');
+    const homeDepartureEpoch = startEpoch + Number(departure[1]);
+    for (const e of events) if (!['tap','done'].includes(e.stage)) e.screenshot = path.join(output, `${stem}-${e.stage}-${e.index}.png`);
     const result = {
         source: 'iphone-simulator',
         date,
@@ -193,6 +204,7 @@ with open(sys.argv[2],'wb') as f:plistlib.dump(p,f)
         route,
         device,
         started,
+        homeDepartureEpoch,
         raw,
         events,
         logPath,

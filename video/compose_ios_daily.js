@@ -57,7 +57,7 @@ function compose(manifestPath) {
         '-i',
         m.raw,
         '-vf',
-        'scale=-2:1920:flags=lanczos,pad=1080:1920:(ow-iw)/2:0:black,setsar=1,fps=30',
+        'scale=-2:1920:flags=lanczos,pad=1080:1920:(ow-iw)/2:0:black,setsar=1,fps=30:start_time=0',
         '-an',
         '-c:v',
         'libx264',
@@ -69,6 +69,27 @@ function compose(manifestPath) {
         'yuv420p',
         normalized,
     ]);
+    // Anchor the media timeline to an actual XCTest screenshot and native tap.
+    // Simulator MOV timestamps can differ from host wall time after startup.
+    const pixels = 80 * 142;
+    const frames = spawnSync(ffmpeg, ['-v','error','-i',normalized,'-vf','fps=10,scale=80:142,format=gray','-f','rawvideo','-'], {maxBuffer:512*1024*1024});
+    if (frames.status !== 0) throw new Error('Could not inspect recording frames');
+    const home = m.events.find(e => e.stage === 'home');
+    const reference = spawnSync(ffmpeg, ['-v','error','-i',home.screenshot,'-vf','scale=-2:1920,pad=1080:1920:(ow-iw)/2:0:black,scale=80:142,format=gray','-frames:v','1','-f','rawvideo','-']);
+    if (reference.status !== 0 || reference.stdout.length !== pixels) throw new Error('Missing native home screenshot');
+    function mse(buffer, offset, expected) {
+        let sum=0;
+        for(let j=0;j<pixels;j++) sum+=(buffer[offset+j]-expected[j])**2;
+        return sum/pixels;
+    }
+    const scores=[];
+    for(let i=0;i<frames.stdout.length/pixels;i++) scores.push(mse(frames.stdout,i*pixels,reference.stdout));
+    const minimum=Math.min(...scores);
+    if(minimum>40) throw new Error(`Home screen not found in recording: ${minimum}`);
+    const lastHome=scores.findLastIndex(v=>v<=minimum+4)/10;
+    const clockCorrection=m.homeDepartureEpoch-m.started-lastHome;
+    if(!Number.isFinite(clockCorrection)) throw new Error('Missing media clock calibration');
+    const calibration={method:'native-home-screenshot-and-real-tap',minimum,lastHome,clockCorrection};
     const clips = [];
     let total = 0;
     const segments = [];
@@ -105,8 +126,16 @@ function compose(manifestPath) {
         const epoch = stage === 'tap' ? e.realTapEpoch : e.epoch;
         if (!Number.isFinite(epoch))
             throw new Error('Missing real input timestamp');
-        const offset = epoch - m.started + (stage === 'tap' ? -0.08 : 0.12);
+        const offset = epoch - m.started - clockCorrection + (stage === 'tap' ? -0.08 : 0.12);
         if (offset < 0) throw new Error('Invalid recording clock');
+        let screenMse;
+        if (stage !== 'tap') {
+            const ref = spawnSync(ffmpeg, ['-v','error','-i',e.screenshot,'-vf','scale=-2:1920,pad=1080:1920:(ow-iw)/2:0:black,scale=80:142,format=gray','-frames:v','1','-f','rawvideo','-']);
+            if(ref.status!==0 || ref.stdout.length!==pixels) throw new Error(`Missing ${stage} screenshot`);
+            const frameIndex=Math.round(offset*10);
+            screenMse=mse(frames.stdout,frameIndex*pixels,ref.stdout);
+            if(!Number.isFinite(screenMse) || screenMse>50) throw new Error(`Recording does not match ${stage}:${index} screenshot (${screenMse})`);
+        }
         const out = path.join(dir, `clip-${clips.length}.mp4`);
         const argv = ['-y', '-ss', offset.toFixed(3), '-i', normalized];
         if (caption !== undefined)
@@ -116,7 +145,7 @@ function compose(manifestPath) {
                 '-i',
                 path.join(dir, `caption-${caption}.png`),
             );
-        const base = 'setpts=PTS-STARTPTS,setsar=1,fps=30';
+        const base = 'setpts=PTS-STARTPTS,setsar=1,fps=30:start_time=0';
         if (caption !== undefined)
             argv.push(
                 '-filter_complex',
@@ -144,6 +173,7 @@ function compose(manifestPath) {
             stage,
             index,
             rawOffset: offset,
+            screenMse,
             duration,
             finalOffset: total,
             caption,
@@ -234,6 +264,7 @@ function compose(manifestPath) {
         JSON.stringify(
             {
                 source: 'iphone-simulator',
+        calibration,
                 manifest: manifestPath,
                 final,
                 total,

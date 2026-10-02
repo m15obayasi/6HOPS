@@ -109,6 +109,9 @@ final class SixHopsUITests: XCTestCase {
         let route = try JSONDecoder().decode([String].self, from: data)
         XCTAssertTrue((2...7).contains(route.count))
         func mark(_ stage: String, _ index: Int = 0) {
+            if stage != "tap" && stage != "done" {
+                print("SIXHOPS_SCREEN " + stage + " " + String(index) + " " + XCUIScreen.main.screenshot().pngRepresentation.base64EncodedString())
+            }
             let event: [String: Any] = ["stage": stage, "index": index, "epoch": Date().timeIntervalSince1970]
             let json = try! JSONSerialization.data(withJSONObject: event, options: .sortedKeys)
             print("SIXHOPS_EVENT " + String(data: json, encoding: .utf8)!)

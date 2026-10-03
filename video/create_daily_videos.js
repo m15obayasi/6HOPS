@@ -10,6 +10,8 @@ const date = args.date || new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit'
 }).format(new Date());
 const privacy = args.privacy || 'public';
+const source = args.source || 'web';
+if (!['web','ios'].includes(source)) throw new Error('source must be web or ios');
 const locales = args.locale ? [args.locale === 'en' ? 'en' : 'ja'] : ['ja', 'en'];
 const outputDir = path.join(__dirname, 'output');
 const metronomeSource = 'sine=frequency=880:sample_rate=48000';
@@ -118,9 +120,13 @@ async function main() {
 
     fs.mkdirSync(outputDir, { recursive: true });
     const generated = [];
+    const device = source === 'ios' ? require('./prepare_ios').prepare(args.device) : null;
     for (const locale of locales) {
         const files = pathsFor(locale);
-        if (!args.force && fs.existsSync(files.final) && fs.existsSync(files.thumbnail) && fs.existsSync(files.cover)) {
+        if (source === 'ios') {
+            const manifest = await require('./record_ios_daily').record({locale,date,route:routes[locale],device});
+            require('./compose_ios_daily').compose(manifest);
+        } else if (!args.force && fs.existsSync(files.final) && fs.existsSync(files.thumbnail) && fs.existsSync(files.cover)) {
             console.log(`既存の動画を使用します: ${files.final}`);
         } else {
             console.log(`${locale.toUpperCase()}版を生成しています…`);

@@ -45,7 +45,7 @@ for (i,c) in captions.enumerated(){
     image("caption-\(i)"){
         // Same panel as Web recording: left 36, center at 32%, 520 square, scaled 1.5x.
         let r=NSRect(x:54,y:1920-224-780,width:780,height:780)
-        NSColor(calibratedWhite:0.025,alpha:0.94).setFill();NSBezierPath(roundedRect:r,xRadius:20,yRadius:20).fill()
+        NSColor(calibratedWhite:0.025,alpha:0.45).setFill();NSBezierPath(roundedRect:r,xRadius:20,yRadius:20).fill()
         NSColor.white.withAlphaComponent(0.3).setStroke();let border=NSBezierPath(roundedRect:r,xRadius:20,yRadius:20);border.lineWidth=2;border.stroke()
         text(c["main"]!,rect:NSRect(x:114,y:r.minY+300,width:660,height:360),size:69,color:.white)
         text(c["sub"] ?? "",rect:NSRect(x:114,y:r.minY+110,width:660,height:180),size:42,color:.lightGray)

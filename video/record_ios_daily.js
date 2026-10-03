@@ -49,6 +49,10 @@ with open(sys.argv[2],'wb') as f:plistlib.dump(p,f)
         date,
         encoded,
     ]);
+    // Re-activate the real display immediately before capture, including the second locale.
+    const developer = run('xcode-select', ['-p']).trim();
+    run('/usr/bin/open', ['-a', path.join(developer, 'Applications/Simulator.app'), '--args', '-CurrentDeviceUDID', device]);
+    await new Promise(resolve => setTimeout(resolve, 2000));
     run('xcrun', [
         'simctl',
         'status_bar',

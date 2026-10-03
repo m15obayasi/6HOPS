@@ -49,4 +49,9 @@ jobs:
             video/output/*-ios-recording.json
             video/output/*-ios-test.log
             video/output/ios-verification-*.json
+            video/output/*-ios-raw.mov
+            video/output/*-home-*.png
+            video/output/*-ready-*.png
+            video/output/*-article-*.png
+            video/output/*-result-*.png
             video/youtube/upload-history.json

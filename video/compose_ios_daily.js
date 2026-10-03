@@ -72,7 +72,7 @@ function compose(manifestPath) {
     // Anchor the media timeline to an actual XCTest screenshot and native tap.
     // Simulator MOV timestamps can differ from host wall time after startup.
     const pixels = 80 * 142;
-    const frames = spawnSync(ffmpeg, ['-v','error','-i',normalized,'-vf','fps=10,scale=80:142,format=gray','-f','rawvideo','-'], {maxBuffer:512*1024*1024});
+    const frames = spawnSync(ffmpeg, ['-v','error','-i',normalized,'-vf','fps=30:start_time=0,scale=80:142,format=gray','-f','rawvideo','-'], {maxBuffer:1024*1024*1024});
     if (frames.status !== 0) throw new Error('Could not inspect recording frames');
     function mse(buffer, offset, expected) {
         let sum=0;
@@ -85,13 +85,13 @@ function compose(manifestPath) {
         if(reference.status!==0 || reference.stdout.length!==pixels) throw new Error(`Missing ${e.stage} screenshot`);
         const scores=[];
         const previous=anchors.at(-1)?.last ?? -1;
-        for(let i=0;i<frames.stdout.length/pixels;i++) scores.push(i/10>previous ? mse(frames.stdout,i*pixels,reference.stdout) : Infinity);
+        for(let i=0;i<frames.stdout.length/pixels;i++) scores.push(i/30>previous ? mse(frames.stdout,i*pixels,reference.stdout) : Infinity);
         const minimum=Math.min(...scores);
         if(minimum>40) throw new Error(`Actual ${e.stage}:${e.index} screen not found (${minimum})`);
         const threshold=Math.min(50,minimum+20);
-        const first=scores.findIndex(v=>v<=threshold)/10;
+        const first=scores.findIndex(v=>v<=threshold)/30;
         let last=first;
-        for(let i=Math.round(first*10);i<scores.length && scores[i]<=threshold;i++) last=i/10;
+        for(let i=Math.round(first*30);i<scores.length && scores[i]<=threshold;i++) last=i/30;
         anchors.push({stage:e.stage,index:e.index,first,last,minimum});
     }
     const calibration={method:'native-stage-screenshots',anchors};
@@ -131,7 +131,7 @@ function compose(manifestPath) {
         const anchor=anchors.find(a=>a.stage===(stage==='tap'?'article':stage) && a.index===(stage==='tap'?index-1:index));
         if(!anchor) throw new Error(`Missing visual anchor ${stage}:${index}`);
         const offset=stage==='tap' ? Math.max(0,anchor.last-0.08) : anchor.first;
-        const sourceDuration=stage==='tap' ? duration : Math.min(duration,Math.max(0.1,anchor.last-anchor.first));
+        const sourceDuration=stage==='tap' ? duration : Math.min(duration,Math.max(1/30,anchor.last-anchor.first-2/30));
         const screenMse=stage==='tap' ? undefined : anchor.minimum;
         const out = path.join(dir, `clip-${clips.length}.mp4`);
         const argv = ['-y', '-ss', offset.toFixed(3), '-i', normalized];
@@ -142,7 +142,7 @@ function compose(manifestPath) {
                 '-i',
                 path.join(dir, `caption-${caption}.png`),
             );
-        const base = 'setpts=PTS-STARTPTS,setsar=1,fps=30:start_time=0';
+        const base = `trim=duration=${sourceDuration},setpts=PTS-STARTPTS,setsar=1,fps=30:start_time=0,tpad=stop_mode=clone:stop_duration=${duration}`;
         if (caption !== undefined)
             argv.push(
                 '-filter_complex',

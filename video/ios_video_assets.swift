@@ -42,15 +42,16 @@ image("title"){title(1080,1920)}
 image("thumbnail",width:1280,height:720){title(1280,720)}
 let captions=config["captions"] as! [[String:String]]
 for (i,c) in captions.enumerated(){
-    image("caption-\(i)"){
-        // Same panel as Web recording: left 36, center at 32%, 520 square, scaled 1.5x.
-        let r=NSRect(x:54,y:1920-224-780,width:780,height:780)
-        NSColor(calibratedWhite:0.025,alpha:0.45).setFill();NSBezierPath(roundedRect:r,xRadius:20,yRadius:20).fill()
-        NSColor.white.withAlphaComponent(0.3).setStroke();let border=NSBezierPath(roundedRect:r,xRadius:20,yRadius:20);border.lineWidth=2;border.stroke()
-        text(c["main"]!,rect:NSRect(x:114,y:r.minY+300,width:660,height:360),size:69,color:.white)
-        text(c["sub"] ?? "",rect:NSRect(x:114,y:r.minY+110,width:660,height:180),size:42,color:.lightGray)
+    image("caption-\(i)",height:200){
+        let shadow=NSShadow()
+        shadow.shadowColor=NSColor.black.withAlphaComponent(0.9)
+        shadow.shadowBlurRadius=6
+        shadow.shadowOffset=NSSize(width:0,height:-2)
+        shadow.set()
+        text(c["main"]!,rect:NSRect(x:60,y:20,width:960,height:160),size:76,color:.white)
     }
 }
+
 for (i,t) in [start,goal,"6HOPS"].enumerated(){
  image("outro-\(i)"){
     NSColor(calibratedRed:0.06,green:0.07,blue:0.06,alpha:1).setFill();NSRect(x:0,y:0,width:1080,height:1920).fill()

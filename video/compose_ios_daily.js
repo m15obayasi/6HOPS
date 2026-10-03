@@ -19,30 +19,9 @@ function compose(manifestPath) {
     const final = path.join(__dirname, stem + '.mp4');
     const dir = path.join(__dirname, 'output', stem + '-assets');
     fs.mkdirSync(dir, { recursive: true });
-    const ja = m.locale === 'ja';
     const start = m.route[0],
         goal = m.route.at(-1);
-    const captions = [
-        {
-            main: ja ? '今日のお題' : "Today's challenge",
-            sub: `${start} → ${goal}`,
-        },
-    ];
-    for (let i = 0; i < m.route.length - 1; i++)
-        captions.push({
-            main: ja
-                ? `${i === 0 ? 'スタート' : '現在'}「${m.route[i]}」`
-                : `${i === 0 ? 'Start' : 'Now'}: ${m.route[i]}`,
-            sub: ja
-                ? `次は「${m.route[i + 1]}」へ`
-                : `Follow the link to ${m.route[i + 1]}`,
-        });
-    captions.push({
-        main: ja
-            ? `${m.route.length - 1} HOPSでゴール！`
-            : `Goal in ${m.route.length - 1} HOPS!`,
-        sub: ja ? '今日のDaily、クリア' : "Today's Daily cleared",
-    });
+    const captions = m.route.map(title => ({ main: title }));
     const config = path.join(dir, 'config.json');
     fs.writeFileSync(
         config,
@@ -146,7 +125,7 @@ function compose(manifestPath) {
         if (caption !== undefined)
             argv.push(
                 '-filter_complex',
-                `[0:v]${base}[phone];[phone][1:v]overlay=0:0:enable='lt(t,1.9)'[v]`,
+                `[0:v]${base}[phone];[phone][1:v]overlay=x=0:y='H-360+360*pow(1-min(t/0.45,1),3)':eval=frame:enable='lt(t,1.9)'[v]`,
                 '-map',
                 '[v]',
             );
@@ -181,12 +160,12 @@ function compose(manifestPath) {
     }
     image('title', 1.2);
     real('home', 0, 1.2);
-    real('ready', 0, 2, 0);
+    real('ready', 0, 2);
     for (let i = 0; i < m.route.length - 1; i++) {
-        real('article', i, 2.8, i + 1);
+        real('article', i, 2.8, i);
         real('tap', i + 1, 0.8);
     }
-    real('result', m.route.length - 1, 2.8, captions.length - 1);
+    real('result', m.route.length - 1, 2.8);
     const outroAt = total;
     for (let i = 0; i < 3; i++) image('outro-' + i, 0.5, true);
     const chimeAt = total;

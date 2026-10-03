@@ -11,11 +11,17 @@ function run(command, args, options = {}) {
 function prepare(requested) {
     if (process.platform !== 'darwin')
         throw new Error('--source ios requires macOS with Xcode.');
+    const sdkVersion = run('xcrun', ['--sdk', 'iphonesimulator', '--show-sdk-version']).trim();
+    const sdkMajor = Number(sdkVersion.split('.')[0]);
+    const developer = run('xcode-select', ['-p']).trim();
     const devices = JSON.parse(
         run('xcrun', ['simctl', 'list', 'devices', 'available', '--json']),
     ).devices;
     const phones = Object.entries(devices)
-        .filter(([runtime]) => runtime.includes('.iOS-'))
+        .filter(([runtime]) => {
+            const version = runtime.match(/\.iOS-(\d+)-/);
+            return version && Number(version[1]) === sdkMajor;
+        })
         .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
         .flatMap(([, list]) => list.filter((d) => d.name.startsWith('iPhone')));
     const device = requested
@@ -28,6 +34,8 @@ function prepare(requested) {
     if (device.state !== 'Booted')
         run('xcrun', ['simctl', 'boot', device.udid]);
     run('xcrun', ['simctl', 'bootstatus', device.udid, '-b']);
+    // Keep the device's real display renderer active on hosted macOS runners.
+    run('/usr/bin/open', ['-a', path.join(developer, 'Applications/Simulator.app'), '--args', '-CurrentDeviceUDID', device.udid]);
     const dir = path.join(__dirname, 'output');
     fs.mkdirSync(dir, { recursive: true });
     const log = path.join(dir, 'ios-build.log');
@@ -56,7 +64,7 @@ function prepare(requested) {
     } finally {
         fs.closeSync(fd);
     }
-    console.log(`iPhone simulator ready: ${device.name} (${device.udid})`);
+    console.log(`iPhone simulator ready (SDK ${sdkVersion}): ${device.name} (${device.udid})`);
     return device.udid;
 }
 module.exports = { prepare };

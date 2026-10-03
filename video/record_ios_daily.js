@@ -125,6 +125,10 @@ with open(sys.argv[2],'wb') as f:plistlib.dump(p,f)
             if (m) {
                 const e = JSON.parse(m[1]);
                 events.push(e);
+                if (e.stage === 'home') {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => test.kill('SIGTERM'), 8 * 60 * 1000);
+                }
                 console.log(locale, e.stage, e.index);
             }
             if (line.includes('Synthesize event')) {
@@ -135,7 +139,8 @@ with open(sys.argv[2],'wb') as f:plistlib.dump(p,f)
     }
     test.stdout.on('data', read);
     test.stderr.on('data', read);
-    const timeout = setTimeout(() => test.kill('SIGTERM'), 8 * 60 * 1000);
+    // A hosted simulator may spend several minutes installing the test runner.
+    let timeout = setTimeout(() => test.kill('SIGTERM'), 20 * 60 * 1000);
     let status;
     try {
         status = await new Promise((resolve, reject) => {
@@ -225,3 +230,4 @@ if (require.main === module)
             process.exitCode = 1;
         });
 module.exports = { record };
+

@@ -55,3 +55,4 @@ jobs:
             video/output/*-article-*.png
             video/output/*-result-*.png
             video/youtube/upload-history.json
+# Record with a simulator-only render heartbeat to preserve static screens.

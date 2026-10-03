@@ -57,7 +57,26 @@ struct GameRecord: Codable, Identifiable {
 
 @main struct SixHopsApp: App {
     @StateObject private var store = GameStore()
-    var body: some Scene { WindowGroup { HomeView().environmentObject(store) } }
+    var body: some Scene {
+        WindowGroup {
+            HomeView().environmentObject(store)
+#if DEBUG && targetEnvironment(simulator)
+                // A two-pixel recording heartbeat keeps static native screens flowing to simctl.
+                // It changes no layout, input, article content or game state.
+                .overlay(alignment: .topLeading) {
+                    if ProcessInfo.processInfo.arguments.contains("-video-date") {
+                        TimelineView(.periodic(from: .now, by: 0.1)) { context in
+                            Rectangle()
+                                .fill(Int(context.date.timeIntervalSince1970 * 10) % 2 == 0 ? Color.black : Color.white)
+                                .frame(width: 2, height: 2)
+                                .allowsHitTesting(false)
+                                .accessibilityHidden(true)
+                        }
+                    }
+                }
+#endif
+        }
+    }
 }
 
 struct LiveGameState: Codable {

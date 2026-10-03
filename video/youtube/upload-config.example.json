@@ -4,7 +4,7 @@
   "madeForKids": false,
   "siteUrl": "https://myeik.net/6HOPS/",
   "titleTemplate": "「{start}」から「{goal}」まで、6クリックで辿り着ける？（{date}）",
-  "descriptionTemplate": "Wikipediaのリンクだけを辿り、6回以内にゴールを目指すゲーム『6HOPS』のDaily実況プレイです。\n\n本日のお題：{start} → {goal}\nプレイはこちら：{url}\n\nお題は毎日変わります。\n\n#6HOPS #Wikipedia #ゲーム #Shorts",
+  "descriptionTemplate": "Wikipediaのリンクだけを辿り、6回以内にゴールを目指すゲーム『6HOPS』のDaily実況プレイです。\n\n本日のお題：{start} → {goal}\nプレイはこちら：{url}\nApp Store（iPhone / iPad）：https://apps.apple.com/jp/app/6hops/id6755679072\n\nお題は毎日変わります。\n\n#6HOPS #Wikipedia #ゲーム #Shorts",
   "tags": [
     "6HOPS",
     "Wikipedia",
@@ -17,7 +17,7 @@
     "en": {
       "siteUrl": "https://myeik.net/6HOPS/en/",
       "titleTemplate": "Can you get from {start} to {goal} in six clicks? ({date})",
-      "descriptionTemplate": "A Daily playthrough of 6HOPS — the game where you follow Wikipedia links and try to reach the goal in six hops or fewer.\n\nToday's challenge: {start} → {goal}\nPlay here: {url}\n\nA new challenge every day.\n\n#6HOPS #Wikipedia #Game #Shorts",
+      "descriptionTemplate": "A Daily playthrough of 6HOPS — the game where you follow Wikipedia links and try to reach the goal in six hops or fewer.\n\nToday's challenge: {start} → {goal}\nPlay here: {url}\nApp Store (iPhone / iPad): https://apps.apple.com/us/app/6hops/id6755679072\n\nA new challenge every day.\n\n#6HOPS #Wikipedia #Game #Shorts",
       "tags": [
         "6HOPS",
         "Wikipedia",

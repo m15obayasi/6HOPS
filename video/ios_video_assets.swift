@@ -42,13 +42,15 @@ image("title"){title(1080,1920)}
 image("thumbnail",width:1280,height:720){title(1280,720)}
 let captions=config["captions"] as! [[String:String]]
 for (i,c) in captions.enumerated(){
-    image("caption-\(i)",height:200){
+    image("caption-\(i)",height:260){
+        NSColor(calibratedWhite:0.025,alpha:0.45).setFill()
+        NSBezierPath(roundedRect:NSRect(x:90,y:20,width:900,height:220),xRadius:28,yRadius:28).fill()
         let shadow=NSShadow()
         shadow.shadowColor=NSColor.black.withAlphaComponent(0.9)
         shadow.shadowBlurRadius=6
         shadow.shadowOffset=NSSize(width:0,height:-2)
         shadow.set()
-        text(c["main"]!,rect:NSRect(x:60,y:20,width:960,height:160),size:76,color:.white)
+        text(c["main"]!,rect:NSRect(x:130,y:50,width:820,height:160),size:76,color:.white)
     }
 }
 

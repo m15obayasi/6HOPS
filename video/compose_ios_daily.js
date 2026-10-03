@@ -125,7 +125,7 @@ function compose(manifestPath) {
         if (caption !== undefined)
             argv.push(
                 '-filter_complex',
-                `[0:v]${base}[phone];[phone][1:v]overlay=x=0:y='H-360+360*pow(1-min(t/0.45,1),3)':eval=frame:enable='lt(t,1.9)'[v]`,
+                `[0:v]${base}[phone];[phone][1:v]overlay=x=0:y='(H-h)/2+180*pow(1-min(t/0.45,1),3)':eval=frame:enable='lt(t,1.9)'[v]`,
                 '-map',
                 '[v]',
             );
